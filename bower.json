@@ -1,0 +1,14 @@
+{
+  "name": "farmbuild-dairy-nutrient-calculator",
+  "description": "This project is the dairy nutrient calculator module of farm build JavaScript library",
+  "version": "0.1.10",
+  "homepage": "https://github.com/FarmBuild/farmbuild-dairy-nutrient-calculator",
+  "license": "MIT",
+  "private": true,
+  "dependencies": {
+    "angular": "^1.3",
+    "angular-mocks": "^1.3",
+    "bootstrap": "^3.2.0",
+    "farmbuild-farmdata": "git://github.com/FarmBuild/farmbuild-farmdata.git#^1.0"
+  }
+}
