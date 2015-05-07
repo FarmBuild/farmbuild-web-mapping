@@ -1,0 +1,501 @@
+{
+  "version": 1.0,
+  "dateCreated": "2015-03-30T21:19:00",
+  "dateLastUpdated": "2015-03-30T21:19:06",
+  "name": "Susan's Farm",
+  "geometry": {
+    "type": "Polygon",
+    "crs": "EPSG:4283",
+    "coordinates": [
+      [
+        [
+          145.57368096419663,
+          -36.224879531701255
+        ],
+        [
+          145.5826132801325,
+          -36.22488327137526
+        ],
+        [
+          145.58260951039628,
+          -36.22801228957186
+        ],
+        [
+          145.57363088613704,
+          -36.22803939355771
+        ],
+        [
+          145.57368096419663,
+          -36.224879531701255
+        ]
+      ]
+    ]
+  },
+  "area": 89.95,
+  "paddocks": [
+    {
+      "name": "P3",
+      "geometry": {
+        "type": "Polygon",
+        "crs": "EPSG:4283",
+        "coordinates": [
+          [
+            [
+              145.58072144612308,
+              -36.22500072918365
+            ],
+            [
+              145.58007203644695,
+              -36.224996785309635
+            ],
+            [
+              145.58007068632003,
+              -36.22579563889769
+            ],
+            [
+              145.579975038195,
+              -36.22579611106869
+            ],
+            [
+              145.57997732422797,
+              -36.22610013854838
+            ],
+            [
+              145.58069096429173,
+              -36.226090652211994
+            ],
+            [
+              145.58072144612308,
+              -36.22500072918365
+            ]
+          ]
+        ]
+      },
+      "area": 0.72
+    },
+    {
+      "name": "P1",
+      "geometry": {
+        "type": "Polygon",
+        "crs": "EPSG:4283",
+        "coordinates": [
+          [
+            [
+              145.5820357180293,
+              -36.224883050102875
+            ],
+            [
+              145.58072609426455,
+              -36.22488253784964
+            ],
+            [
+              145.58070132605394,
+              -36.225512331175615
+            ],
+            [
+              145.58218018756546,
+              -36.22550501283936
+            ],
+            [
+              145.58211312173296,
+              -36.225216285770216
+            ],
+            [
+              145.5820357180293,
+              -36.224883050102875
+            ]
+          ]
+        ]
+      },
+      "area": 0.87
+    }
+  ],
+  "nutrientCalculator": {
+    "summary": {
+      "milkingAreaInHa": 70.39,
+      "averageCowWeightInKg": 550,
+      "numberOfMilkingCows": 228,
+      "numberOfMilkingDays": 365
+    },
+    "milkSold": {
+      "totalPerYearInLitre": 1751317,
+      "fatInKg": 74080.70910000001,
+      "fatPercentage": 4.23,
+      "proteinInKg": 59895.041399999995,
+      "proteinPercentage": 3.42,
+      "nitrogenInKg": 9462.091848341232,
+      "nitrogenPercentage": 0.5402843601895735,
+      "phosphorusInKg": 1742.6129545100002,
+      "phosphorusPercentage": 0.09950300000000001,
+      "potassiumInKg": 2451.8438000000006,
+      "potassiumPercentage": 0.14,
+      "sulphurInKg": 1050.7902,
+      "sulphurPercentage": 0.06
+    },
+    "cowsPurchased": {
+      "cows": [
+        {
+          "name": "Average adult cattle",
+          "numberOfCows": 45,
+          "weight": 500
+        }
+      ],
+      "numberOfCows": 45,
+      "weight": 22500,
+      "nitrogenInKg": 630,
+      "phosphorusInKg": 162,
+      "potassiumInKg": 45,
+      "sulphurInKg": 180
+    },
+    "cowsCulled": {
+      "cows": [
+        {
+          "name": "Average adult cattle",
+          "numberOfCows": 38,
+          "weight": 500
+        },
+        {
+          "name": "Heavy adult cattle",
+          "numberOfCows": 3,
+          "weight": 650
+        },
+        {
+          "name": "Weaned young stock",
+          "numberOfCows": 13,
+          "weight": 120
+        },
+        {
+          "name": "Bobby calves",
+          "numberOfCows": 120,
+          "weight": 40
+        }
+      ],
+      "numberOfCows": 174,
+      "weight": 27310,
+      "nitrogenInKg": 764.68,
+      "phosphorusInKg": 196.632,
+      "potassiumInKg": 54.62,
+      "sulphurInKg": 218.48
+    },
+    "fertilizersPurchased": {
+      "fertilizers": [
+        {
+          "type": {
+            "name": "DAP",
+            "nitrogenPercentage": 18,
+            "phosphorusPercentage": 20,
+            "potassiumPercentage": 0,
+            "sulphurPercentage": 1.6,
+            "dryMatterPercentage": 100
+          },
+          "weight": 4000,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Superphosphate (Super)",
+            "nitrogenPercentage": 0,
+            "phosphorusPercentage": 8.8,
+            "potassiumPercentage": 0,
+            "sulphurPercentage": 11,
+            "dryMatterPercentage": 100
+          },
+          "weight": 13000,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Urea",
+            "nitrogenPercentage": 46,
+            "phosphorusPercentage": 0,
+            "potassiumPercentage": 0,
+            "sulphurPercentage": 0,
+            "dryMatterPercentage": 100
+          },
+          "weight": 11000,
+          "isDry": true
+        }
+      ],
+      "weight": 28000,
+      "dryMatterWeight": 28000,
+      "nitrogenInKg": 5117.6,
+      "nitrogenPercentage": 18.27714285714286,
+      "phosphorusInKg": 1166.0000000000002,
+      "phosphorusPercentage": 4.164285714285715,
+      "potassiumInKg": 55.2,
+      "potassiumPercentage": 0.19714285714285715,
+      "sulphurInKg": 1442,
+      "sulphurPercentage": 5.1499999999999995
+    },
+    "foragesPurchased": {
+      "forages": [
+        {
+          "type": {
+            "name": "Canola hay",
+            "nitrogenPercentage": "2.88",
+            "phosphorusPercentage": "0.33",
+            "potassiumPercentage": "2.29",
+            "sulphurPercentage": "0.57",
+            "dryMatterPercentage": "82.93",
+            "metabolisableEnergyInMJPerKg": "9.06"
+          },
+          "weight": 54600,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Oat Hay",
+            "nitrogenPercentage": "1.4",
+            "phosphorusPercentage": "0.24",
+            "potassiumPercentage": "1.64",
+            "sulphurPercentage": "0.15",
+            "dryMatterPercentage": "87.32",
+            "metabolisableEnergyInMJPerKg": "8.42"
+          },
+          "weight": 8900,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Cereal straw",
+            "nitrogenPercentage": "0.62",
+            "phosphorusPercentage": "0.1",
+            "potassiumPercentage": "1.05",
+            "sulphurPercentage": "0.1",
+            "dryMatterPercentage": "87.22",
+            "metabolisableEnergyInMJPerKg": "5.99"
+          },
+          "weight": 850,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Cereal straw",
+            "nitrogenPercentage": "0.62",
+            "phosphorusPercentage": "0.1",
+            "potassiumPercentage": "1.05",
+            "sulphurPercentage": "0.1",
+            "dryMatterPercentage": "87.22",
+            "metabolisableEnergyInMJPerKg": "5.99"
+          },
+          "weight": 104000,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Cereal hay",
+            "nitrogenPercentage": "1.54",
+            "phosphorusPercentage": "0.22",
+            "potassiumPercentage": "1.83",
+            "sulphurPercentage": "0.17",
+            "dryMatterPercentage": "84.74",
+            "metabolisableEnergyInMJPerKg": "8.32"
+          },
+          "weight": 18000,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Lucerne hay",
+            "nitrogenPercentage": "3.34",
+            "phosphorusPercentage": "0.38",
+            "potassiumPercentage": "2.03",
+            "sulphurPercentage": "0.29",
+            "dryMatterPercentage": "83.23",
+            "metabolisableEnergyInMJPerKg": "9.54"
+          },
+          "weight": 84140,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Oat Hay",
+            "nitrogenPercentage": "1.4",
+            "phosphorusPercentage": "0.24",
+            "potassiumPercentage": "1.64",
+            "sulphurPercentage": "0.15",
+            "dryMatterPercentage": "87.32",
+            "metabolisableEnergyInMJPerKg": "8.42"
+          },
+          "weight": 253000,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Pasture hay",
+            "nitrogenPercentage": "1.87",
+            "phosphorusPercentage": "0.28",
+            "potassiumPercentage": "1.87",
+            "sulphurPercentage": "0.24",
+            "dryMatterPercentage": "85.53",
+            "metabolisableEnergyInMJPerKg": "8.17"
+          },
+          "weight": 22500,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Cereal hay",
+            "nitrogenPercentage": "1.54",
+            "phosphorusPercentage": "0.22",
+            "potassiumPercentage": "1.83",
+            "sulphurPercentage": "0.17",
+            "dryMatterPercentage": "84.74",
+            "metabolisableEnergyInMJPerKg": "8.32"
+          },
+          "weight": 220500,
+          "isDry": true
+        }
+      ],
+      "weight": 766490,
+      "dryMatterWeight": 766490,
+      "nitrogenInKg": 12793.076000000001,
+      "nitrogenPercentage": 1.669046693368472,
+      "phosphorusInKg": 1821.022,
+      "phosphorusPercentage": 0.23757935524272986,
+      "potassiumInKg": 13139.766999999998,
+      "potassiumPercentage": 1.7142776813787521,
+      "sulphurInKg": 1512.3760000000002,
+      "sulphurPercentage": 0.19731190230792314,
+      "metabolisableEnergyInMJ": 6298766.1,
+      "metabolisableEnergyInMJPerKg": 8.32
+    },
+    "concentratesPurchased": {
+      "concentrates": [
+        {
+          "type": {
+            "name": "Pellets Calf",
+            "nitrogenPercentage": 3.14,
+            "phosphorusPercentage": 0.67,
+            "potassiumPercentage": 0.84,
+            "sulphurPercentage": 0.28,
+            "dryMatterPercentage": 88.78,
+            "metabolisableEnergyInMJPerKg": 12.72
+          },
+          "weight": 18500,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Pellets Dairy",
+            "nitrogenPercentage": 2.37,
+            "phosphorusPercentage": 0.72,
+            "potassiumPercentage": 0.7,
+            "sulphurPercentage": 0.24,
+            "dryMatterPercentage": 89.64,
+            "metabolisableEnergyInMJPerKg": 12.54
+          },
+          "weight": 81500,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Pellets Dairy",
+            "nitrogenPercentage": 2.37,
+            "phosphorusPercentage": 0.72,
+            "potassiumPercentage": 0.7,
+            "sulphurPercentage": 0.24,
+            "dryMatterPercentage": 89.64,
+            "metabolisableEnergyInMJPerKg": 12.54
+          },
+          "weight": 20500,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Average concentrate",
+            "nitrogenPercentage": 3.88,
+            "phosphorusPercentage": 0.64,
+            "potassiumPercentage": 0.74,
+            "sulphurPercentage": 0.32,
+            "dryMatterPercentage": 76,
+            "metabolisableEnergyInMJPerKg": 12.62
+          },
+          "weight": 78150,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Pellets Calf",
+            "nitrogenPercentage": 3.14,
+            "phosphorusPercentage": 0.67,
+            "potassiumPercentage": 0.84,
+            "sulphurPercentage": 0.28,
+            "dryMatterPercentage": 88.78,
+            "metabolisableEnergyInMJPerKg": 12.72
+          },
+          "weight": 10120,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Pellets Dairy",
+            "nitrogenPercentage": 2.37,
+            "phosphorusPercentage": 0.72,
+            "potassiumPercentage": 0.7,
+            "sulphurPercentage": 0.24,
+            "dryMatterPercentage": 89.64,
+            "metabolisableEnergyInMJPerKg": 12.54
+          },
+          "weight": 96580,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Pellets Dairy",
+            "nitrogenPercentage": 2.37,
+            "phosphorusPercentage": 0.72,
+            "potassiumPercentage": 0.7,
+            "sulphurPercentage": 0.24,
+            "dryMatterPercentage": 89.64,
+            "metabolisableEnergyInMJPerKg": 12.54
+          },
+          "weight": 85710,
+          "isDry": true
+        },
+        {
+          "type": {
+            "name": "Fruit",
+            "nitrogenPercentage": 2.74,
+            "phosphorusPercentage": 0.5,
+            "potassiumPercentage": 3.66,
+            "sulphurPercentage": 0.21,
+            "dryMatterPercentage": 3.85,
+            "metabolisableEnergyInMJPerKg": 11.6
+          },
+          "weight": 3280,
+          "isDry": true
+        }
+      ],
+      "weight": 394340,
+      "dryMatterWeight": 394340,
+      "nitrogenInKg": 10758.433,
+      "nitrogenPercentage": 2.728212456256023,
+      "phosphorusInKg": 2755.202,
+      "phosphorusPercentage": 0.6986869199168231,
+      "potassiumInKg": 2928.796,
+      "potassiumPercentage": 0.7427083227671551,
+      "sulphurInKg": 1019.4000000000001,
+      "sulphurPercentage": 0.25850788659532387,
+      "metabolisableEnergyInMJ": 4953343.9999999997,
+      "metabolisableEnergyInMJPerKg": 11.6
+    },
+    "legumes": {
+      "importedEnergyConsumedInMJ": 10204602.305,
+      "utilisationFactor": 75,
+      "dryMatterConsumedPerHaInKg": 8761.326115546455,
+      "dryMatterGrownPerHaInKg": 11681.76815406194,
+      "averageNitrogenAppliedPerHaInKg": 82.1139366387271,
+      "availableNitrogenFromLegumesPerHaInKg": 13.431975500695733,
+      "availableNitrogenToPasturePerHaInKg": 95.54591213942282,
+      "cattleEnergyUsedInMJ": 16680054.630369807,
+      "milkEnergyInMJ": 9751288.792938001,
+      "milkEnergyNotSoldInMJ": 390051.55171752005,
+      "milkProteinInKg": 59895.04,
+      "milkFatInKg": 74080.71,
+      "milkSoldPerYearInLitre": 1751317,
+      "legumePerHaInKg": 408.8618853921679,
+      "legumePercentage": 3.5
+    }
+  }
+}
