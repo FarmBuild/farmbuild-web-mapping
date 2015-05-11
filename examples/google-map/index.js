@@ -4,9 +4,11 @@ var gmap = new google.maps.Map(document.getElementById('gmap'), {
 		draggable: false,
 		disableDoubleClickZoom: true,
 		scrollwheel: false,
-		streetViewControl: false
+		streetViewControl: false,
+		mapTypeId: google.maps.MapTypeId.SATELLITE
 	}),
 	initGoogleMap = function (olMapDiv) {
 		olMapDiv.parentNode.removeChild(olMapDiv);
 		gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(olMapDiv);
+		//gmap.setTilt(45)
 	};

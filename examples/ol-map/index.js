@@ -17,7 +17,7 @@ var olMapDiv = document.getElementById('olmap'),
 				source: vS,
 				style: new ol.style.Style({
 					fill: new ol.style.Fill({
-						color: 'rgba(255, 255, 255, 0.6)'
+						color: 'rgba(255, 255, 255, 0.4)'
 					}),
 					stroke: new ol.style.Stroke({
 						color: '#319FD3',
