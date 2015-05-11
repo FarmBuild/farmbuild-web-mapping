@@ -20,3 +20,8 @@ div.fill {
 .ol-scale-line {
     margin-bottom: 25px;
 }
+
+.draw-control {
+    top: 80px;
+    left: .5em;
+}
