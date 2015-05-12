@@ -1,4 +1,5 @@
-var data = farmData();
-initOlMap(data);
+var paddocks = paddocks();
+var farm = farm();
+initOlMap(farm, paddocks);
 initGoogleMap(olMapDiv);
-initDrawControl(map);
+//initDrawControl(map);

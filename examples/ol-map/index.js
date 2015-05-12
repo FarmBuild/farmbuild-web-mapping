@@ -1,39 +1,74 @@
 var olMapDiv = document.getElementById('olmap'),
-	map, saveData,
-	initOlMap = function (data) {
-		var view = new ol.View({
-				rotation: 0,
-				maxZoom: 21
-			}),
+	map, saveData, view, isNew = false,
+	initOlMap = function (farm, paddocks) {
+		var selectedLayer = document.getElementById('layers');
 
-			vS = new ol.source.GeoJSON(
+		view = new ol.View({
+			rotation: 0,
+			maxZoom: 21
+		});
+
+		if (isNew) {
+			paddocks = {
+				"type": "FeatureCollection",
+				"features": []
+			};
+
+			farm = {
+				"type": "FeatureCollection",
+				"features": []
+			}
+		}
+
+		var paddocksSource = new ol.source.GeoJSON(
 				({
-					"object": data,
-					projection: 'EPSG:3857'
+					projection: 'EPSG:3857',
+					"object": paddocks
 				})
 			),
 
-			vL = new ol.layer.Vector({
-				source: vS,
+			paddocksLayer = new ol.layer.Vector({
+				source: paddocksSource,
 				style: new ol.style.Style({
 					fill: new ol.style.Fill({
-						color: 'rgba(255, 255, 255, 0.4)'
+						color: 'rgba(255, 255, 255, 0.3)'
 					}),
 					stroke: new ol.style.Stroke({
 						color: '#319FD3',
 						width: 1
 					})
 				})
+			}),
+
+			farmSource = new ol.source.GeoJSON(
+				({
+					"object": farm,
+					projection: 'EPSG:3857'
+				})
+			),
+
+			farmLayer = new ol.layer.Vector({
+				source: farmSource,
+				style: new ol.style.Style({
+					fill: new ol.style.Fill({
+						color: 'rgba(255, 255, 255, 0)'
+					}),
+					stroke: new ol.style.Stroke({
+						color: '#ff6600',
+						width: 3
+					})
+				})
 			});
 
 		map = new ol.Map({
-			layers: [vL],
+			layers: [paddocksLayer, farmLayer],
 			target: olMapDiv,
 			view: view,
 			interactions: ol.interaction.defaults({
 				altShiftDragRotate: false,
 				dragPan: false,
-				rotate: false
+				rotate: false,
+				mouseWheelZoom: false
 			}).extend([new ol.interaction.DragPan({kinetic: null})]),
 			controls: ol.control.defaults({
 				attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
@@ -41,18 +76,13 @@ var olMapDiv = document.getElementById('olmap'),
 				})
 			}).extend([
 				new ol.control.ZoomToExtent({
-					extent: vS.getExtent()
+					extent: farmSource.getExtent()
 				}),
-				new ol.control.ScaleLine(),
-				new DrawControl()
+				new ol.control.ScaleLine()
 			])
 		});
 
-		var feature = vS.getFeatures()[0],
-
-			polygon = /** @type {ol.geom.SimpleGeometry} */ (feature.getGeometry()),
-
-			size = /** @type {ol.Size} */ (map.getSize());
+		var size = /** @type {ol.Size} */ (map.getSize());
 
 		view.on('change:center', function () {
 			var center = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326');
@@ -63,7 +93,61 @@ var olMapDiv = document.getElementById('olmap'),
 			gmap.setZoom(view.getZoom());
 		});
 
-		view.fitGeometry(polygon, size);
+		if (isNew) {
+			gmap.setCenter(new google.maps.LatLng(-36.22488327137526, 145.5826132801325));
+			view.setCenter(ol.proj.transform([145.5826132801325, -36.22488327137526], 'EPSG:4326', 'EPSG:3857'));
+			view.setZoom(6);
+		} else {
+			view.fitExtent(farmSource.getExtent(), size);
+		}
+
+		var select = new ol.interaction.Select({
+			layers: function (layer) {
+				var activeLayer = selectedLayer.value;
+				return (activeLayer === 'farm' && layer === farmLayer) || (activeLayer === 'paddocks' && layer === paddocksLayer);
+			},
+			style: new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: 'rgba(255, 255, 255, 0.6)'
+				}),
+				stroke: new ol.style.Stroke({
+					color: '#ffcc33',
+					width: 3
+				})
+			})
+		});
+
+		selectedLayer.addEventListener('change', function () {
+			select.getFeatures().unselectAll();
+		});
+
+		var draw = new ol.interaction.Draw({
+			source: paddocksSource,
+			type: /** @type {ol.geom.GeometryType} */ 'Polygon'
+		});
+
+		var modify = new ol.interaction.Modify({
+			features: select.getFeatures()
+		});
+
+		map.on('click', function (evt) {
+			var activeLayer = selectedLayer.value;
+			if ((paddocksSource.getFeaturesAtCoordinate(evt.coordinate).length > 0 && activeLayer === 'paddocks') ||
+				(farmSource.getFeaturesAtCoordinate(evt.coordinate).length > 0 && activeLayer === 'farm')) {
+				map.removeInteraction(draw);
+				map.addInteraction(select);
+				map.addInteraction(modify);
+			} else {
+				if (activeLayer === 'farm' || activeLayer === 'paddocks') {
+					map.removeInteraction(select);
+					map.removeInteraction(modify);
+					map.addInteraction(draw);
+				}
+			}
+		});
+
+		//map.addInteraction(select);
+		//map.addInteraction(modify);
 
 		// shows data in textarea
 		// replace this function by what you need
@@ -79,6 +163,17 @@ var olMapDiv = document.getElementById('olmap'),
 			}
 			// format is JSON
 			return JSON.stringify(data, null, 4);
+		};
+
+		window.onresize = function () {
+			setTimeout(function () {
+				var features = paddocksSource.getFeatures();
+				//paddocksSource.clear();
+				//paddocksSource.addFeatures(features);
+				//gmap.setCenter(new google.maps.LatLng(view.getCenter()[0], view.getCenter()[1]));
+				//gmap.setZoom(view.getZoom());
+			}, 500);
+
 		}
 
 	};
