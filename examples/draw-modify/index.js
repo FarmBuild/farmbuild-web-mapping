@@ -1,8 +1,7 @@
-var deselectFeatures, initDrawModify = function() {
+var removeOverlay, addOverlay, removeInteraction, initDrawModify = function(source) {
 	map.on('click', function (evt) {
 		var activeLayer = selectedLayer.value;
-		if ((paddocksSource.getFeaturesAtCoordinate(evt.coordinate).length > 0 && activeLayer === 'paddocks') ||
-			(farmSource.getFeaturesAtCoordinate(evt.coordinate).length > 0 && activeLayer === 'farm')) {
+		if (source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
 			drawPaddock.disable();
 			modifyPaddock.enable();
 		} else if (activeLayer === 'farm' || activeLayer === 'paddocks') {
@@ -15,35 +14,65 @@ var deselectFeatures, initDrawModify = function() {
 	});
 
 	// Deselect selected features
-	deselectFeatures = function deselectFeatures() {
-		featureOverlay.getFeatures().clear()
+	removeOverlay = function removeOverlay(overlay) {
+		overlay.getFeatures().clear();
+		map.removeOverlay(overlay);
+	};
+
+	function removeOverLays(){
+		var overLays = map.getOverlays().clear();
+		//angular.forEach(overLays, function(overlay){
+		//	removeOverlay(overlay)
+		//})
 	}
+
+	// Deselect selected features
+	removeInteraction = function removeInteraction(interaction) {
+		map.removeInteraction(interaction);
+	};
+
+	function removeInteractions(){
+		var interactions = map.getInteractions().clear();
+		//angular.forEach(interactions, function(interaction){
+		//	removeInteraction(interaction)
+		//})
+	}
+
+	addOverlay = function addOverlay(source) {
+		// The features are not added to a regular vector layer/source,
+// but to a feature overlay which holds a collection of features.
+// This collection is passed to the modify and also the draw
+// interaction, so that both can add or modify features.
+		return new ol.FeatureOverlay({
+			features: source.getFeatures(),
+			style: new ol.style.Style({
+				fill: new ol.style.Fill({
+					color: 'rgba(255, 255, 255, 0.2)'
+				}),
+				stroke: new ol.style.Stroke({
+					color: '#ffcc33',
+					width: 2
+				}),
+				image: new ol.style.Circle({
+					radius: 7,
+					fill: new ol.style.Fill({
+						color: '#ffcc33'
+					})
+				})
+			}),
+			map: map
+		});
+
+	};
+
+	removeOverLays(map);
+	removeInteractions(map);
 
 // The features are not added to a regular vector layer/source,
 // but to a feature overlay which holds a collection of features.
 // This collection is passed to the modify and also the draw
 // interaction, so that both can add or modify features.
-	var featureOverlay = new ol.FeatureOverlay({
-		features: paddocksSource.getFeatures(),
-		style: new ol.style.Style({
-			fill: new ol.style.Fill({
-				color: 'rgba(255, 255, 255, 0.2)'
-			}),
-			stroke: new ol.style.Stroke({
-				color: '#ffcc33',
-				width: 2
-			}),
-			image: new ol.style.Circle({
-				radius: 7,
-				fill: new ol.style.Fill({
-					color: '#ffcc33'
-				})
-			})
-		}),
-		map: map
-	});
-
-	featureOverlay.addFeature(farmSource.getFeatures()[0]);
+	var featureOverlay = addOverlay(source);
 
 	var modifyPaddock = function () {
 		var select = new ol.interaction.Select(),

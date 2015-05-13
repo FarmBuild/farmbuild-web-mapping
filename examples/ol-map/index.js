@@ -102,7 +102,14 @@ initOlMap = function (farm, paddocks) {
 
 	// Deselect all selections when layer is changed from farm to paddocks.
 	selectedLayer.addEventListener('change', function () {
-		//deselectFeatures();
+		var source;
+		if(selectedLayer.value === "paddocks"){
+			source = paddocksSource;
+		}
+		if(selectedLayer.value === "farm"){
+			source = farmSource;
+		}
+		initDrawModify(source);
 	});
 
 	function clearMap() {
