@@ -4,9 +4,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         $rootScope.appVersion = farmbuild.examples.webmapping.version;
     })
 
-    .controller('MapCtrl', function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer) {
+    .controller('MapCtrl', function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openlayersmap) {
 
-        var load = $location.search().load || false;
+        var load = $location.search().load || false, gmap, view, map, ol;
 
         $scope.farmData = {};
 
@@ -25,10 +25,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
                 var farm = farmGeometry.farm,
                     paddocks = farmGeometry.paddocks;
-                initOlMap(farm, paddocks, googlemapslayer.init("gmap", "olmap"));
+                ol = openlayersmap.load(gmap, farm, paddocks);
+                map = ol.map;
+                view = ol.view;
                 googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', view, map);
             } catch (e) {
-                console.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format')
+                console.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
                 $scope.noResult = true;
             }
         };
@@ -53,26 +55,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             return angular.fromJson(sessionStorage.getItem('farmData'));
         };
 
-    })
+      gmap = googlemapslayer.init("gmap", "olmap");
+      ol = openlayersmap.load(gmap);
+      map = ol.map;
+      view = ol.view;
+      googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', view, map);
 
-    .directive('onReadFile', function ($parse) {
-        return {
-            restrict: 'A',
-            scope: false,
-            link: function (scope, element, attrs) {
-                var fn = $parse(attrs.onReadFile);
-
-                element.on('change', function (onChangeEvent) {
-                    var reader = new FileReader();
-
-                    reader.onload = function (onLoadEvent) {
-                        scope.$apply(function () {
-                            fn(scope, {$fileContent: onLoadEvent.target.result});
-                        });
-                    };
-
-                    reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
-                });
-            }
-        };
     });

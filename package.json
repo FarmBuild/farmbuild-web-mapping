@@ -39,7 +39,7 @@
     "jshint": " node_modules/.bin/jshint -c .jshintrc --filename src/**/*-src.js src/nutrient-calculator.js --verbose --show-non-errors",
     "concat": "uglifyjs src/nutrient-calculator.js src/**/*.src.js src/index.js -o dist/farmbuild-nutrientcalculator.js -v -b",
     "uglify": "uglifyjs dist/farmbuild-nutrientcalculator.js --source-map dist/farmbuild-nutrientcalculator.min.js.map --source-map-url farmbuild-nutrientcalculator.min.js.map -o dist/farmbuild-nutrientcalculator.min.js -v -c",
-    "copy-core": "ncp bower_components/farmbuild-core/dist/ dist/ && ncp bower_components/farmbuild-farmdata/dist/ dist/ && ncp bower_components/proj4/dist/ dist/proj4",
+    "copy-core": "ncp bower_components/jquery/dist/ dist/jquery && ncp bower_components/farmbuild-core/dist/ dist/ && ncp bower_components/farmbuild-farmdata/dist/ dist/ && ncp bower_components/proj4/dist/ dist/proj4",
     "copy-ol": "ncp lib/ dist/",
     "dist": "npm run clean && npm run copy-core && npm run copy-ol"
   }
