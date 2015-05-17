@@ -1,6 +1,6 @@
 var olMapDiv = document.getElementById('olmap'),
 	map, saveData, view, isNew = false, centerNew = [-36.22488327137526, 145.5826132801325], zoomNew = 6, paddocksSource, farmSource, selectedLayer;
-initOlMap = function (farm, paddocks) {
+initOlMap = function (farm, paddocks, gmap) {
 
 	selectedLayer = document.getElementById('layers');
 

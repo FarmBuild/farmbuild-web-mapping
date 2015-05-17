@@ -9,65 +9,90 @@
 'use strict';
 
 /**
- * webMapping
- * @module webMapping
+ * webmapping
+ * @module webmapping
  */
-angular.module('farmbuild.webMapping', ['farmbuild.core', 'farmbuild.farmdata'])
-	.factory('webMapping',
-	function (farmdata,
-	          validations,
-	          $log, $http) {
-		var _isPositiveNumber = validations.isPositiveNumber,
-			_isDefined = validations.isDefined,
-			webMapping = {};
+angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
+    .factory('webmapping',
+    function (farmdata,
+              validations,
+              $log) {
+        var _isDefined = validations.isDefined,
+            webmapping = {};
 
-		function _extractGeometry(farmData) {
-			console.log(farmData.data.features);
-			var features = [];
-			//angular.forEach(farmData.data, function(){
-			//
-			//});
+        function _fromFarmData(farmData) {
+            $log.info("Extracting farm and paddocks geometry from farmData ...");
+            var farm = farmData.geometry,
+                paddocks = [];
 
-			return angular.toJson({
-				"type": "FeatureCollection",
-				"features": farmData.data.features
-			})
-		};
+            if (!_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
+                return undefined;
+            }
 
-		$log.info('Welcome to Web Mapping... ' +
-		'this should only be initialised once! why we see twice in the example?');
+            angular.forEach(farmData.paddocks, function (val) {
+                paddocks.push(
+                    {
+                        "type": "Feature",
+                        "geometry": val.geometry
+                    });
+            });
 
-		/**
-		 * Validate farmData block
-		 * @method load
-		 * @param {!object} url
-		 * @returns {object} farmData
-		 * @public
-		 * @static
-		 */
-		webMapping.load = function (url) {
-			$http.get(url).then(function (resp) {
-				_load(resp);
-			});
+            return {
+                farm: {
+                    "type": "FeatureCollection",
+                    "features": [
+                        {
+                            "type": "Feature",
+                            "geometry": farm
+                        }]
+                },
+                paddocks: {
+                    "type": "FeatureCollection",
+                    "features": paddocks
+                }
+            }
+        };
 
-			function _load(toLoad) {
-				//if (!farmdata.isFarmData(toLoad)) {
-				//	return undefined;
-				//}
-				_extractGeometry(toLoad);
-			}
-		};
+        function _toFarmData(farmGeometry) {
+            $log.info("Writing farm and paddocks geometry to farmData ...");
+            var farm = data.geometry,
+                paddocks = [];
 
-		// Provide a shortcut for modules
-		webMapping.version = '0.1.0';
+            angular.forEach(data.paddocks, function (val) {
+                paddocks.push(val.geometry);
+            });
 
-		if (typeof window.farmbuild === 'undefined') {
-			window.farmbuild = {
-				webmapping: webMapping
-			};
-		} else {
-			window.farmbuild.webmapping = webMapping;
-		}
+            return farmData;
+        };
 
-		return webMapping;
-	});
+        $log.info('Welcome to Web Mapping... ' +
+            'this should only be initialised once! why we see twice in the example?');
+
+        /**
+         * Validate farmData block
+         * @method load
+         * @param {!object} url
+         * @returns {object} farmData
+         * @public
+         * @static
+         */
+        webmapping.load = function (toLoad) {
+            if (!farmdata.isFarmData(toLoad)) {
+                return undefined;
+            }
+            return _fromFarmData(toLoad);
+        };
+
+        // Provide a shortcut for modules
+        webmapping.version = '0.1.0';
+
+        if (typeof window.farmbuild === 'undefined') {
+            window.farmbuild = {
+                webmapping: webmapping
+            };
+        } else {
+            window.farmbuild.webmapping = webmapping;
+        }
+
+        return webmapping;
+    });
