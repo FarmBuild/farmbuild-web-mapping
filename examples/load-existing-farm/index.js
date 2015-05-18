@@ -57,7 +57,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		(function _inti() {
 			gmap = googlemapslayer.init("gmap", "olmap");
 			ol = openlayersmap.load(gmap);
-			googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', ol.view, gmap);
+			googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', ol.view);
 		})();
 
 	});
