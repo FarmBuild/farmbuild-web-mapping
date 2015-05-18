@@ -9,6 +9,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         var load = $location.search().load || false, gmap, view, map, ol;
 
         $scope.farmData = {};
+        $scope.farmReady = false;
 
         $scope.loadFarmData = function ($fileContent) {
             try {
@@ -20,15 +21,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
                     return;
                 }
                 $scope.farmGeometry = farmGeometry;
+                $scope.farmReady = true;
                 $scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
                 $scope.saveToSessionStorage('farmGeometry', angular.toJson($scope.farmGeometry));
 
                 var farm = farmGeometry.farm,
                     paddocks = farmGeometry.paddocks;
                 ol = openlayersmap.load(gmap, farm, paddocks);
-                map = ol.map;
-                view = ol.view;
-                googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', view, map);
             } catch (e) {
                 console.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
                 $scope.noResult = true;
@@ -57,8 +56,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
       gmap = googlemapslayer.init("gmap", "olmap");
       ol = openlayersmap.load(gmap);
-      map = ol.map;
-      view = ol.view;
-      googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', view, map);
+      googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', ol.view, gmap);
 
     });

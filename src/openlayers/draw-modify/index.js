@@ -4,7 +4,8 @@ angular.module('farmbuild.webmapping')
 	.factory('openlayersDraw',
 	function (validations,
 	          $log) {
-		_init = function(source) {
+		var _init = function(source, map) {
+			var selectedLayer = document.getElementById('layers');
 			map.on('click', function (evt) {
 				var activeLayer = selectedLayer.value;
 				if (source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {

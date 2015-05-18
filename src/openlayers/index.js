@@ -3,41 +3,41 @@ angular.module('farmbuild.webmapping')
 	function (validations,
 	          $log,
 	          openlayersDraw) {
-		var olMapDiv = document.getElementById('olmap'),
-			map, paddocksSource, farmSource, selectedLayer,
-			defaults = {
+		var defaults = {
 				centerNew: [-36.22488327137526, 145.5826132801325],
 				zoomNew: 6
-			};
+			},
+			_map,
+			_init = function (gmap, farm, paddocks, isNew, target, openLayerTarget) {
 
-		var _init = function (gmap, farm, paddocks, isNew, target, openLayerTarget) {
+				if (_map && _map.setTarget) {
+					_map.setTarget(null);
+					_map = null;
+				}
 
-				selectedLayer = document.getElementById('layers');
+				var selectedLayer = document.getElementById('layers');
 
 				proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs");
 				var projection = ol.proj.get({code: 'EPSG:4283'});
 
 				var view = new ol.View({
-					rotation: 0,
-					projection: projection,
-					maxZoom: 21
-				});
-
-				paddocksSource = new ol.source.Vector({
-					features: (new ol.format.GeoJSON()).readFeatures(paddocks, {
-						dataProjection: 'EPSG:4283',
-						featureProjection: 'EPSG:3857'
-					})
-				});
-
-				farmSource = new ol.source.Vector({
-					features: (new ol.format.GeoJSON()).readFeatures(farm, {
-						dataProjection: 'EPSG:4283',
-						featureProjection: 'EPSG:3857'
-					})
-				});
-
-				var paddocksLayer = new ol.layer.Vector({
+						rotation: 0,
+						projection: projection,
+						maxZoom: 21
+					}),
+					paddocksSource = new ol.source.Vector({
+						features: (new ol.format.GeoJSON()).readFeatures(paddocks, {
+							dataProjection: 'EPSG:4283',
+							featureProjection: 'EPSG:3857'
+						})
+					}),
+					farmSource = new ol.source.Vector({
+						features: (new ol.format.GeoJSON()).readFeatures(farm, {
+							dataProjection: 'EPSG:4283',
+							featureProjection: 'EPSG:3857'
+						})
+					}),
+					paddocksLayer = new ol.layer.Vector({
 						source: paddocksSource,
 						style: new ol.style.Style({
 							fill: new ol.style.Fill({
@@ -61,31 +61,31 @@ angular.module('farmbuild.webmapping')
 								width: 3
 							})
 						})
-					});
+					}),
 
-				map = new ol.Map({
-					layers: [paddocksLayer, farmLayer],
-					target: olMapDiv,
-					view: view,
-					interactions: ol.interaction.defaults({
-						altShiftDragRotate: false,
-						dragPan: false,
-						rotate: false,
-						mouseWheelZoom: false
-					}).extend([new ol.interaction.DragPan({kinetic: null})]),
-					controls: ol.control.defaults({
-						attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-							collapsible: false
-						})
-					}).extend([
-						new ol.control.ZoomToExtent({
-							extent: farmSource.getExtent()
-						}),
-						new ol.control.ScaleLine()
-					])
-				});
+					map = _map = new ol.Map({
+						layers: [paddocksLayer, farmLayer],
+						target: target,
+						view: view,
+						interactions: ol.interaction.defaults({
+							altShiftDragRotate: false,
+							dragPan: false,
+							rotate: false,
+							mouseWheelZoom: false
+						}).extend([new ol.interaction.DragPan({kinetic: null})]),
+						controls: ol.control.defaults({
+							attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+								collapsible: false
+							})
+						}).extend([
+							new ol.control.ZoomToExtent({
+								extent: farmSource.getExtent()
+							}),
+							new ol.control.ScaleLine()
+						])
+					}),
 
-				var size = /** @type {ol.Size} */ (map.getSize());
+					size = /** @type {ol.Size} */ (map.getSize());
 
 				view.on('change:center', function () {
 					var center = ol.proj.transform(view.getCenter(), 'EPSG:3857', 'EPSG:4326');
@@ -113,7 +113,7 @@ angular.module('farmbuild.webmapping')
 					if (selectedLayer.value === "farm") {
 						source = farmSource;
 					}
-					openlayersDraw.init(source);
+					openlayersDraw.init(source, map);
 				});
 
 				// Google Map and vector layers go out of sync when window is resized.
@@ -142,11 +142,11 @@ angular.module('farmbuild.webmapping')
 					"type": "FeatureCollection",
 					"features": []
 				};
-				return _init(gmap, farm, paddocks, true);
+				return _init(gmap, farm, paddocks, true, 'olmap');
 			},
 
 			_loadExisting = function (gmap, farm, paddocks) {
-				return _init(gmap, farm, paddocks, false);
+				return _init(gmap, farm, paddocks, false, 'olmap');
 			},
 
 			_load = function (gmap, farm, paddocks) {

@@ -12,19 +12,30 @@
 <body>
 
 <div id="map" class="map" ng-controller="MapCtrl">
-    <input type="text" id="locationautocomplete" class="address-search addon" >
-    <form-item class="form-group col-md-6" style="z-index: 1000; position: absolute; top: 200px; left: 10px">
-        <button class="btn btn-primary" my-file-upload ng-model="farmDataFile" ng-change="loadFarmData(farmDataFile)">
-            <span class="fa fa-camera"></span>
-            Load farm data
-        </button>
-    </form-item>
+    <input type="text" id="locationautocomplete" class="address-search addon">
+    <wrapper ng-show="!farmReady" style="z-index: 1000; position: absolute; top: 0; left: 0; display: block; width: 100%; height: 100%; background-color: rgba(0,0,0,0.3);"  >
+        <buttons
+                style="background-color: rgba(255,255,255,0.7); width: 300px; height: 100px; display: block; margin: 200px auto 0 auto; border-radius: 5px; padding: 20px">
+            <p>Please select an option to start</p>
+            <button class="btn btn-primary" my-file-upload ng-model="farmDataFile"
+                    ng-change="loadFarmData(farmDataFile)">
+                <span class="fa fa-camera"></span>
+                Load My Farm
+            </button>
+            <button class="btn btn-primary" my-file-upload ng-model="farmDataFile"
+                    ng-change="loadFarmData(farmDataFile)">
+                <span class="fa fa-camera"></span>
+                New Farm
+            </button>
+        </buttons>
+    </wrapper>
 
-    <select id="layers" class="farm-layers addon">
+    <select id="layers" class="farm-layers addon" ng-show="farmReady">
         <option value="">none</option>
         <option value="farm">farm</option>
         <option value="paddocks">paddocks</option>
     </select>
+
     <div id="gmap" class="fill">
     </div>
     <div id="olmap" class="fill"></div>
