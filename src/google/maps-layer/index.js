@@ -16,7 +16,7 @@ angular.module('farmbuild.webmapping')
     .factory('googlemapslayer',
     function (validations,
               $log) {
-        var _init = function (target, openLayerTarget) {
+        var _init = function (target) {
 
             var gmap = new google.maps.Map(document.getElementById(target), {
                 disableDefaultUI: true,
@@ -27,8 +27,7 @@ angular.module('farmbuild.webmapping')
                 streetViewControl: false,
                 mapTypeId: google.maps.MapTypeId.SATELLITE
             });
-            //olMapDiv.parentNode.removeChild(openLayerTarget);
-            //gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(openLayerTarget);
+
             return gmap;
         };
         return {

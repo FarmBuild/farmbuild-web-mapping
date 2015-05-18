@@ -8,4 +8,6 @@ This is the web mapping component of farm build JavaScript library.
 To get you started simply download this repository using <a href="https://github.com/FarmBuild/farmbuild-web-mapping/archive/master.zip" target="_blank">"Download ZIP"</a> on the right side of this page.
 Unzip the downloaded folder and go to "examples" and open one of the html files in a browser.
 
-For more information about API and Testing see the [Wik i](https://github.com/FarmBuild/farmbuild-web-mapping/wiki) section.
+For more information about API and Testing see the [Wiki](https://github.com/FarmBuild/farmbuild-web-mapping/wiki) section.
+
+* <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/examples/load-existing-farm/index.html" target="_blank">Load existing farm data - angularJS example</a>

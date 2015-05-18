@@ -8,7 +8,7 @@ angular.module('farmbuild.webmapping')
 				zoomNew: 6
 			},
 			_map,
-			_init = function (gmap, farm, paddocks, isNew, target, openLayerTarget) {
+			_init = function (gmap, farm, paddocks, isNew, target) {
 
 				if (_map && _map.setTarget) {
 					_map.setTarget(null);
@@ -101,6 +101,9 @@ angular.module('farmbuild.webmapping')
 					view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]], 'EPSG:4326', 'EPSG:3857'));
 					view.setZoom(defaults.zoomNew);
 				} else {
+					var targetEl = document.getElementById(target);
+					targetEl.parentNode.removeChild(targetEl);
+					gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetEl);
 					view.fitExtent(farmSource.getExtent(), size);
 				}
 
@@ -125,7 +128,6 @@ angular.module('farmbuild.webmapping')
 						//gmap.setCenter(new google.maps.LatLng(view.getCenter()[0], view.getCenter()[1]));
 						//gmap.setZoom(view.getZoom());
 					}, 500);
-
 				};
 
 				return {
