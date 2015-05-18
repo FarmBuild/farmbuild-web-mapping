@@ -22,15 +22,16 @@
 
     <wrapper ng-show="!farmLoaded && !noResult">
         <buttons>
-            <p>Please select an option to start</p>
+            <p>Please select one of the below options to start</p>
             <button class="btn btn-primary" my-file-upload ng-model="farmDataFile"
                     ng-change="loadFarmData(farmDataFile)">
                 <span class="fa fa-camera"></span>
-                Load My Farm
+                Load My farm data
             </button>
+            Or
             <button class="btn btn-primary" ng-click="farmLoaded=true">
                 <span class="fa fa-camera"></span>
-                New Farm
+                Define a new farm
             </button>
         </buttons>
     </wrapper>
