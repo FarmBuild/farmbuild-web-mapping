@@ -10,4 +10,5 @@ Unzip the downloaded folder and go to "examples" and open one of the html files 
 
 For more information about API and Testing see the [Wiki](https://github.com/FarmBuild/farmbuild-web-mapping/wiki) section.
 
-* <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/examples/load-existing-farm/index.html" target="_blank">Load existing farm data - angularJS example</a>
+* <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/examples/overlay/index.html" target="_blank">Overlay layout - angularJS example</a>
+* <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/examples/side/index.html" target="_blank">Side layout - angularJS example</a>
