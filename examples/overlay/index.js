@@ -9,7 +9,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		var load = $location.search().load || false, gmap, ol;
 
 		$scope.farmData = {};
+		$scope.farmChanged = false;
 		$scope.noResult = $scope.farmLoaded = false;
+
+		$scope.$watch('farmData', function(old,newVal){
+			if(!angular.equals(old,newVal)){
+				$scope.farmChanged = true;
+			}
+		}, true)
 
 		$scope.loadFarmData = function ($fileContent) {
 			try {
@@ -40,13 +47,36 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.apply = function () {
-			$log.info('calculate...');
+			$log.info('apply...');
+			$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
+			$scope.farmChanged = false;
+			//webmapping.ga.trackCalculate('AgSmart');
+		};
 
+		$scope.cancel = function () {
+			$log.info('cancel...');
+			$scope.farmData = findInSessionStorage();
+			$scope.farmChanged = false;
+			//webmapping.ga.trackCalculate('AgSmart');
+		};
+
+		$scope.defineFarm = function () {
+			$log.info('defineFarm...');
+			$scope.farmLoaded = true;
+			$scope.farmChanged = false;
+			$scope.saveToSessionStorage('farmData', {});
 			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.saveToSessionStorage = function (key, value) {
 			sessionStorage.setItem(key, value);
+		};
+
+		$scope.deleteFromSessionStorage = function (key, value) {
+			sessionStorage.clear();
+			$scope.farmData = {};
+			openlayersmap.clear();
+			$scope.farmChanged = true;
 		};
 
 		function findInSessionStorage() {
