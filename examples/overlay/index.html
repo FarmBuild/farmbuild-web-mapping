@@ -21,7 +21,8 @@
     <modal ng-if="noResult" ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
     <input type="text" id="locationautocomplete" class="address-search addon" ng-hide="!farmLoaded || noResult">
     <select id="layers" class="farm-layers addon" ng-hide="!farmLoaded || noResult">
-        <option value="">none</option>
+        <option value="">Select layer</option>
+        <option value="none">none</option>
         <option value="farm">farm</option>
         <option value="paddocks">paddocks</option>
     </select>

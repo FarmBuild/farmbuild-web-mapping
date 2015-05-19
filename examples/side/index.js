@@ -88,7 +88,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			ol = openlayersmap.init('olmap', 'layers');
 			openlayersmap.integrateGMap(gmap);
 			googleaddresssearch.init('locationautocomplete');
-			if(findInSessionStorage()){
+			if(findInSessionStorage() && findInSessionStorage().name && findInSessionStorage().geometry){
 				$scope.loadFarmData(findInSessionStorage())
 			}
 		};
