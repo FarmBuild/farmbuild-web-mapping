@@ -13,22 +13,20 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.loadFarmData = function ($fileContent) {
 			try {
-				$scope.farmData = $fileContent;
-				$scope.farmGeometry = {};
-				var farmGeometry = webmapping.load(angular.fromJson($fileContent));
-				if (!angular.isDefined(farmGeometry)) {
+
+				$scope.farmData = angular.fromJson($fileContent);
+				var geometry = webmapping.load($scope.farmData);
+
+				if (!angular.isDefined(geometry)) {
 					$scope.noResult = true;
 					return;
 				}
-				$scope.farmGeometry = farmGeometry;
-				$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
-				$scope.saveToSessionStorage('farmGeometry', angular.toJson($scope.farmGeometry));
 
-				var farm = farmGeometry.farm,
-					paddocks = farmGeometry.paddocks;
-				ol = openlayersmap.load(farm, paddocks);
+				$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
+				ol = openlayersmap.load(geometry.farm, geometry.paddocks);
 				openlayersmap.integrateGMap(gmap);
 				$scope.farmLoaded = true;
+
 			} catch (e) {
 				$log.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
 				$scope.noResult = true;
@@ -41,10 +39,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			window.focus();
 		};
 
-		$scope.calculate = function () {
+		$scope.apply = function () {
 			$log.info('calculate...');
 
-			nutrientCalculator.ga.trackCalculate('AgSmart');
+			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.saveToSessionStorage = function (key, value) {
@@ -55,11 +53,16 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			return angular.fromJson(sessionStorage.getItem('farmData'));
 		};
 
-		(function _init() {
+		function init() {
 			gmap = googlemapslayer.init("gmap");
 			ol = openlayersmap.init('olmap', 'layers');
 			openlayersmap.integrateGMap(gmap);
 			googleaddresssearch.init('locationautocomplete');
-		})();
+			if(findInSessionStorage()){
+				$scope.loadFarmData(findInSessionStorage())
+			}
+		};
+
+		init();
 
 	});

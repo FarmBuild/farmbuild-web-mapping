@@ -83,6 +83,14 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
             return _fromFarmData(toLoad);
         };
 
+
+        webmapping.export = function (toExport) {
+            if (!toExport) {
+                return undefined;
+            }
+            return _toFarmData(toExport);
+        };
+
         // Provide a shortcut for modules
         webmapping.version = '0.1.0';
 

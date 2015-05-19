@@ -9,26 +9,31 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		var load = $location.search().load || false, gmap, ol;
 
 		$scope.farmData = {};
+		$scope.farmChanged = false;
 		$scope.noResult = $scope.farmLoaded = false;
+
+		$scope.$watch('farmData', function(old,newVal){
+			if(!angular.equals(old,newVal)){
+				$scope.farmChanged = true;
+			}
+		}, true)
 
 		$scope.loadFarmData = function ($fileContent) {
 			try {
-				$scope.farmData = $fileContent;
-				$scope.farmGeometry = {};
-				var farmGeometry = webmapping.load(angular.fromJson($fileContent));
-				if (!angular.isDefined(farmGeometry)) {
+
+				$scope.farmData = angular.fromJson($fileContent);
+				var geometry = webmapping.load($scope.farmData);
+
+				if (!angular.isDefined(geometry)) {
 					$scope.noResult = true;
 					return;
 				}
-				$scope.farmGeometry = farmGeometry;
-				$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
-				$scope.saveToSessionStorage('farmGeometry', angular.toJson($scope.farmGeometry));
 
-				var farm = farmGeometry.farm,
-					paddocks = farmGeometry.paddocks;
-				ol = openlayersmap.load(farm, paddocks);
+				$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
+				ol = openlayersmap.load(geometry.farm, geometry.paddocks);
 				openlayersmap.integrateGMap(gmap);
 				$scope.farmLoaded = true;
+
 			} catch (e) {
 				$log.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
 				$scope.noResult = true;
@@ -41,25 +46,45 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			window.focus();
 		};
 
-		$scope.calculate = function () {
-			$log.info('calculate...');
+		$scope.apply = function () {
+			$log.info('apply...');
+			$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
+			$scope.farmChanged = false;
+			//webmapping.ga.trackCalculate('AgSmart');
+		};
 
-			nutrientCalculator.ga.trackCalculate('AgSmart');
+		$scope.cancel = function () {
+			$log.info('cancel...');
+			$scope.farmData = findInSessionStorage();
+			$scope.farmChanged = false;
+			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.saveToSessionStorage = function (key, value) {
 			sessionStorage.setItem(key, value);
 		};
 
+		$scope.deleteFromSessionStorage = function (key, value) {
+			sessionStorage.clear();
+			$scope.farmData = {};
+			openlayersmap.clear();
+			$scope.farmChanged = true;
+		};
+
 		function findInSessionStorage() {
 			return angular.fromJson(sessionStorage.getItem('farmData'));
 		};
 
-		(function _init() {
+		function init() {
 			gmap = googlemapslayer.init("gmap");
-			ol = openlayersmap.load();
+			ol = openlayersmap.init('olmap', 'layers');
 			openlayersmap.integrateGMap(gmap);
-			googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857');
-		})();
+			googleaddresssearch.init('locationautocomplete');
+			if(findInSessionStorage()){
+				$scope.loadFarmData(findInSessionStorage())
+			}
+		};
+
+		init();
 
 	});

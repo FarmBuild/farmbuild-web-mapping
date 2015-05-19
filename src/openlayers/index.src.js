@@ -104,7 +104,7 @@ angular.module('farmbuild.webmapping')
                     altShiftDragRotate: false,
                     dragPan: false,
                     rotate: false,
-                    mouseWheelZoom: false
+                    mouseWheelZoom: true
                 }).extend([new ol.interaction.DragPan({kinetic: null})]),
                 controls: ol.control.defaults({
                     attributionOptions: /** @type {olx.control.AttributionOptions} */ ({

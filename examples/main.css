@@ -110,6 +110,15 @@ farm-details
     width: auto;
     display: block;
 }
+
+form-section {
+    padding: 5px;
+}
+
+form-item {
+    margin-bottom: 5px;
+}
+
 .show-errors input.ng-invalid {
     border: solid 2px #ffe4ea !important;
 }

@@ -1,12 +1,26 @@
 <form>
-    <form-item class="form-group">
-        <label for="farmName">Farm Name:</label>
-        <input type="text" id="farmName" class="form-control"
-               ng-model="farm.name"
-                />
-    </form-item>
-    <button class="btn btn-primary" ng-click="isNew=true">
-        <span class="fa fa-camera"></span>
-        Create
-    </button>
+    <form-section>
+        <form-item class="form-group">
+            <label for="farmName">Farm Name:</label>
+            <input type="text" id="farmName" class="form-control"
+                   ng-model="farmData.name"
+                   required
+                    />
+        </form-item>
+        <wrapper ng-show="farmChanged">
+            <button class="btn btn-primary" ng-click="apply()" ng-disabled="!farmChanged">
+                Apply
+            </button>
+            <button class="btn btn-default" ng-click="cancel()" ng-disabled="!farmChanged">
+                Cancel
+            </button>
+        </wrapper>
+        <hr/>
+        <button class="btn btn-success" ng-click="exportFarmData(farmData)" ng-show="farmData.name">
+            Export
+        </button>
+        <button class="btn btn-danger" ng-click="deleteFromSessionStorage()" ng-show="farmData.name">
+            Delete
+        </button>
+    </form-section>
 </form>

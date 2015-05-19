@@ -1,0 +1,20 @@
+<form>
+    <form-section>
+        <p>Please select one of the below options to start</p>
+        <buttons>
+            <form-item>
+                <button class="btn btn-primary" my-file-upload ng-model="farmDataFile"
+                        ng-change="loadFarmData(farmDataFile)">
+                    <span class="fa fa-camera"></span>
+                    Load my farm data
+                </button>
+            </form-item>
+            <form-item>
+                <button class="btn btn-primary" ng-click="farmLoaded=true; isNew=true">
+                    <span class="fa fa-camera"></span>
+                    Define a new farm
+                </button>
+            </form-item>
+        </buttons>
+    </form-section>
+</form>
