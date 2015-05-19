@@ -16,9 +16,11 @@ angular.module('farmbuild.webmapping')
     .factory('googlemapslayer',
     function (validations,
               $log) {
-        var _init = function (target) {
+        var _projection = 'EPSG:3857';
 
-            return new google.maps.Map(document.getElementById(target), {
+        function _init(targetElementId) {
+
+            return new google.maps.Map(document.getElementById(targetElementId), {
                 disableDefaultUI: true,
                 keyboardShortcuts: false,
                 draggable: false,
@@ -28,7 +30,13 @@ angular.module('farmbuild.webmapping')
                 mapTypeId: google.maps.MapTypeId.SATELLITE
             });
         };
+
+        function _getProjection() {
+            return _projection;
+        };
+
         return {
-            init: _init
+            init: _init,
+            getProjection: _getProjection
         }
     });

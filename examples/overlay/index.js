@@ -26,7 +26,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 				var farm = farmGeometry.farm,
 					paddocks = farmGeometry.paddocks;
-				ol = openlayersmap.load(gmap, farm, paddocks);
+				ol = openlayersmap.load(farm, paddocks);
+				openlayersmap.integrateGMap(gmap);
 				$scope.farmLoaded = true;
 			} catch (e) {
 				$log.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
@@ -55,9 +56,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		(function _init() {
-			gmap = googlemapslayer.init("gmap", "olmap");
-			ol = openlayersmap.load(gmap);
-			googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', ol.view, ol.map);
+			gmap = googlemapslayer.init("gmap");
+			ol = openlayersmap.init('olmap', 'layers');
+			openlayersmap.integrateGMap(gmap);
+			googleaddresssearch.init('locationautocomplete');
 		})();
 
 	});
