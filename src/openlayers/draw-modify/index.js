@@ -1,51 +1,40 @@
-var removeOverlay, addOverlay, removeInteraction;
+'use strict';
 
 angular.module('farmbuild.webmapping')
 	.factory('openlayersDraw',
 	function (validations,
 	          $log) {
-		var _init = function(source, map) {
-			var selectedLayer = document.getElementById('layers');
+		var _featureOverlay, _init = function (source, map) {
+			var _isDefined = validations.isDefined, _draw, _modify, _select, _snap, selectedLayer = document.getElementById('layers');
 			map.on('click', function (evt) {
 				var activeLayer = selectedLayer.value;
 				if (source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
-					drawPaddock.disable();
-					modifyPaddock.enable();
+					draw.disable();
+					modify.enable();
 				} else if (activeLayer === 'farm' || activeLayer === 'paddocks') {
-					modifyPaddock.disable();
-					drawPaddock.enable();
+					modify.disable();
+					draw.enable();
 				} else {
-					modifyPaddock.disable();
-					drawPaddock.disable();
+					modify.disable();
+					draw.disable();
 				}
 			});
 
 			// Deselect selected features
-			removeOverlay = function removeOverlay(overlay) {
-				overlay.getFeatures().clear();
-				map.removeOverlay(overlay);
+			function _removeOverLay() {
+				if (_isDefined(_featureOverlay)) {
+					_featureOverlay.setStyle(new ol.style.Style({}));
+					map.removeOverlay(_featureOverlay);
+				}
 			};
 
-			function removeOverLays(){
-				var overLays = map.getOverlays().clear();
-				//angular.forEach(overLays, function(overlay){
-				//	removeOverlay(overlay)
-				//})
-			}
-
-			// Deselect selected features
-			removeInteraction = function removeInteraction(interaction) {
-				map.removeInteraction(interaction);
+			// Remove all interactions of map
+			function _removeInteractions() {
+				map.getInteractions().clear()
+				map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
 			};
 
-			function removeInteractions(){
-				var interactions = map.getInteractions().clear();
-				//angular.forEach(interactions, function(interaction){
-				//	removeInteraction(interaction)
-				//})
-			}
-
-			addOverlay = function addOverlay(source) {
+			function _addOverlay(source) {
 				// The features are not added to a regular vector layer/source,
 // but to a feature overlay which holds a collection of features.
 // This collection is passed to the modify and also the draw
@@ -72,42 +61,47 @@ angular.module('farmbuild.webmapping')
 
 			};
 
-			removeOverLays(map);
-			removeInteractions(map);
+			_removeOverLay(map);
+			_removeInteractions(map);
 
 // The features are not added to a regular vector layer/source,
 // but to a feature overlay which holds a collection of features.
 // This collection is passed to the modify and also the draw
 // interaction, so that both can add or modify features.
-			var featureOverlay = addOverlay(source);
+			if (!_isDefined(source)) {
+				source = new ol.source.Vector({
+					features: []
+				});
+			}
+			_featureOverlay = _addOverlay(source);
 
-			var modifyPaddock = function () {
-				var select = new ol.interaction.Select(),
-					modify = new ol.interaction.Modify({
-						features: select.getFeatures()
+			var modify = function () {
+				_select = new ol.interaction.Select();
+					_modify = new ol.interaction.Modify({
+						features: _select.getFeatures()
 					});
 
 				function _init() {
-					map.addInteraction(select);
-					map.addInteraction(modify);
+					map.addInteraction(_select);
+					map.addInteraction(_modify);
 
 					setEvents();
 				}
 
 				function _enable() {
-					select.setActive(true);
-					modify.setActive(true);
+					_select.setActive(true);
+					_modify.setActive(true);
 				}
 
 				function _disable() {
-					select.setActive(false);
-					modify.setActive(false);
+					_select.setActive(false);
+					_modify.setActive(false);
 				}
 
 				function setEvents() {
-					var selectedFeatures = select.getFeatures();
+					var selectedFeatures = _select.getFeatures();
 
-					select.on('change:active', function () {
+					_select.on('change:active', function () {
 						selectedFeatures.forEach(selectedFeatures.remove, selectedFeatures);
 					});
 				}
@@ -120,23 +114,23 @@ angular.module('farmbuild.webmapping')
 			}();
 
 
-			var drawPaddock = function () {
-				var draw = new ol.interaction.Draw({
-					features: featureOverlay.getFeatures(),
+			var draw = function () {
+				_draw = new ol.interaction.Draw({
+					features: _featureOverlay.getFeatures(),
 					type: /** @type {ol.geom.GeometryType} */ ('Polygon')
 				});
 
 				function _init() {
-					map.addInteraction(draw);
-					draw.setActive(false);
+					map.addInteraction(_draw);
+					_draw.setActive(false);
 				}
 
 				function _enable() {
-					draw.setActive(true);
+					_draw.setActive(true);
 				}
 
 				function _disable() {
-					draw.setActive(false);
+					_draw.setActive(false);
 				}
 
 				return {
@@ -146,16 +140,16 @@ angular.module('farmbuild.webmapping')
 				}
 			}();
 
-			var snap = new ol.interaction.Snap({
-				features: featureOverlay.getFeatures()
+			_snap = new ol.interaction.Snap({
+				features: _featureOverlay.getFeatures()
 			});
 
 
-			modifyPaddock.init();
-			drawPaddock.init();
-			map.addInteraction(snap);
-			drawPaddock.disable();
-			modifyPaddock.disable();
+			modify.init();
+			draw.init();
+			map.addInteraction(_snap);
+			draw.disable();
+			modify.disable();
 		};
 
 		return {

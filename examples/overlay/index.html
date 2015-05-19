@@ -5,37 +5,31 @@
     <meta http-equiv="X-UA-Compatible" content="chrome=1">
     <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
     <link rel="stylesheet" href="../../dist/ol/ol.css" type="text/css">
-    <link rel="stylesheet" href="../css/main.css" type="text/css">
+    <link rel="stylesheet" href="../main.css" type="text/css">
+    <link rel="stylesheet" href="overlay.css" type="text/css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <title>Load Susan's farm example</title>
 </head>
 <body>
 
 <div id="map" class="map" ng-controller="MapCtrl">
-    <modal ng-if="noResult" ng-include="'../modal-validation-error.html'"></modal>
+    <wrapper ng-show="isNew">
+        <float-box>
+            <farm-details ng-include="'../farm-details/farm-details.tpl.html'"></farm-details>
+        </float-box>
+    </wrapper>
+    <modal ng-if="noResult" ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
     <input type="text" id="locationautocomplete" class="address-search addon" ng-hide="!farmLoaded || noResult">
     <select id="layers" class="farm-layers addon" ng-hide="!farmLoaded || noResult">
         <option value="">none</option>
         <option value="farm">farm</option>
         <option value="paddocks">paddocks</option>
     </select>
-
     <wrapper ng-show="!farmLoaded && !noResult">
-        <buttons>
-            <p>Please select one of the below options to start</p>
-            <button class="btn btn-primary" my-file-upload ng-model="farmDataFile"
-                    ng-change="loadFarmData(farmDataFile)">
-                <span class="fa fa-camera"></span>
-                Load my farm data
-            </button>
-            Or
-            <button class="btn btn-primary" ng-click="farmLoaded=true">
-                <span class="fa fa-camera"></span>
-                Define a new farm
-            </button>
-        </buttons>
+        <float-box style="height: 120px">
+            <startup ng-include="'../startup/startup.tpl.html'"></startup>
+        </float-box>
     </wrapper>
-
     <div id="olmap" class="fill"></div>
     <div id="gmap" class="fill"></div>
 </div>
@@ -54,6 +48,6 @@
 <script type="text/javascript" src="../../src/google/maps-layer/index.js"></script>
 <script type="text/javascript" src="../../src/google/address-search/index.js"></script>
 <script type="text/javascript" src="index.js"></script>
-<script type="text/javascript" src="file-upload.js"></script>
+<script type="text/javascript" src="../file-upload/file-upload.js"></script>
 </body>
 </html>

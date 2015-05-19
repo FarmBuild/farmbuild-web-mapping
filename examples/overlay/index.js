@@ -54,10 +54,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			return angular.fromJson(sessionStorage.getItem('farmData'));
 		};
 
-		(function _inti() {
+		(function _init() {
 			gmap = googlemapslayer.init("gmap", "olmap");
 			ol = openlayersmap.load(gmap);
-			googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', ol.view);
+			googleaddresssearch.init('locationautocomplete', 'EPSG:4326', 'EPSG:3857', ol.view, ol.map);
 		})();
 
 	});

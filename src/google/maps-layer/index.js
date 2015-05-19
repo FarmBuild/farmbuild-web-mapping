@@ -18,7 +18,7 @@ angular.module('farmbuild.webmapping')
               $log) {
         var _init = function (target) {
 
-            var gmap = new google.maps.Map(document.getElementById(target), {
+            return new google.maps.Map(document.getElementById(target), {
                 disableDefaultUI: true,
                 keyboardShortcuts: false,
                 draggable: false,
@@ -27,8 +27,6 @@ angular.module('farmbuild.webmapping')
                 streetViewControl: false,
                 mapTypeId: google.maps.MapTypeId.SATELLITE
             });
-
-            return gmap;
         };
         return {
             init: _init

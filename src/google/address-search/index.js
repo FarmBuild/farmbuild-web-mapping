@@ -15,10 +15,10 @@
 angular.module('farmbuild.webmapping')
 	.factory('googleaddresssearch',
 	function (validations,
-	          $log) {
+	          $log, openlayersmap) {
 		var countryRestrict = {'country': 'au'},
 
-			_init = function (target, sourceProjection, destinationProjection, view) {
+			_init = function (target, sourceProjection, destinationProjection, view, map) {
 				// Create the autocomplete object and associate it with the UI input control.
 				// Restrict the search to the default country, and to place type "cities".
 				var autocomplete = new google.maps.places.Autocomplete(
@@ -29,21 +29,21 @@ angular.module('farmbuild.webmapping')
 					});
 
 				google.maps.event.addListener(autocomplete, 'place_changed', function () {
-					_onPlaceChanged(autocomplete, sourceProjection, destinationProjection, view)
+					_onPlaceChanged(autocomplete, sourceProjection, destinationProjection, view, map)
 				});
 			},
 
 
 		// When the user selects a city, get the place details for the city and
 		// zoom the map in on the city.
-			_onPlaceChanged = function (autocomplete, sourceProjection, destinationProjection, view) {
+			_onPlaceChanged = function (autocomplete, sourceProjection, destinationProjection, view, map) {
 				var place = autocomplete.getPlace(), latLng;
 				if (!place.geometry) {
 					return;
 				}
 
 				latLng = place.geometry.location;
-				_center(latLng, sourceProjection, destinationProjection, view);
+				_center(latLng, sourceProjection, destinationProjection, view, map);
 			},
 
 			_transform = function (latLng, sourceProjection, destinationProjection) {
@@ -54,6 +54,7 @@ angular.module('farmbuild.webmapping')
 				var center = _transform(latLng, sourceProjection, destinationProjection);
 				view.setCenter(center);
 				view.setZoom(15);
+				//openlayersmap.clear();
 			};
 
 		return {
