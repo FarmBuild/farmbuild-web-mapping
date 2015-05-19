@@ -60,6 +60,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
+		$scope.defineFarm = function () {
+			$log.info('defineFarm...');
+			$scope.farmLoaded = true;
+			$scope.farmChanged = false;
+			$scope.saveToSessionStorage('farmData', {});
+			//webmapping.ga.trackCalculate('AgSmart');
+		};
+
 		$scope.saveToSessionStorage = function (key, value) {
 			sessionStorage.setItem(key, value);
 		};
