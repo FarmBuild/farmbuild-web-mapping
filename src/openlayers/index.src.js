@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-	.factory('openlayersmap',
+	.factory('openLayers',
 	function (validations,
 	          $log,
 	          openlayersDraw,
@@ -98,7 +98,7 @@ angular.module('farmbuild.webmapping')
 			});
 
 			_map = new ol.Map({
-				layers: [_paddocksLayer, _farmLayer],
+				layers: [_paddocksLayer],
 				target: targetElementId,
 				view: _view,
 				interactions: ol.interaction.defaults({
@@ -209,6 +209,50 @@ angular.module('farmbuild.webmapping')
 			_view.setZoom(15);
 		};
 
+		function _paddocksLayer(paddocksGeometry){
+			var _paddocksSource = new ol.source.Vector({
+				features: (new ol.format.GeoJSON()).readFeatures(paddocksGeometry, {
+					dataProjection: 'EPSG:4283',
+					featureProjection: 'EPSG:3857'
+				})
+			});
+
+			return new ol.layer.Vector({
+				source: _paddocksSource,
+				style: new ol.style.Style({
+					fill: new ol.style.Fill({
+						color: 'rgba(255, 255, 255, 0.3)'
+					}),
+					stroke: new ol.style.Stroke({
+						color: '#319FD3',
+						width: 1
+					})
+				})
+			});
+		};
+
+		function _farmLayer(farmGeometry){
+			var paddocksSource = new ol.source.Vector({
+				features: (new ol.format.GeoJSON()).readFeatures(farmGeometry, {
+					dataProjection: 'EPSG:4283',
+					featureProjection: 'EPSG:3857'
+				})
+			});
+
+			return new ol.layer.Vector({
+				source: paddocksSource,
+				style: new ol.style.Style({
+					fill: new ol.style.Fill({
+						color: 'rgba(255, 255, 255, 0.3)'
+					}),
+					stroke: new ol.style.Stroke({
+						color: '#319FD3',
+						width: 1
+					})
+				})
+			});
+		};
+
 		return {
 			init: _init,
 			load: _load,
@@ -216,8 +260,10 @@ angular.module('farmbuild.webmapping')
 			clear: _clear,
 			center: _center,
 			integrateGMap: _integrateGMap,
-			getView: _getView,
-			getProjection: _getProjection
+			getProjection: _getProjection,
+
+			paddocksLayer: _paddocksLayer,
+			farmLayer: _farmLayer
 		}
 
 	});

@@ -1,62 +1,56 @@
 "use strict";
 
-angular.module("farmbuild.farmdata", []);
+angular.module("farmbuild.farmdata", [ "farmbuild.core" ]);
 
-window.farmbuild = {
-    farmdata: {}
-};
+window.farmbuild.farmdata = {};
+
+angular.injector([ "ng", "farmbuild.farmdata" ]);
 
 "use strict";
 
-angular.module("farmbuild.farmdata").factory("farmdata", function(farmdataSession) {
+angular.module("farmbuild.farmdata").factory("farmdata", function(farmdataSession, farmdataValidator, validations) {
     var farmdata = {
-        session: farmdataSession
-    }, defaults = {
+        session: farmdataSession,
+        validator: farmdataValidator
+    }, isEmpty = validations.isEmpty, defaults = {
+        id: "" + new Date().getTime(),
         name: "My new farm",
         geometry: {
             type: "Polygon",
             crs: "EPSG:4283",
             coordinates: []
         }
-    }, create = function(name) {
+    }, create = function(name, id) {
         return {
             version: 1,
             dateCreated: new Date(),
             dateLastUpdated: new Date(),
-            name: name ? name : defaults.name,
+            id: isEmpty(id) ? defaults.id : id,
+            name: isEmpty(name) ? defaults.name : name,
             geometry: angular.copy(defaults.geometry),
-            area: 0
+            area: 0,
+            areaUnit: "hectare"
         };
     };
     farmdata.defaultValues = function() {
         return angular.copy(defaults);
     };
-    function parameterByName(search, name) {
-        name = name.replace(/[\[]/, "\\[").replace(/[\]]/, "\\]");
-        var regex = new RegExp("[\\?&]" + name + "=([^&#]*)"), results = regex.exec(location.search);
-        return results === null ? "" : decodeURIComponent(results[1].replace(/\+/g, " "));
-    }
-    farmdata.isLoadFlagSet = function(location) {
-        var load = false;
-        if (location.href.split("?").length > 1 && location.href.split("?")[1].indexOf("load") === 0) {
-            load = location.href.split("?")[1].split("=")[1] === "true";
-        }
-        return load;
-    };
     farmdata.isFarmData = function(farmData) {
-        if (!angular.isDefined(farmData)) {
-            return false;
-        }
-        if (!angular.isObject(farmData)) {
-            return false;
-        }
-        if (!farmData.hasOwnProperty("name")) {
-            return false;
-        }
-        return true;
+        return farmdataValidator.validate(farmData);
+    };
+    farmdata.validate = function(farmData) {
+        return farmdataValidator.validate(farmData);
     };
     farmdata.create = function(name) {
         return create(name);
+    };
+    farmdata.load = farmdataSession.load;
+    farmdata.find = farmdataSession.find;
+    farmdata.save = function(farmData) {
+        return farmdataSession.save(farmData).find();
+    };
+    farmdata.update = function(farmData) {
+        return farmdataSession.update(farmData).find();
     };
     window.farmbuild.farmdata = farmdata;
     return farmdata;
@@ -64,7 +58,7 @@ angular.module("farmbuild.farmdata").factory("farmdata", function(farmdataSessio
 
 "use strict";
 
-angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, validations) {
+angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, farmdataValidator, validations) {
     var farmdataSession = {}, isDefined = validations.isDefined;
     farmdataSession.clear = function() {
         sessionStorage.clear();
@@ -72,11 +66,17 @@ angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, v
     };
     farmdataSession.save = function(farmData) {
         $log.info("saving farmData");
-        if (!isDefined(farmData)) {
-            $log.error("Unable to save farmData... it is undefined");
+        if (!farmdataValidator.validate(farmData)) {
+            $log.error("Unable to save farmData... it is invalid");
             return farmdataSession;
         }
         sessionStorage.setItem("farmData", angular.toJson(farmData));
+        return farmdataSession;
+    };
+    farmdataSession.update = function(farmData) {
+        $log.info("update farmData");
+        farmData.dateLastUpdated = new Date();
+        farmdataSession.save(farmData);
         return farmdataSession;
     };
     farmdataSession.find = function() {
@@ -86,42 +86,39 @@ angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, v
         }
         return angular.fromJson(json);
     };
+    farmdataSession.load = function(farmData) {
+        if (!farmdataValidator.validate(farmData)) {
+            $log.error("Unable to load farmData... it is invalid");
+            return undefined;
+        }
+        return farmdataSession.save(farmData).find();
+    };
     return farmdataSession;
 });
 
 "use strict";
 
-angular.module("farmbuild.farmdata").factory("validations", function($log) {
-    var validations = {};
-    validations.isPositiveNumberOrZero = function(value) {
-        return !isNaN(parseFloat(value)) && isFinite(value) && parseFloat(value) >= 0;
-    };
-    validations.isPositiveNumber = function(value) {
-        return validations.isPositiveNumberOrZero(value) && parseFloat(value) > 0;
-    };
-    validations.isAlphabet = function(value) {
-        var regex = /^[A-Za-z]+$/gi;
-        return regex.test(value);
-    };
-    validations.isAlphanumeric = function(value) {
-        var regex = /^[a-zA-Z0-9]*[a-zA-Z]+[a-zA-Z0-9 _]*$/gi;
-        return regex.test(value);
-    };
-    var isEmpty = function(data) {
-        if (typeof data == "number" || typeof data == "boolean") {
+angular.module("farmbuild.core").factory("farmdataValidator", function(validations, $log) {
+    var farmdataValidator = {}, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isEmpty = validations.isEmpty, _isObject = validations.isObject, _isString = validations.isString;
+    function errorLog() {}
+    function _validate(farmData) {
+        $log.info("validating farmData...");
+        if (!_isDefined(farmData)) {
+            $log.error("farmData is undefined.");
             return false;
         }
-        if (typeof data == "undefined" || data === null) {
-            return true;
+        if (!_isObject(farmData)) {
+            $log.error("farmData must be a javascript Object.");
+            return false;
         }
-        if (typeof data.length != "undefined") {
-            return data.length == 0;
+        if (!farmData.hasOwnProperty("name") || !_isString(farmData.name) || _isEmpty(farmData.name)) {
+            $log.error("farmData must have a name property and cannot be empty.");
+            return false;
         }
-        return false;
-    };
-    validations.isEmpty = isEmpty;
-    validations.isDefined = angular.isDefined;
-    validations.isArray = angular.isArray;
-    validations.equals = angular.equals;
-    return validations;
+        return true;
+    }
+    farmdataValidator.validate = _validate;
+    return farmdataValidator;
 });
+
+"use strict";

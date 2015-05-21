@@ -4,9 +4,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$rootScope.appVersion = farmbuild.examples.webmapping.version;
 	})
 
-	.controller('MapCtrl', function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openlayersmap) {
+	.controller('MapCtrl', function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openLayers) {
 
-		var load = $location.search().load || false, gmap, ol;
+		var load = $location.search().load || false, gmap;
 
 		$scope.farmData = {};
 		$scope.farmChanged = false;
@@ -16,28 +16,29 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			if(!angular.equals(old,newVal)){
 				$scope.farmChanged = true;
 			}
-		}, true)
+		}, true);
 
 		$scope.loadFarmData = function ($fileContent) {
 			try {
 
 				$scope.farmData = angular.fromJson($fileContent);
-				var geometry = webmapping.load($scope.farmData);
+				var geometry = webmapping.load($scope.farmData).webMapping;
 
 				if (!angular.isDefined(geometry)) {
 					$scope.noResult = true;
 					return;
 				}
 
-				$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
-				ol = openlayersmap.load(geometry.farm, geometry.paddocks);
-				openlayersmap.integrateGMap(gmap);
+				openLayers.load(geometry.farm, geometry.paddocks);
+				openLayers.integrateGMap(gmap);
 				$scope.farmLoaded = true;
 
 			} catch (e) {
 				$log.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
 				$scope.noResult = true;
 			}
+
+			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.exportFarmData = function (farmData) {
@@ -50,14 +51,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$log.info('apply...');
 			$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
 			$scope.farmChanged = false;
-			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.cancel = function () {
 			$log.info('cancel...');
 			$scope.farmData = findInSessionStorage();
 			$scope.farmChanged = false;
-			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.defineFarm = function () {
@@ -65,7 +64,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.farmLoaded = true;
 			$scope.farmChanged = false;
 			$scope.saveToSessionStorage('farmData', {});
-			//webmapping.ga.trackCalculate('AgSmart');
 		};
 
 		$scope.saveToSessionStorage = function (key, value) {
@@ -75,7 +73,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.deleteFromSessionStorage = function (key, value) {
 			sessionStorage.clear();
 			$scope.farmData = {};
-			openlayersmap.clear();
+			openLayers.clear();
 			$scope.farmChanged = true;
 		};
 
@@ -84,9 +82,32 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		function init() {
+			//proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs");
+			//var projection = ol.proj.get({code: 'EPSG:4283'});
+			//var openLayerMap = new ol.Map({
+			//	target: 'olmap',
+			//	view:new ol.View({
+			//		rotation: 0,
+			//		projection: projection,
+			//		maxZoom: 21
+			//	}),
+			//	interactions: ol.interaction.defaults({
+			//		altShiftDragRotate: false,
+			//		dragPan: false,
+			//		rotate: false,
+			//		mouseWheelZoom: true
+			//	}).extend([new ol.interaction.DragPan({kinetic: null})]),
+			//	controls: ol.control.defaults({
+			//		attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+			//			collapsible: false
+			//		})
+			//	}).extend([
+			//		new ol.control.ScaleLine()
+			//	])
+			//});
 			gmap = googlemapslayer.init("gmap");
-			ol = openlayersmap.init('olmap', 'layers');
-			openlayersmap.integrateGMap(gmap);
+			openLayers.init('olmap', 'layers');
+			openLayers.integrateGMap(gmap);
 			googleaddresssearch.init('locationautocomplete');
 			if(findInSessionStorage() && findInSessionStorage().name && findInSessionStorage().geometry){
 				$scope.loadFarmData(findInSessionStorage())

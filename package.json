@@ -37,10 +37,13 @@
     "generate-docs": "node_modules/.bin/jsdoc --configure .jsdoc.json",
     "version": "node_modules/.bin/replace '@version {version}' '@version 0.1.1' src/*.js src/**/*.js",
     "jshint": " node_modules/.bin/jshint -c .jshintrc --filename src/**/*-src.js src/nutrient-calculator.js --verbose --show-non-errors",
-    "concat": "uglifyjs src/nutrient-calculator.js src/**/*.src.js src/index.js -o dist/farmbuild-nutrientcalculator.js -v -b",
-    "uglify": "uglifyjs dist/farmbuild-nutrientcalculator.js --source-map dist/farmbuild-nutrientcalculator.min.js.map --source-map-url farmbuild-nutrientcalculator.min.js.map -o dist/farmbuild-nutrientcalculator.min.js -v -c",
-    "copy-core": "ncp bower_components/jquery/dist/ dist/jquery && ncp bower_components/farmbuild-core/dist/ dist/ && ncp bower_components/farmbuild-farmdata/dist/ dist/ && ncp bower_components/proj4/dist/ dist/proj4",
+    "concat": "uglifyjs src/web-mapping.src.js src/**/*.src.js src/**/**/*.src.js src/index.src.js -o dist/farmbuild-webmapping.js -v -b",
+    "uglify": "uglifyjs dist/farmbuild-webmapping.js --source-map dist/farmbuild-webmapping.min.js.map --source-map-url farmbuild-webmapping.min.js.map -o dist/farmbuild-webmapping.min.js -v -c",
+    "copy-core": "ncp bower_components/farmbuild-core/dist/ dist/ && ncp bower_components/farmbuild-farmdata/dist/ dist/",
     "copy-ol": "ncp lib/ dist/",
-    "dist": "npm run clean && npm run copy-core && npm run copy-ol"
+    "copy-jquery": "ncp bower_components/jquery/dist/ dist/jquery",
+    "copy-turf": "ncp bower_components/turf/ dist/turf",
+    "copy-proj4js": "ncp bower_components/proj4/dist/ dist/proj4",
+    "dist": "npm run clean && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-jquery && npm run copy-turf && npm run copy-proj4js"
   }
 }
