@@ -6,125 +6,125 @@ angular.module('farmbuild.webmapping')
 	          $log) {
 		var _isDefined = validations.isDefined,
 			_draw, _modify, _select, _snap, _layer, _source, _init = function (layer, map) {
-			var selectedLayer = document.getElementById('layers');
-			if (!_isDefined(layer)) {
-				return;
-			}
-			_layer = layer;
-			_source = layer.getSource();
-			map.on('click', function (evt) {
-				var activeLayer = selectedLayer.value;
-				if (!(activeLayer === 'farm' || activeLayer === 'paddocks')) {
-					modify.disable();
-					draw.disable();
+				var selectedLayer = document.getElementById('layers');
+				if (!_isDefined(layer)) {
 					return;
 				}
-				if (_source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
-					draw.disable();
-					modify.enable();
-				} else {
-					modify.disable();
-					draw.enable();
-				}
-			});
-
-			// Remove all interactions of map
-			function _removeInteractions() {
-				map.getInteractions().clear();
-				map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
-			};
-
-
-			_removeInteractions(map);
-
-			if (!_isDefined(_source)) {
-				_source = new ol.source.Vector({
-					features: []
-				});
-			}
-
-			var modify = function () {
-				_select = new ol.interaction.Select({
-					addCondition: ol.events.condition.shiftKeyOnly,
-					layers: [layer]
-				});
-				_modify = new ol.interaction.Modify({
-					features: _select.getFeatures()
+				_layer = layer;
+				_source = layer.getSource();
+				map.on('click', function (evt) {
+					var activeLayer = selectedLayer.value;
+					if (!(activeLayer === 'farm' || activeLayer === 'paddocks')) {
+						modify.disable();
+						draw.disable();
+						return;
+					}
+					if (_source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
+						draw.disable();
+						modify.enable();
+					} else {
+						modify.disable();
+						draw.enable();
+					}
 				});
 
-				function _init() {
-					map.addInteraction(_select);
-					map.addInteraction(_modify);
-
-					setEvents();
-				}
-
-				function _enable() {
-					_select.setActive(true);
-					_modify.setActive(true);
-				}
-
-				function _disable() {
-					_select.setActive(false);
-					_modify.setActive(false);
-				}
-
-				function setEvents() {
-					var selectedFeatures = _select.getFeatures();
-
-					_select.on('change:active', function () {
-						selectedFeatures.forEach(selectedFeatures.remove, selectedFeatures);
-					});
+				// Remove all interactions of map
+				function _removeInteractions() {
+					map.getInteractions().clear();
+					map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
 				};
 
 
-				return {
-					init: _init,
-					enable: _enable,
-					disable: _disable
+				_removeInteractions(map);
+
+				if (!_isDefined(_source)) {
+					_source = new ol.source.Vector({
+						features: []
+					});
 				}
-			}();
+
+				var modify = function () {
+					_select = new ol.interaction.Select({
+						addCondition: ol.events.condition.shiftKeyOnly,
+						layers: [layer]
+					});
+					_modify = new ol.interaction.Modify({
+						features: _select.getFeatures()
+					});
+
+					function _init() {
+						map.addInteraction(_select);
+						map.addInteraction(_modify);
+
+						setEvents();
+					}
+
+					function _enable() {
+						_select.setActive(true);
+						_modify.setActive(true);
+					}
+
+					function _disable() {
+						_select.setActive(false);
+						_modify.setActive(false);
+					}
+
+					function setEvents() {
+						var selectedFeatures = _select.getFeatures();
+
+						_select.on('change:active', function () {
+							selectedFeatures.forEach(selectedFeatures.remove, selectedFeatures);
+						});
+					};
 
 
-			var draw = function () {
-				_draw = new ol.interaction.Draw({
-					source: _source,
-					type: /** @type {ol.geom.GeometryType} */ ('Polygon')
+					return {
+						init: _init,
+						enable: _enable,
+						disable: _disable
+					}
+				}();
+
+
+				var draw = function () {
+					_draw = new ol.interaction.Draw({
+						source: _source,
+						type: /** @type {ol.geom.GeometryType} */ ('Polygon')
+					});
+
+					function _init() {
+						map.addInteraction(_draw);
+						_draw.setActive(false);
+					}
+
+					function _enable() {
+						_draw.setActive(true);
+					}
+
+					function _disable() {
+						_draw.setActive(false);
+					}
+
+					return {
+						init: _init,
+						enable: _enable,
+						disable: _disable
+					}
+				}();
+
+				_snap = new ol.interaction.Snap({
+					source: _source
 				});
 
-				function _init() {
-					map.addInteraction(_draw);
-					_draw.setActive(false);
-				}
 
-				function _enable() {
-					_draw.setActive(true);
-				}
+				modify.init();
+				draw.init();
+				map.addInteraction(_snap);
+				draw.disable();
+				modify.disable();
+			};
 
-				function _disable() {
-					_draw.setActive(false);
-				}
-
-				return {
-					init: _init,
-					enable: _enable,
-					disable: _disable
-				}
-			}();
-
-			_snap = new ol.interaction.Snap({
-				source: _source
-			});
-
-
-			modify.init();
-			draw.init();
-			map.addInteraction(_snap);
-			draw.disable();
-			modify.disable();
-		};
-
-		function _merge(){
+		function _merge() {
 			var format = new ol.format['GeoJSON'](),
 			// this will be the data in the chosen format
 				data,
@@ -139,36 +139,31 @@ angular.module('farmbuild.webmapping')
 			_select.getFeatures().clear();
 		};
 
-		function _clip(clippee, clipper){
+		function _clip(clippee, clipper) {
 			return turf.erase(clippee, clipper);
 
 		};
 
-		function _clipAdd(){
+		function _clipAdd() {
+			_source.removeFeature(_select.getFeatures().item(0));
 			var format = new ol.format['GeoJSON'](),
 			// this will be the data in the chosen format
 				featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0],
-				layerFeatures = _source.getFeatures(),
-				clipped;
+				layerFeatures = _source.getFeatures(), clipped = featureToClip;
 
-			angular.forEach(layerFeatures, function(layerFeature){
-				var clipper = angular.fromJson(format.writeFeature(layerFeature)), _clipped;
-				_clipped = _clip(featureToClip, clipper);
-				if(_isDefined(_clipped)){
-					clipped = _clipped;
-				}
+			angular.forEach(layerFeatures, function (layerFeature) {
+				var clipper = angular.fromJson(format.writeFeature(layerFeature));
+				clipped = _clip(clipped, clipper);
 			});
 
 			_source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(clipped.geometry.coordinates)
+				geometry: new ol.geom[clipped.geometry.type](clipped.geometry.coordinates)
 			}));
-
-			_source.removeFeature(_select.getFeatures().item(0));
 
 			_select.getFeatures().clear();
 		};
 
-		function _area(){
+		function _area() {
 			var format = new ol.format['GeoJSON'](),
 			// this will be the data in the chosen format
 				features,
@@ -180,13 +175,13 @@ angular.module('farmbuild.webmapping')
 
 		function _removeFeatures(features, layer) {
 			if (_isDefined(features)) {
-				angular.forEach(features, function(feature){
+				angular.forEach(features, function (feature) {
 					layer.getSource().removeFeature(feature);
 				});
 			}
 		};
 
-		function _remove(){
+		function _remove() {
 			var featuresToRemove = _select.getFeatures().getArray();
 			_removeFeatures(featuresToRemove, _layer);
 			_select.getFeatures().clear();

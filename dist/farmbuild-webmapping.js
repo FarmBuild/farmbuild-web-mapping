@@ -505,18 +505,15 @@ angular.module("farmbuild.webmapping").factory("openlayersDraw", function(valida
         return turf.erase(clippee, clipper);
     }
     function _clipAdd() {
-        var format = new ol.format["GeoJSON"](), featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0], layerFeatures = _source.getFeatures(), clipped;
+        _source.removeFeature(_select.getFeatures().item(0));
+        var format = new ol.format["GeoJSON"](), featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0], layerFeatures = _source.getFeatures(), clipped = featureToClip;
         angular.forEach(layerFeatures, function(layerFeature) {
-            var clipper = angular.fromJson(format.writeFeature(layerFeature)), _clipped;
-            _clipped = _clip(featureToClip, clipper);
-            if (_isDefined(_clipped)) {
-                clipped = _clipped;
-            }
+            var clipper = angular.fromJson(format.writeFeature(layerFeature));
+            clipped = _clip(clipped, clipper);
         });
         _source.addFeature(new ol.Feature({
-            geometry: new ol.geom.Polygon(clipped.geometry.coordinates)
+            geometry: new ol.geom[clipped.geometry.type](clipped.geometry.coordinates)
         }));
-        _source.removeFeature(_select.getFeatures().item(0));
         _select.getFeatures().clear();
     }
     function _area() {
