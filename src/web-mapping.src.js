@@ -82,6 +82,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 		 */
 		function _load(farmData) {
 			var loaded = farmdata.load(farmData);
+
 			if (!_isDefined(loaded)) {
 				return undefined;
 			}
