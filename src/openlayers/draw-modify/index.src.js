@@ -1,4 +1,4 @@
-var MERGE, REMOVE, CLIP, AREA;
+var MERGE, REMOVE, CLIP, AREA, SELECT;
 
 angular.module('farmbuild.webmapping')
 	.factory('openlayersDraw',
@@ -55,8 +55,7 @@ angular.module('farmbuild.webmapping')
 					function _init() {
 						map.addInteraction(_select);
 						map.addInteraction(_modify);
-
-						setEvents();
+						SELECT = _select;
 					}
 
 					function _enable() {
@@ -68,15 +67,6 @@ angular.module('farmbuild.webmapping')
 						_select.setActive(false);
 						_modify.setActive(false);
 					}
-
-					function setEvents() {
-						var selectedFeatures = _select.getFeatures();
-
-						_select.on('change:active', function () {
-							selectedFeatures.forEach(selectedFeatures.remove, selectedFeatures);
-						});
-					};
-
 
 					return {
 						init: _init,
@@ -104,6 +94,14 @@ angular.module('farmbuild.webmapping')
 					function _disable() {
 						_draw.setActive(false);
 					}
+
+					_draw.on('drawend', function (e) {
+						var feature = e.feature;
+						_clip(feature);
+						setTimeout(function () {
+							_source.removeFeature(feature);
+						}, 100);
+					});
 
 					return {
 						init: _init,
@@ -134,26 +132,20 @@ angular.module('farmbuild.webmapping')
 			data = angular.fromJson(format.writeFeatures(featuresToMerge));
 			merged = turf.merge(data);
 			_source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(merged.geometry.coordinates)
+				geometry: new ol.geom[merged.geometry.type](merged.geometry.coordinates)
 			}));
 			_select.getFeatures().clear();
 		};
 
-		function _clip(clippee, clipper) {
-			return turf.erase(clippee, clipper);
-
-		};
-
-		function _clipAdd() {
-			_source.removeFeature(_select.getFeatures().item(0));
+		function _clip(feature) {
 			var format = new ol.format['GeoJSON'](),
 			// this will be the data in the chosen format
-				featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0],
+				featureToClip = angular.fromJson(format.writeFeature(feature)),
 				layerFeatures = _source.getFeatures(), clipped = featureToClip;
 
 			angular.forEach(layerFeatures, function (layerFeature) {
 				var clipper = angular.fromJson(format.writeFeature(layerFeature));
-				clipped = _clip(clipped, clipper);
+				clipped = turf.erase(clipped, clipper);
 			});
 
 			_source.addFeature(new ol.Feature({
@@ -189,14 +181,14 @@ angular.module('farmbuild.webmapping')
 
 		MERGE = _merge;
 		REMOVE = _remove;
-		CLIP = _clipAdd;
+		CLIP = _clip;
 		AREA = _area;
 
 		return {
 			init: _init,
 			merge: _merge,
 			remove: _remove,
-			clip: _clipAdd,
+			clip: _clip,
 			area: _area
 		}
 
