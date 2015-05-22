@@ -501,14 +501,22 @@ angular.module("farmbuild.webmapping").factory("openlayersDraw", function(valida
         }));
         _select.getFeatures().clear();
     }
-    function _clip() {
-        var format = new ol.format["GeoJSON"](), data, featuresToClip = _select.getFeatures().getArray(), f1, f2;
-        _layer.getSource().removeFeature(featuresToClip[0]);
-        data = angular.fromJson(format.writeFeatures(featuresToClip)).features;
-        f1 = turf.erase(data[0], data[1]);
+    function _clip(clippee, clipper) {
+        return turf.erase(clippee, clipper);
+    }
+    function _clipAdd() {
+        var format = new ol.format["GeoJSON"](), featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0], layerFeatures = _source.getFeatures(), clipped;
+        angular.forEach(layerFeatures, function(layerFeature) {
+            var clipper = angular.fromJson(format.writeFeature(layerFeature)), _clipped;
+            _clipped = _clip(featureToClip, clipper);
+            if (_isDefined(_clipped)) {
+                clipped = _clipped;
+            }
+        });
         _source.addFeature(new ol.Feature({
-            geometry: new ol.geom.Polygon(f1.geometry.coordinates)
+            geometry: new ol.geom.Polygon(clipped.geometry.coordinates)
         }));
+        _source.removeFeature(_select.getFeatures().item(0));
         _select.getFeatures().clear();
     }
     function _area() {
@@ -530,13 +538,13 @@ angular.module("farmbuild.webmapping").factory("openlayersDraw", function(valida
     }
     MERGE = _merge;
     REMOVE = _remove;
-    CLIP = _clip;
+    CLIP = _clipAdd;
     AREA = _area;
     return {
         init: _init,
         merge: _merge,
         remove: _remove,
-        clip: _clip,
+        clip: _clipAdd,
         area: _area
     };
 });

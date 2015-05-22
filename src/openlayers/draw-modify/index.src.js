@@ -139,24 +139,32 @@ angular.module('farmbuild.webmapping')
 			_select.getFeatures().clear();
 		};
 
-		function _clip(){
+		function _clip(clippee, clipper){
+			return turf.erase(clippee, clipper);
+
+		};
+
+		function _clipAdd(){
 			var format = new ol.format['GeoJSON'](),
 			// this will be the data in the chosen format
-				data,
-				featuresToClip = _select.getFeatures().getArray(),
-				f1, f2;
+				featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0],
+				layerFeatures = _source.getFeatures(),
+				clipped;
 
-			_layer.getSource().removeFeature(featuresToClip[0]);
+			angular.forEach(layerFeatures, function(layerFeature){
+				var clipper = angular.fromJson(format.writeFeature(layerFeature)), _clipped;
+				_clipped = _clip(featureToClip, clipper);
+				if(_isDefined(_clipped)){
+					clipped = _clipped;
+				}
+			});
 
-			data = angular.fromJson(format.writeFeatures(featuresToClip)).features;
-			f1 = turf.erase(data[0], data[1]);
-			//f2 = turf.erase(data[1], data[0]);
 			_source.addFeature(new ol.Feature({
-				geometry: new ol.geom.Polygon(f1.geometry.coordinates)
+				geometry: new ol.geom.Polygon(clipped.geometry.coordinates)
 			}));
-			//_source.addFeature(new ol.Feature({
-			//	geometry: new ol.geom.Polygon(f2.geometry.coordinates)
-			//}));
+
+			_source.removeFeature(_select.getFeatures().item(0));
+
 			_select.getFeatures().clear();
 		};
 
@@ -186,14 +194,14 @@ angular.module('farmbuild.webmapping')
 
 		MERGE = _merge;
 		REMOVE = _remove;
-		CLIP = _clip;
+		CLIP = _clipAdd;
 		AREA = _area;
 
 		return {
 			init: _init,
 			merge: _merge,
 			remove: _remove,
-			clip: _clip,
+			clip: _clipAdd,
 			area: _area
 		}
 
