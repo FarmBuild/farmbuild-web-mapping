@@ -98,7 +98,7 @@ angular.module('farmbuild.webmapping')
 			});
 
 			_map = new ol.Map({
-				layers: [_paddocksLayer],
+				layers: [_paddocksLayer, _farmLayer],
 				target: targetElementId,
 				view: _view,
 				interactions: ol.interaction.defaults({
@@ -123,14 +123,14 @@ angular.module('farmbuild.webmapping')
 
 			// Deselect all selections when layer is changed from farm to paddocks.
 			_layerSelectionElement.addEventListener('change', function () {
-				var source;
+				var layer;
 				if (_layerSelectionElement.value === "paddocks") {
-					source = _paddocksSource;
+					layer = _paddocksLayer;
 				}
 				if (_layerSelectionElement.value === "farm") {
-					source = _farmSource;
+					layer = _farmLayer;
 				}
-				openlayersDraw.init(source, _map);
+				openlayersDraw.init(layer, _map);
 			});
 
 			return {

@@ -1,85 +1,56 @@
-'use strict';
+var MERGE, REMOVE, CLIP, AREA;
 
 angular.module('farmbuild.webmapping')
 	.factory('openlayersDraw',
 	function (validations,
 	          $log) {
-		var _featureOverlay, _init = function (source, map) {
-			var _isDefined = validations.isDefined, _draw, _modify, _select, _snap, selectedLayer = document.getElementById('layers');
+		var _isDefined = validations.isDefined,
+			_draw, _modify, _select, _snap, _layer, _source, _init = function (layer, map) {
+			var selectedLayer = document.getElementById('layers');
+			if (!_isDefined(layer)) {
+				return;
+			}
+			_layer = layer;
+			_source = layer.getSource();
 			map.on('click', function (evt) {
 				var activeLayer = selectedLayer.value;
-				if (source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
+				if (!(activeLayer === 'farm' || activeLayer === 'paddocks')) {
+					modify.disable();
+					draw.disable();
+					return;
+				}
+				if (_source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
 					draw.disable();
 					modify.enable();
-				} else if (activeLayer === 'farm' || activeLayer === 'paddocks') {
-					modify.disable();
-					draw.enable();
 				} else {
 					modify.disable();
-					draw.disable();
+					draw.enable();
 				}
 			});
 
-			// Deselect selected features
-			function _removeOverLay() {
-				if (_isDefined(_featureOverlay)) {
-					_featureOverlay.setStyle(new ol.style.Style({}));
-					map.removeOverlay(_featureOverlay);
-				}
-			};
-
 			// Remove all interactions of map
 			function _removeInteractions() {
-				map.getInteractions().clear()
+				map.getInteractions().clear();
 				map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
 			};
 
-			function _addOverlay(source) {
-				// The features are not added to a regular vector layer/source,
-// but to a feature overlay which holds a collection of features.
-// This collection is passed to the modify and also the draw
-// interaction, so that both can add or modify features.
-				return new ol.FeatureOverlay({
-					features: source.getFeatures(),
-					style: new ol.style.Style({
-						fill: new ol.style.Fill({
-							color: 'rgba(255, 255, 255, 0.2)'
-						}),
-						stroke: new ol.style.Stroke({
-							color: '#ffcc33',
-							width: 2
-						}),
-						image: new ol.style.Circle({
-							radius: 7,
-							fill: new ol.style.Fill({
-								color: '#ffcc33'
-							})
-						})
-					}),
-					map: map
-				});
 
-			};
-
-			_removeOverLay(map);
 			_removeInteractions(map);
 
-// The features are not added to a regular vector layer/source,
-// but to a feature overlay which holds a collection of features.
-// This collection is passed to the modify and also the draw
-// interaction, so that both can add or modify features.
-			if (!_isDefined(source)) {
-				source = new ol.source.Vector({
+			if (!_isDefined(_source)) {
+				_source = new ol.source.Vector({
 					features: []
 				});
 			}
-			_featureOverlay = _addOverlay(source);
 
 			var modify = function () {
-				_select = new ol.interaction.Select();
-					_modify = new ol.interaction.Modify({
-						features: _select.getFeatures()
-					});
+				_select = new ol.interaction.Select({
+					addCondition: ol.events.condition.shiftKeyOnly,
+					layers: [layer]
+				});
+				_modify = new ol.interaction.Modify({
+					features: _select.getFeatures()
+				});
 
 				function _init() {
 					map.addInteraction(_select);
@@ -104,7 +75,8 @@ angular.module('farmbuild.webmapping')
 					_select.on('change:active', function () {
 						selectedFeatures.forEach(selectedFeatures.remove, selectedFeatures);
 					});
-				}
+				};
+
 
 				return {
 					init: _init,
@@ -116,7 +88,7 @@ angular.module('farmbuild.webmapping')
 
 			var draw = function () {
 				_draw = new ol.interaction.Draw({
-					features: _featureOverlay.getFeatures(),
+					source: _source,
 					type: /** @type {ol.geom.GeometryType} */ ('Polygon')
 				});
 
@@ -141,7 +113,7 @@ angular.module('farmbuild.webmapping')
 			}();
 
 			_snap = new ol.interaction.Snap({
-				features: _featureOverlay.getFeatures()
+				source: _source
 			});
 
 
@@ -152,8 +124,85 @@ angular.module('farmbuild.webmapping')
 			modify.disable();
 		};
 
+		function _merge(){
+			var format = new ol.format['GeoJSON'](),
+			// this will be the data in the chosen format
+				data,
+				featuresToMerge = _select.getFeatures().getArray(),
+				merged;
+			_removeFeatures(featuresToMerge, _layer);
+			data = angular.fromJson(format.writeFeatures(featuresToMerge));
+			merged = turf.merge(data);
+			_source.addFeature(new ol.Feature({
+				geometry: new ol.geom.Polygon(merged.geometry.coordinates)
+			}));
+			_select.getFeatures().clear();
+		};
+
+		function _clip(clippee, clipper){
+			return turf.erase(clippee, clipper);
+
+		};
+
+		function _clipAdd(){
+			var format = new ol.format['GeoJSON'](),
+			// this will be the data in the chosen format
+				featureToClip = angular.fromJson(format.writeFeatures(_select.getFeatures().getArray())).features[0],
+				layerFeatures = _source.getFeatures(),
+				clipped;
+
+			angular.forEach(layerFeatures, function(layerFeature){
+				var clipper = angular.fromJson(format.writeFeature(layerFeature)), _clipped;
+				_clipped = _clip(featureToClip, clipper);
+				if(_isDefined(_clipped)){
+					clipped = _clipped;
+				}
+			});
+
+			_source.addFeature(new ol.Feature({
+				geometry: new ol.geom.Polygon(clipped.geometry.coordinates)
+			}));
+
+			_source.removeFeature(_select.getFeatures().item(0));
+
+			_select.getFeatures().clear();
+		};
+
+		function _area(){
+			var format = new ol.format['GeoJSON'](),
+			// this will be the data in the chosen format
+				features,
+				olFeatures = _select.getFeatures().getArray();
+
+			features = angular.fromJson(format.writeFeatures(olFeatures));
+			return turf.area(features) * 0.0001;
+		};
+
+		function _removeFeatures(features, layer) {
+			if (_isDefined(features)) {
+				angular.forEach(features, function(feature){
+					layer.getSource().removeFeature(feature);
+				});
+			}
+		};
+
+		function _remove(){
+			var featuresToRemove = _select.getFeatures().getArray();
+			_removeFeatures(featuresToRemove, _layer);
+			_select.getFeatures().clear();
+		};
+
+		MERGE = _merge;
+		REMOVE = _remove;
+		CLIP = _clipAdd;
+		AREA = _area;
+
 		return {
-			init: _init
+			init: _init,
+			merge: _merge,
+			remove: _remove,
+			clip: _clipAdd,
+			area: _area
 		}
 
 	});
