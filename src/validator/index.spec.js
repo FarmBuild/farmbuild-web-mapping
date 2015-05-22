@@ -23,14 +23,14 @@ describe('farmbuild.webmapping module', function() {
       webmappingValidator = _webmappingValidator_
   }))
 
-  describe('Given calling validator.validate should return true or fale', function() {
+  describe('Given calling validator.validate should return true or false', function() {
     it('webmappingValidator should be defined', inject(function() {
       expect(webmappingValidator).toBeDefined()
     }))
 
     it('Susan farm data should be valid', inject(function() {
       var loaded = fixture.load(susanFarm);
-      expect(webmappingValidator.validate(loaded)).toBeDefined()
+      expect(webmappingValidator.validate(loaded)).toBeTruthy()
     }))
 
 

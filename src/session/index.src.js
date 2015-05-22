@@ -25,52 +25,28 @@ angular.module('farmbuild.webmapping')
       return root.webMapping;
     }
 
+//    function save(toSave) {
+//      var farmData = farmdata.session.find();
+//
+//      if(!_isDefined(farmData)) {
+//        $log.error('Unable to find the farmData in the session!');
+//        return undefined;
+//      }
+//
+//      farmData.dateLastUpdated = new Date();
+//
+//      farmData.webMapping = toSave;
+//      farmdata.session.save(farmData);
+//
+//      return toSave;
+//    }
+//    webMappingSession.save = save;
 
-    webMappingSession.saveSection = function(section, value) {
-      var loaded = load();
+//    webMappingSession.loadSection = function(section) {
+//      var loaded = load();
+//      return loaded?loaded[section]:null;
+//    }
 
-      if(!_isDefined(loaded)) {
-        $log.error('Unable to find an existing farmData! please create then save.');
-        return webMappingSession
-      }
-
-      loaded[section] = value;
-
-      return save(loaded);
-    }
-
-    function save(toSave) {
-      var farmData = farmdata.session.find();
-
-      if(!_isDefined(farmData)) {
-        $log.error('Unable to find the farmData in the session!');
-        return undefined;
-      }
-
-      farmData.dateLastUpdated = new Date();
-
-      farmData.webMapping = toSave;
-      farmdata.session.save(farmData);
-
-      return toSave;
-    }
-    webMappingSession.save = save;
-
-    webMappingSession.loadSection = function(section) {
-      var loaded = load();
-      return loaded?loaded[section]:null;
-    }
-
-    webMappingSession.isLoadFlagSet = function(location) {
-      var load = false;
-
-      if(location.href.split('?').length > 1 &&
-        location.href.split('?')[1].indexOf('load') === 0){
-        load = (location.href.split('?')[1].split('=')[1] === 'true');
-      }
-
-      return load;
-    }
 
     webMappingSession.find = function() {
       return farmdata.session.find();

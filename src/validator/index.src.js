@@ -17,6 +17,7 @@
 angular.module('farmbuild.webmapping')
   .factory('webmappingValidator',
   function (validations,
+            farmdata,
             $log) {
     var webmappingValidator = {},
       _isDefined = validations.isDefined,
@@ -36,6 +37,10 @@ angular.module('farmbuild.webmapping')
 
     function _validate(farmData) {
       $log.info('validating farmData...', farmData);
+
+      if(!farmdata.validate(farmData)) {
+        return false;
+      }
 
       if (!_isDefined(farmData) ||
           !_isDefined(farmData.geometry) ||

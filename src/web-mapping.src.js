@@ -17,66 +17,37 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	function (farmdata,
 	          validations,
 	          $log,
+            webmappingValidator,
+            webmappingConverter,
 	          webMappingSession) {
 		var _isDefined = validations.isDefined,
-			webmapping;
-
-		function _fromFarmData(farmData) {
-			$log.info("Extracting farm and paddocks geometry from farmData ...");
-			var farm = farmData.geometry,
-				paddocks = [];
-
-			if (!_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
-				return undefined;
-			}
-
-			angular.forEach(farmData.paddocks, function (val) {
-				paddocks.push(
-					{
-						"type": "Feature",
-						"geometry": val.geometry
-					});
-			});
-
-			return {
-				farm: {
-					"type": "FeatureCollection",
-					"features": [
-						{
-							"type": "Feature",
-							"geometry": farm
-						}]
-				},
-				paddocks: {
-					"type": "FeatureCollection",
-					"features": paddocks
-				}
-			}
-		};
-
-		function _toFarmData(farmGeometry) {
-			$log.info("Writing farm and paddocks geometry to farmData ...");
-			var farm = data.geometry,
-				paddocks = [];
-
-			angular.forEach(data.paddocks, function (val) {
-				paddocks.push(val.geometry);
-			});
-
-			return farmGeometry;
-		};
+			webmapping = {session:webMappingSession, farmdata: farmdata,
+      validate:webmappingValidator.validate};
 
 		$log.info('Welcome to Web Mapping... ' +
 		'this should only be initialised once! why we see twice in the example?');
 
+    /**
+     * Finds the farmData from the session.
+     * @method find
+     * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+     * @public
+     * @static
+     */
+    webmapping.find = function () {
+      return webMappingSession.find();
+    }
+
 		function createDefault(farmData) {
-			return _fromFarmData(farmData);
+			return webmappingConverter.toGeoJson(farmData);
 		}
 
 		/**
 		 * Validate farmData block
 		 * @method load
-		 * @returns {object} farmData
+		 * @returns {object} geoJsons containing the feature collection,
+     * geoJsons.farm: represents the farm
+     * geoJsonspaddocks: represents the paddocks
 		 * @public
 		 * @static
 		 */
@@ -87,14 +58,9 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				return undefined;
 			}
 
-			if (!loaded.hasOwnProperty('webMapping')) {
-				loaded.webMapping = createDefault(farmData);
-				loaded = farmdata.update(loaded);
-			}
-
-			return loaded;
+			return createDefault(farmData);
 		};
-
+    webmapping.load = _load;
 
 		function _exportFarmData(toExport) {
 			if (!toExport) {
@@ -103,10 +69,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 			return _toFarmData(toExport);
 		};
 
-		webmapping = {
-			exportFarmData: _exportFarmData,
-			load: _load
-		};
+		webmapping.exportFarmData = _exportFarmData;
 
 		// Provide a shortcut for modules
 		webmapping.version = '0.1.0';

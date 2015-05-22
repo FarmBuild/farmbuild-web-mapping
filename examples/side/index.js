@@ -22,23 +22,26 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			try {
 
 				$scope.farmData = angular.fromJson($fileContent);
-				var geometry = webmapping.load($scope.farmData).webMapping;
 
-				if (!angular.isDefined(geometry)) {
+				var geoJsons = webmapping.load($scope.farmData);
+
+				if (!angular.isDefined(geoJsons)) {
 					$scope.noResult = true;
 					return;
 				}
 
-				openLayers.load(geometry.farm, geometry.paddocks);
-				openLayers.integrateGMap(gmap);
-				$scope.farmLoaded = true;
+				openLayers.load(geoJsons.farm, geoJsons.paddocks);
+
+        openLayers.integrateGMap(gmap);
+
+        $scope.farmLoaded = true;
 
 			} catch (e) {
 				$log.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
 				$scope.noResult = true;
 			}
 
-			//webmapping.ga.trackCalculate('AgSmart');
+			//webmapping.ga.track('AgSmart');
 		};
 
 		$scope.exportFarmData = function (farmData) {
@@ -82,32 +85,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		function init() {
-			//proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs");
-			//var projection = ol.proj.get({code: 'EPSG:4283'});
-			//var openLayerMap = new ol.Map({
-			//	target: 'olmap',
-			//	view:new ol.View({
-			//		rotation: 0,
-			//		projection: projection,
-			//		maxZoom: 21
-			//	}),
-			//	interactions: ol.interaction.defaults({
-			//		altShiftDragRotate: false,
-			//		dragPan: false,
-			//		rotate: false,
-			//		mouseWheelZoom: true
-			//	}).extend([new ol.interaction.DragPan({kinetic: null})]),
-			//	controls: ol.control.defaults({
-			//		attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-			//			collapsible: false
-			//		})
-			//	}).extend([
-			//		new ol.control.ScaleLine()
-			//	])
-			//});
 			gmap = googlemapslayer.init("gmap");
+
 			openLayers.init('olmap', 'layers');
+
 			openLayers.integrateGMap(gmap);
+
 			googleaddresssearch.init('locationautocomplete');
 		};
 
