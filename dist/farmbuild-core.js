@@ -6340,8 +6340,9 @@ angular.module("farmbuild.core").factory("googleAnalytics", function($log, valid
         ga(trackerName + ".send", "pageview", values);
     }
     ga("create", "UA-53478356-1", "auto", {
-        name: trackerName
+        name: name
     });
+    sendPageView();
     googleAnalytics.track = function(apiName, clientName) {
         if (!_isDefined(apiName)) {
             $log.error("googleAnalytics.track apiName must be provided." + " Please specify you API name.");

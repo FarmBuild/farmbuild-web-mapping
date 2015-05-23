@@ -74,7 +74,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("openLayers", function(validations, $log, openlayersDraw, googlemapslayer) {
+angular.module("farmbuild.webmapping").factory("openLayers", function(validations, $log, interactions, googlemapslayer) {
     var defaults = {
         centerNew: [ -36.22488327137526, 145.5826132801325 ],
         zoomNew: 6
@@ -174,7 +174,26 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
             if (_layerSelectionElement.value === "farm") {
                 layer = _farmLayer;
             }
-            openlayersDraw.init(layer, _map);
+            interactions.destroy(_map);
+            interactions.init(layer, _map, _paddocksSource, _farmSource);
+        });
+        _map.on("click", function(event) {
+            if (_layerSelectionElement.value === "none" || _layerSelectionElement.value === "") {
+                interactions.destroy(_map);
+                return;
+            }
+            var layer;
+            if (_layerSelectionElement.value === "paddocks") {
+                layer = _paddocksLayer;
+            }
+            if (_layerSelectionElement.value === "farm") {
+                layer = _farmLayer;
+            }
+            if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
+                interactions.enableEditing();
+            } else {
+                interactions.enableDrawing();
+            }
         });
         return {
             map: _map,
@@ -391,151 +410,203 @@ angular.module("farmbuild.webmapping").factory("googlemapslayer", function(valid
     };
 });
 
-var MERGE, REMOVE, CLIP, AREA, SELECT;
+"use strict";
 
-angular.module("farmbuild.webmapping").factory("openlayersDraw", function(validations, $log) {
-    var _isDefined = validations.isDefined, _draw, _modify, _select, _snap, _layer, _source, _init = function(layer, map) {
-        var selectedLayer = document.getElementById("layers");
-        if (!_isDefined(layer)) {
-            return;
-        }
-        _layer = layer;
-        _source = layer.getSource();
-        map.on("click", function(evt) {
-            var activeLayer = selectedLayer.value;
-            if (!(activeLayer === "farm" || activeLayer === "paddocks")) {
-                modify.disable();
-                draw.disable();
-                return;
-            }
-            if (_source.getFeaturesAtCoordinate(evt.coordinate).length > 0) {
-                draw.disable();
-                modify.enable();
-            } else {
-                modify.disable();
-                draw.enable();
-            }
+angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log) {
+    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _mode;
+    function _createSelect(layer, map) {
+        var selectInteraction = new ol.interaction.Select({
+            addCondition: ol.events.condition.shiftKeyOnly,
+            layers: [ layer ]
         });
-        function _removeInteractions() {
-            map.getInteractions().clear();
-            map.addInteraction(new ol.interaction.DragPan({
-                kinetic: null
-            }));
+        function _init() {
+            $log.info("select interaction init ...");
+            map.addInteraction(selectInteraction);
+            selectInteraction.setActive(false);
         }
-        _removeInteractions(map);
-        if (!_isDefined(_source)) {
-            _source = new ol.source.Vector({
-                features: []
-            });
+        function _enable() {
+            selectInteraction.setActive(true);
         }
-        var modify = function() {
-            _select = new ol.interaction.Select({
-                addCondition: ol.events.condition.shiftKeyOnly,
-                layers: [ layer ]
-            });
-            _modify = new ol.interaction.Modify({
-                features: _select.getFeatures()
-            });
-            function _init() {
-                map.addInteraction(_select);
-                map.addInteraction(_modify);
-                SELECT = _select;
-            }
-            function _enable() {
-                _select.setActive(true);
-                _modify.setActive(true);
-            }
-            function _disable() {
-                _select.setActive(false);
-                _modify.setActive(false);
-            }
-            return {
-                init: _init,
-                enable: _enable,
-                disable: _disable
-            };
-        }();
-        var draw = function() {
-            _draw = new ol.interaction.Draw({
-                source: _source,
-                type: "Polygon"
-            });
-            function _init() {
-                map.addInteraction(_draw);
-                _draw.setActive(false);
-            }
-            function _enable() {
-                _draw.setActive(true);
-            }
-            function _disable() {
-                _draw.setActive(false);
-            }
-            _draw.on("drawend", function(e) {
+        function _disable() {
+            selectInteraction.setActive(false);
+        }
+        return {
+            init: _init,
+            enable: _enable,
+            disable: _disable,
+            interaction: selectInteraction
+        };
+    }
+    function _createModify(select, map) {
+        var modifyInteraction = new ol.interaction.Modify({
+            features: select.interaction.getFeatures()
+        });
+        function _init() {
+            $log.info("modify interaction init ...");
+            map.addInteraction(modifyInteraction);
+            modifyInteraction.setActive(false);
+        }
+        function _enable() {
+            modifyInteraction.setActive(true);
+        }
+        function _disable() {
+            modifyInteraction.setActive(false);
+        }
+        return {
+            init: _init,
+            enable: _enable,
+            disable: _disable,
+            interaction: modifyInteraction
+        };
+    }
+    function _createDraw(paddocksSource, farmSource, map) {
+        var drawInteraction = new ol.interaction.Draw({
+            source: paddocksSource,
+            type: "Polygon"
+        });
+        function _init() {
+            $log.info("draw interaction init ...");
+            map.addInteraction(drawInteraction);
+            drawInteraction.setActive(false);
+            drawInteraction.on("drawend", function(e) {
                 var feature = e.feature;
-                _clip(feature);
+                _clip(feature, paddocksSource, farmSource);
                 setTimeout(function() {
-                    _source.removeFeature(feature);
+                    paddocksSource.removeFeature(feature);
                 }, 100);
             });
-            return {
-                init: _init,
-                enable: _enable,
-                disable: _disable
-            };
-        }();
-        _snap = new ol.interaction.Snap({
-            source: _source
-        });
-        modify.init();
-        draw.init();
-        map.addInteraction(_snap);
-        draw.disable();
-        modify.disable();
-    };
-    function _merge() {
-        var format = new ol.format["GeoJSON"](), data, featuresToMerge = _select.getFeatures().getArray(), merged;
-        _removeFeatures(featuresToMerge, _layer);
-        data = angular.fromJson(format.writeFeatures(featuresToMerge));
-        merged = turf.merge(data);
-        _source.addFeature(new ol.Feature({
-            geometry: new ol.geom[merged.geometry.type](merged.geometry.coordinates)
-        }));
-        _select.getFeatures().clear();
+        }
+        function _enable() {
+            drawInteraction.setActive(true);
+        }
+        function _disable() {
+            drawInteraction.setActive(false);
+        }
+        return {
+            init: _init,
+            enable: _enable,
+            disable: _disable,
+            interaction: drawInteraction
+        };
     }
-    function _clip(feature) {
-        var format = new ol.format["GeoJSON"](), featureToClip = angular.fromJson(format.writeFeature(feature)), layerFeatures = _source.getFeatures(), clipped = featureToClip;
-        angular.forEach(layerFeatures, function(layerFeature) {
-            var clipper = angular.fromJson(format.writeFeature(layerFeature));
+    function _createSnap(paddocksSource, map) {
+        var snapInteraction = new ol.interaction.Snap({
+            source: paddocksSource
+        });
+        function _enable() {
+            snapInteraction.setActive(true);
+        }
+        function _disable() {
+            snapInteraction.setActive(false);
+        }
+        function _init() {
+            $log.info("snap interaction init ...");
+            map.addInteraction(snapInteraction);
+            snapInteraction.setActive(false);
+        }
+        return {
+            init: _init,
+            enable: _enable,
+            disable: _disable,
+            interaction: snapInteraction
+        };
+    }
+    function _destroy(map) {
+        $log.info("destroying all interactions ...");
+        map.getInteractions().clear();
+        map.addInteraction(new ol.interaction.DragPan({
+            kinetic: null
+        }));
+    }
+    function _init(activeLayer, map, paddocksSource, farmSource) {
+        $log.info("interactions init ...");
+        if (!_isDefined(activeLayer) || !_isDefined(map) || !_isDefined(paddocksSource) || !_isDefined(farmSource)) {
+            return;
+        }
+        _select = _createSelect(activeLayer, map);
+        _modify = _createModify(_select, map);
+        _draw = _createDraw(paddocksSource, farmSource, map);
+        _snap = _createSnap(paddocksSource, map);
+        _activeLayer = activeLayer;
+        _select.init();
+        _modify.init();
+        _draw.init();
+        _snap.init();
+    }
+    function _featureToGeoJson(feature) {
+        return angular.fromJson(_geoJSONFormat.writeFeature(feature));
+    }
+    function _addGeoJsonFeature(layer, feature) {
+        layer.getSource().addFeature(new ol.Feature({
+            geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
+        }));
+        _select.interaction.getFeatures().clear();
+    }
+    function _merge(features) {
+        $log.info("merging features ...", features);
+        var featuresArray = features.getArray(), toMerge;
+        toMerge = _featuresToGeoJson(featuresArray);
+        _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
+    }
+    function _featuresToGeoJson(features) {
+        return angular.fromJson(_geoJSONFormat.writeFeatures(features));
+    }
+    function _clip(feature, paddockSource, farmSource) {
+        $log.info("clipping feature ...", feature);
+        var featureToClip = _featureToGeoJson(feature), paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), clipped = featureToClip;
+        paddocksFeatures.forEach(function(layerFeature) {
+            var clipper = _featureToGeoJson(layerFeature);
             clipped = turf.erase(clipped, clipper);
         });
-        _source.addFeature(new ol.Feature({
-            geometry: new ol.geom[clipped.geometry.type](clipped.geometry.coordinates)
-        }));
-        _select.getFeatures().clear();
+        farmFeatures.forEach(function(layerFeature) {
+            var clipper = _featureToGeoJson(layerFeature);
+            clipped = turf.erase(clipper, clipped);
+            clipped = turf.erase(clipper, clipped);
+        });
+        _addGeoJsonFeature(_activeLayer, clipped);
     }
-    function _area() {
-        var format = new ol.format["GeoJSON"](), features, olFeatures = _select.getFeatures().getArray();
-        features = angular.fromJson(format.writeFeatures(olFeatures));
-        return turf.area(features) * 1e-4;
+    function _area(features) {
+        $log.info("calculating area of features ...", features);
+        var geoJsonFeatures = _featuresToGeoJson(features);
+        return turf.area(geoJsonFeatures) * 1e-4;
     }
-    function _removeFeatures(features, layer) {
-        if (_isDefined(features)) {
-            angular.forEach(features, function(feature) {
-                layer.getSource().removeFeature(feature);
+    function _remove(features) {
+        $log.info("removing features ...", features);
+        if (_isDefined(features) || _isDefined(featuresLayer)) {
+            features.forEach(function(feature) {
+                _activeLayer.getSource().removeFeature(feature);
             });
         }
-    }
-    function _remove() {
-        var featuresToRemove = _select.getFeatures().getArray();
-        _removeFeatures(featuresToRemove, _layer);
         _select.getFeatures().clear();
     }
-    MERGE = _merge;
-    REMOVE = _remove;
-    CLIP = _clip;
-    AREA = _area;
+    function _enableEditing() {
+        if (_mode === "edit") {
+            return;
+        }
+        $log.info("editing enabled");
+        _select.enable();
+        _modify.enable();
+        _snap.enable();
+        _draw.disable();
+        _mode = "edit";
+    }
+    function _enableDrawing() {
+        if (_mode === "draw") {
+            return;
+        }
+        $log.info("drawing enabled");
+        _select.interaction.getFeatures().clear();
+        _select.disable();
+        _modify.disable();
+        _draw.enable();
+        _snap.enable();
+        _mode = "draw";
+    }
     return {
         init: _init,
+        destroy: _destroy,
+        enableDrawing: _enableDrawing,
+        enableEditing: _enableEditing,
         merge: _merge,
         remove: _remove,
         clip: _clip,
