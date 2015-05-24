@@ -17,6 +17,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		}, true);
 
+    //webmapping.farmdata.findPaddock(id)
+
+    //geoJsons.paddocks.push
 
 		$scope.loadFarmData = function () {
         $scope.farmData = webmapping.find();
