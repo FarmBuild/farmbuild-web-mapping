@@ -131,7 +131,7 @@ angular.module('farmbuild.webmapping')
                     layer = _farmLayer;
                 }
                 interactions.destroy(_map);
-                interactions.init(layer, _map, _paddocksSource, _farmSource);
+                interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
             });
 
             _map.on('click', function (event) {
