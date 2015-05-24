@@ -33,7 +33,7 @@ angular.module('farmbuild.webmapping')
       };
     }
 
-    function toGeoJson(farmData) {
+    function toGeoJsons(farmData) {
       $log.info("Extracting farm and paddocks geometry from farmData ...");
       var farm = farmData.geometry,
         paddocks = [];
@@ -57,7 +57,7 @@ angular.module('farmbuild.webmapping')
         }
       }
     };
-    webmappingConverter.toGeoJson = toGeoJson;
+    webmappingConverter.toGeoJsons = toGeoJsons;
 
     function toFarmData(geoJson) {
       $log.info("Writing farm and paddocks geojson to farmData ...");

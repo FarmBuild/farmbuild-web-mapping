@@ -21,8 +21,9 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
             webmappingConverter,
 	          webMappingSession) {
 		var _isDefined = validations.isDefined,
-			webmapping = {session:webMappingSession, farmdata: farmdata,
-      validate:webmappingValidator.validate};
+      session = webMappingSession,
+			webmapping = {session:session, farmdata: farmdata,
+      validator:webmappingValidator, toGeoJsons:webmappingConverter.toGeoJsons};
 
 		$log.info('Welcome to Web Mapping... ' +
 		'this should only be initialised once! why we see twice in the example?');
@@ -35,17 +36,13 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
      * @static
      */
     webmapping.find = function () {
-      return webMappingSession.find();
+      return session.find();
     }
 
-		function createDefault(farmData) {
-			return webmappingConverter.toGeoJson(farmData);
-		}
-
 		/**
-		 * Validate farmData block
+		 * Load the specified farmData into session
 		 * @method load
-		 * @returns {object} geoJsons containing the feature collection,
+		 * @returns {object} the farmData stored in session
      * geoJsons.farm: represents the farm
      * geoJsonspaddocks: represents the paddocks
 		 * @public
@@ -58,8 +55,9 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				return undefined;
 			}
 
-			return createDefault(farmData);
+			return farmData;
 		};
+
     webmapping.load = _load;
 
 		function _exportFarmData(toExport) {

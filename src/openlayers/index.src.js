@@ -122,16 +122,16 @@ angular.module('farmbuild.webmapping')
 			_size = /** @type {ol.Size} */ (_map.getSize());
 
 			// Deselect all selections when layer is changed from farm to paddocks.
-			_layerSelectionElement.addEventListener('change', function () {
-				var layer;
-				if (_layerSelectionElement.value === "paddocks") {
-					layer = _paddocksLayer;
-				}
-				if (_layerSelectionElement.value === "farm") {
-					layer = _farmLayer;
-				}
-				openlayersDraw.init(layer, _map);
-			});
+//			_layerSelectionElement.addEventListener('change', function () {
+//				var layer;
+//				if (_layerSelectionElement.value === "paddocks") {
+//					layer = _paddocksLayer;
+//				}
+//				if (_layerSelectionElement.value === "farm") {
+//					layer = _farmLayer;
+//				}
+//				openlayersDraw.init(layer, _map);
+//			});
 
 			return {
 				map: _map,

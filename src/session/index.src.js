@@ -48,6 +48,8 @@ angular.module('farmbuild.webmapping')
 //    }
 
 
+    webMappingSession.isLoadFlagSet = farmdata.session.isLoadFlagSet;
+
     webMappingSession.find = function() {
       return farmdata.session.find();
     }

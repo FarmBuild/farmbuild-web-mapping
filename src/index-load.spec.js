@@ -27,8 +27,12 @@ describe('farmbuild.webmapping module', function() {
     it('Loading from json file should create geoJson', inject(function() {
 
       var loaded = fixture.load(susanFarm),
-        geoJson = webmapping.load(loaded)
-      expect(geoJson).toBeDefined()
+        farmData = webmapping.load(loaded),
+        geoJsons = webmapping.toGeoJsons(farmData)
+
+      expect(webmapping.validator.validate(farmData)).toBeDefined()
+
+      expect(webmapping.validator.isGeoJsons(geoJsons)).toBeDefined()
 
     }))
   })

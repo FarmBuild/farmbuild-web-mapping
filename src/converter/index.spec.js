@@ -31,14 +31,14 @@ describe('farmbuild.webmapping module', function() {
 
     it('Susan farm data should be converted to valid geoJson', inject(function() {
       var loaded = fixture.load(susanFarm),
-        geoJson = webmappingConverter.toGeoJson(loaded);
+        geoJson = webmappingConverter.toGeoJsons(loaded);
 
       expect(geoJson).toBeDefined()
       expect(geoJson.farm).toBeDefined()
-      expect(webmappingValidator.isGeoJson(geoJson.farm)).toBeDefined()
+      expect(webmappingValidator.isGeoJsons(geoJson.farm)).toBeDefined()
 
       expect(geoJson.paddocks).toBeDefined()
-      expect(webmappingValidator.isGeoJson(geoJson.paddocks)).toBeDefined()
+      expect(webmappingValidator.isGeoJsons(geoJson.paddocks)).toBeDefined()
 
 
       $log.info('geoJson:%j', geoJson)

@@ -4,9 +4,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$rootScope.appVersion = farmbuild.examples.webmapping.version;
 	})
 
-	.controller('MapCtrl', function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openLayers) {
-
-		var load = $location.search().load || false, gmap;
+	.controller('MapCtrl',
+  function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openLayers) {
 
 		$scope.farmData = {};
 		$scope.farmChanged = false;
@@ -18,31 +17,35 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		}, true);
 
-		$scope.loadFarmData = function ($fileContent) {
-			try {
 
-				$scope.farmData = angular.fromJson($fileContent);
+		$scope.loadFarmData = function () {
+        $scope.farmData = webmapping.find();
 
-				var geoJsons = webmapping.load($scope.farmData);
+				var geoJsons = webmapping.toGeoJsons($scope.farmData);
 
 				if (!angular.isDefined(geoJsons)) {
 					$scope.noResult = true;
 					return;
 				}
 
-				openLayers.load(geoJsons.farm, geoJsons.paddocks);
+        gmap = googlemapslayer.init("gmap");
 
-        openLayers.integrateGMap(gmap);
+        openLayers.init('olmap', 'layers');
+
+
+        openLayers.load(geoJsons.farm, geoJsons.paddocks);
+
+        window.setTimeout(function() {
+          openLayers.integrateGMap(gmap);
+
+        }, 1000)
 
         $scope.farmLoaded = true;
 
-			} catch (e) {
-				$log.error('farmbuild.nutrientCalculator.examples > load: Your file should be in json format');
-				$scope.noResult = true;
-			}
-
 			//webmapping.ga.track('AgSmart');
 		};
+
+    $scope.loadFarmData();
 
 		$scope.exportFarmData = function (farmData) {
 			var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
@@ -62,38 +65,42 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.farmChanged = false;
 		};
 
-		$scope.defineFarm = function () {
-			$log.info('defineFarm...');
-			$scope.farmLoaded = true;
-			$scope.farmChanged = false;
-			$scope.saveToSessionStorage('farmData', {});
-		};
+//		$scope.defineFarm = function () {
+//			$log.info('defineFarm...');
+//			$scope.farmLoaded = true;
+//			$scope.farmChanged = false;
+//			$scope.saveToSessionStorage('farmData', {});
+//		};
 
-		$scope.saveToSessionStorage = function (key, value) {
-			sessionStorage.setItem(key, value);
-		};
+//		$scope.saveToSessionStorage = function (key, value) {
+//			sessionStorage.setItem(key, value);
+//		};
 
-		$scope.deleteFromSessionStorage = function (key, value) {
-			sessionStorage.clear();
-			$scope.farmData = {};
-			openLayers.clear();
-			$scope.farmChanged = true;
-		};
+//		$scope.deleteFromSessionStorage = function (key, value) {
+//			sessionStorage.clear();
+//			$scope.farmData = {};
+//			openLayers.clear();
+//			$scope.farmChanged = true;
+//		};
+//
+//		function findInSessionStorage() {
+//			return angular.fromJson(sessionStorage.getItem('farmData'));
+//		};
 
-		function findInSessionStorage() {
-			return angular.fromJson(sessionStorage.getItem('farmData'));
-		};
-
-		function init() {
-			gmap = googlemapslayer.init("gmap");
-
-			openLayers.init('olmap', 'layers');
-
-			openLayers.integrateGMap(gmap);
-
-			googleaddresssearch.init('locationautocomplete');
-		};
-
-		init();
+//		function init() {
+//			gmap = googlemapslayer.init("gmap");
+//
+//			openLayers.init('olmap', 'layers');
+//
+//			openLayers.integrateGMap(gmap);
+//
+//			googleaddresssearch.init('locationautocomplete');
+//
+////			if(findInSessionStorage() && findInSessionStorage().name && findInSessionStorage().geometry){
+////				$scope.loadFarmData(findInSessionStorage())
+////			}
+//		};
+//
+//		init();
 
 	});

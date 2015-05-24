@@ -6,7 +6,8 @@
   "repository": "https://github.com/FarmBuild/farmbuild-dairy-nutrient-calculator",
   "license": "MIT",
   "dependencies": {
-    "geojsonhint":"^1.0"
+    "geojsonhint": "^1.0",
+    "mkdirp": "^0.5.1"
   },
   "devDependencies": {
     "karma": "^0.12",
@@ -55,6 +56,7 @@
     "copy-jquery": "ncp bower_components/jquery/dist/ dist/jquery",
     "copy-turf": "ncp bower_components/turf/ dist/turf",
     "copy-proj4js": "ncp bower_components/proj4/dist/ dist/proj4",
-    "dist": "npm run clean && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-jquery && npm run copy-turf && npm run copy-proj4js"
+    "copy-geojsonhint": "mkdirp dist/geojsonhint && ncp node_modules/geojsonhint/geojsonhint.js dist/geojsonhint/geojsonhint.js",
+    "dist": "npm run clean && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-jquery && npm run copy-turf && npm run copy-proj4js && npm run copy-geojsonhint"
   }
 }

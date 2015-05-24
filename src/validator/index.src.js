@@ -29,11 +29,11 @@ angular.module('farmbuild.webmapping')
       throw Error('geojsonhint must be available!')
     }
 
-    function isGeoJson(geoJson) {
+    function isGeoJsons(geoJson) {
       return geojsonhint.hint(geoJson).length === 0;
     }
 
-    webmappingValidator.isGeoJson = isGeoJson;
+    webmappingValidator.isGeoJsons = isGeoJsons;
 
     function _validate(farmData) {
       $log.info('validating farmData...', farmData);
