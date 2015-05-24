@@ -552,10 +552,14 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         return angular.fromJson(_geoJSONFormat.writeFeatures(features));
     }
     function _addGeoJsonFeature(layer, feature) {
-        layer.getSource().addFeature(new ol.Feature({
-            geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
-        }));
-        _select.interaction.getFeatures().clear();
+        try {
+            layer.getSource().addFeature(new ol.Feature({
+                geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
+            }));
+            _select.interaction.getFeatures().clear();
+        } catch (e) {
+            $log.error(e);
+        }
     }
     function _merge(features) {
         $log.info("merging features ...", features);
