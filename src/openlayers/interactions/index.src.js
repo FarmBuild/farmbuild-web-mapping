@@ -6,7 +6,7 @@ angular.module('farmbuild.webmapping')
               $log) {
         var _isDefined = validations.isDefined,
             _geoJSONFormat = new ol.format['GeoJSON'](),
-            _select, _modify, _draw, _snap, _activeLayer,
+            _select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
             _mode;
 
         function _createSelect(layer, map) {
@@ -134,18 +134,28 @@ angular.module('farmbuild.webmapping')
             map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
         };
 
-        function _init(activeLayer, map, paddocksSource, farmSource) {
+        function _init(map, farmLayer, paddocksLayer, activeLayerName) {
 
             $log.info('interactions init ...');
-            if (!_isDefined(activeLayer) || !_isDefined(map) || !_isDefined(paddocksSource) || !_isDefined(farmSource)) {
+            if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(paddocksLayer) || !_isDefined(farmLayer)) {
                 return;
             }
 
-            _select = _createSelect(activeLayer, map);
+            if(activeLayerName === 'paddocks'){
+                _activeLayer = paddocksLayer;
+
+            } else if(activeLayerName === 'farm'){
+                _activeLayer = farmLayer;
+            } else {
+                return;
+            }
+
+            _select = _createSelect(_activeLayer, map);
             _modify = _createModify(_select, map);
-            _draw = _createDraw(paddocksSource, farmSource, map);
-            _snap = _createSnap(paddocksSource, map);
-            _activeLayer = activeLayer;
+            _draw = _createDraw(paddocksLayer.getSource(), farmLayer.getSource(), map);
+            _snap = _createSnap(paddocksLayer.getSource(), map);
+            _mode = '';
+            _activeLayerName = activeLayerName;
 
             _select.init();
             _modify.init();
@@ -159,6 +169,10 @@ angular.module('farmbuild.webmapping')
             return angular.fromJson(_geoJSONFormat.writeFeature(feature));
         };
 
+        function _featuresToGeoJson(features) {
+            return angular.fromJson(_geoJSONFormat.writeFeatures(features));
+        };
+
         function _addGeoJsonFeature(layer, feature) {
             layer.getSource().addFeature(new ol.Feature({
                 geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
@@ -168,35 +182,45 @@ angular.module('farmbuild.webmapping')
 
         function _merge(features) {
             $log.info('merging features ...', features);
-            var featuresArray = features.getArray(),
-                toMerge;
-            toMerge = _featuresToGeoJson(featuresArray);
+            var toMerge;
+            toMerge = _featuresToGeoJson(features);
             _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
         };
 
-        function _featuresToGeoJson(features) {
-            return angular.fromJson(_geoJSONFormat.writeFeatures(features));
+        function _erase(feature, features){
+            features.forEach(function (layerFeature) {
+                var clipper = _featureToGeoJson(layerFeature);
+                feature = turf.erase(feature, clipper);
+            });
+            return feature;
+        }
+
+        function _inverseErase(feature, features){
+            features.forEach(function (layerFeature) {
+                var clipper = _featureToGeoJson(layerFeature);
+                feature = turf.erase(clipper, feature);
+                feature = turf.erase(clipper, feature);
+            });
+            return feature;
         };
 
         function _clip(feature, paddockSource, farmSource) {
             $log.info('clipping feature ...', feature);
             var featureToClip = _featureToGeoJson(feature),
                 paddocksFeatures = paddockSource.getFeatures(),
-                farmFeatures = farmSource.getFeatures(),
-                clipped = featureToClip;
+                farmFeatures = farmSource.getFeatures(), clipped;
 
-            paddocksFeatures.forEach(function (layerFeature) {
-                var clipper = _featureToGeoJson(layerFeature);
-                clipped = turf.erase(clipped, clipper);
-            });
+            if(_activeLayerName === 'paddocks') {
+                clipped = _erase(featureToClip, paddocksFeatures);
+                clipped = _inverseErase(clipped, farmFeatures);
+            }
 
-            farmFeatures.forEach(function (layerFeature) {
-                var clipper = _featureToGeoJson(layerFeature);
-                clipped = turf.erase(clipper, clipped);
-                clipped = turf.erase(clipper, clipped);
-            });
+            if(_activeLayerName === 'farm'){
+                clipped = _erase(featureToClip, farmFeatures);
+            }
 
             _addGeoJsonFeature(_activeLayer, clipped);
+
         };
 
         function _area(features) {
@@ -213,6 +237,11 @@ angular.module('farmbuild.webmapping')
                 });
             }
             _select.getFeatures().clear();
+        };
+
+        function _selected() {
+            $log.info('Selected features ...');
+            return _select.interaction.getFeatures();
         };
 
         function _enableEditing() {
@@ -248,7 +277,8 @@ angular.module('farmbuild.webmapping')
             merge: _merge,
             remove: _remove,
             clip: _clip,
-            area: _area
+            area: _area,
+            selected: _selected
         }
 
     });
