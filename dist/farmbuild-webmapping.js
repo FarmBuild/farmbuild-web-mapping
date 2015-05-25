@@ -177,6 +177,7 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
         });
         _size = _map.getSize();
         _layerSelectionElement.addEventListener("change", function() {
+            interactions.destroy(_map);
             interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
         });
         _map.on("click", function(event) {

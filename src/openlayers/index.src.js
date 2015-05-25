@@ -123,6 +123,7 @@ angular.module('farmbuild.webmapping')
 
 			//Deselect all selections when layer is changed from farm to paddocks.
 			_layerSelectionElement.addEventListener('change', function () {
+				interactions.destroy(_map);
 				interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
 			});
 
