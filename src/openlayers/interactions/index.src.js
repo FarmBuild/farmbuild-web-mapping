@@ -27,7 +27,7 @@ angular.module('farmbuild.webmapping')
 
 				if (event.keyCode == 13) {
 					if (selectedFeatures.getLength() > 1) {
-						_merge(selectedFeatures);
+						_merge(selectedFeatures.getArray());
 					}
 					if (selectedFeatures.getLength() === 1) {
 						_activeLayer.getSource().removeFeature(selectedFeatures.item(0));
@@ -215,7 +215,7 @@ angular.module('farmbuild.webmapping')
 			$log.info('merging features ...', features);
 			var toMerge;
 			_remove(features);
-			toMerge = _featuresToGeoJson(features.getArray());
+			toMerge = _featuresToGeoJson(features);
 			try {
 				_addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
 			} catch (e) {
@@ -230,10 +230,10 @@ angular.module('farmbuild.webmapping')
 					var clipper = _featureToGeoJson(layerFeature);
 					feature = turf.erase(feature, clipper);
 				});
+				return feature;
 			} catch (e) {
 				$log.error(e);
 			}
-			return feature;
 		};
 
 		function _inverseErase(feature, features) {
@@ -242,10 +242,10 @@ angular.module('farmbuild.webmapping')
 					var clipper = _featureToGeoJson(layerFeature);
 					feature = turf.intersect(feature, clipper);
 				});
+				return feature;
 			} catch (e) {
 				$log.error(e);
 			}
-			return feature;
 		};
 
 		function _clip(feature, paddockSource, farmSource) {
@@ -264,6 +264,10 @@ angular.module('farmbuild.webmapping')
 			}
 
 			_addGeoJsonFeature(_activeLayer, clipped);
+
+			if (_activeLayerName === 'farm') {
+				_merge(farmSource.getFeatures());
+			}
 
 		};
 
