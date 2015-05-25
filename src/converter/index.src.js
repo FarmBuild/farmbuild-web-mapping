@@ -32,6 +32,11 @@ angular.module('farmbuild.webmapping')
       return geometry;
     }
 
+    function resetCrs(geometry) {
+      geometry.crs = geometry.crs.properties.name;
+      return geometry;
+    }
+
     function createFeature(geometry, crs) {
       return {
         "type": "Feature",
@@ -43,15 +48,16 @@ angular.module('farmbuild.webmapping')
 
     function toGeoJsons(farmData) {
       $log.info("Extracting farm and paddocks geometry from farmData ...");
+      var copied = angular.copy(farmData)
 
-      if (!validator.validate(farmData)) {
+      if (!validator.validate(copied)) {
         return undefined;
       }
 
-      var farm = farmData.geometry,
+      var farm = copied.geometry,
         paddocks = [];
 
-      angular.forEach(farmData.paddocks, function (val) {
+      angular.forEach(copied.paddocks, function (val) {
         paddocks.push(createFeature(val.geometry, farm.crs));
       });
 
@@ -73,10 +79,11 @@ angular.module('farmbuild.webmapping')
       $log.info("Converting geoJsons.farm.features[0] and paddocks geojson to farmData ...");
       var farmFeature = geoJsons.farm.features[0],
         paddocks = geoJsons.paddocks;
-      farmData.geometry = farmFeature.geometry;
+      farmData.geometry = resetCrs(farmFeature.geometry);
 
       paddocks.features.forEach(function (paddockFeature, i) {
-        farmData.paddocks[i].geometry = (paddockFeature.geometry);
+        farmData.paddocks[i].geometry = paddockFeature.geometry;
+        delete farmData.paddocks[i].geometry.crs;
       });
 
       return farmData;

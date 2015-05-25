@@ -48,15 +48,25 @@ describe('farmbuild.webmapping module', function() {
       $log.info('geoJsons:%j', geoJsons)
     }))
 
-//    it('geoJsons  should be converted to valid farmData', inject(function() {
-//      var loaded = fixture.load(susanFarm),
-//        geoJsons = webmappingConverter.toGeoJsons(loaded),
-//        converted = webmappingConverter.toFarmData(angular.copy(loaded), geoJsons)
-//
-//      $log.info('converted:%j', converted)
-//
-//      expect(angular.equals(loaded, converted)).toBeTruthy()
-//    }))
+    it('geoJsons  should be converted to valid farmData', inject(function() {
+      var loaded = fixture.load(susanFarm),
+        source = angular.copy(loaded),
+        geoJsons = webmappingConverter.toGeoJsons(loaded)
+
+      $log.info('loaded:%j', source.geometry.crs)
+
+      var converted = webmappingConverter.toFarmData(loaded, geoJsons)
+
+      $log.info('source:%j, converted:%j', source.geometry.crs, converted.geometry.crs)
+
+      expect(angular.equals(source.geometry.crs, loaded.geometry.crs)).toBeTruthy()
+      expect(angular.equals(source.geometry, loaded.geometry)).toBeTruthy()
+
+      $log.info('source:%j, converted:%j',
+        source.paddocks[0].geometry, converted.paddocks[0].geometry)
+      expect(angular.equals(source.paddocks, loaded.paddocks)).toBeTruthy()
+
+    }))
 
 
   })
