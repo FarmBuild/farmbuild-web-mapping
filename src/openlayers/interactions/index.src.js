@@ -18,10 +18,7 @@ angular.module('farmbuild.webmapping')
 			$(document).on('keydown', function (event) {
 				var selectedFeatures = selectInteraction.getFeatures();
 				if (event.keyCode == 46 || event.keyCode == 8) {
-					// remove all selected features from select_interaction and my_vectorlayer
-					selectedFeatures.forEach(function (selectedFeature) {
-						_activeLayer.getSource().removeFeature(selectedFeature);
-					})
+					_remove(selectedFeatures);
 					selectInteraction.getFeatures().clear();
 				}
 
@@ -250,26 +247,35 @@ angular.module('farmbuild.webmapping')
 
 		function _clip(feature, paddockSource, farmSource) {
 			$log.info('clipping feature ...', feature);
-			var featureToClip = _featureToGeoJson(feature),
-				paddocksFeatures = paddockSource.getFeatures(),
-				farmFeatures = farmSource.getFeatures(), clipped;
+
+			var featureToClip = _featureToGeoJson(feature);
 
 			if (_activeLayerName === 'paddocks') {
-				clipped = _erase(featureToClip, paddocksFeatures);
-				clipped = _inverseErase(clipped, farmFeatures);
+				_clipPaddocks(featureToClip, paddockSource, farmSource);
 			}
 
 			if (_activeLayerName === 'farm') {
-				clipped = _erase(featureToClip, farmFeatures);
+				_clipFarm(featureToClip, farmSource)
+
 			}
+		};
+
+		function _clipPaddocks(featureToClip, paddockSource, farmSource) {
+			var clipped,
+				paddocksFeatures = paddockSource.getFeatures(),
+				farmFeatures = farmSource.getFeatures();
+			clipped = _erase(featureToClip, paddocksFeatures);
+			clipped = _inverseErase(clipped, farmFeatures);
 
 			_addGeoJsonFeature(_activeLayer, clipped);
+		}
 
-			if (_activeLayerName === 'farm') {
-				_merge(farmSource.getFeatures());
-			}
-
-		};
+		function _clipFarm(featureToClip, farmSource) {
+			var farmFeatures = farmSource.getFeatures(),
+				clipped = _erase(featureToClip, farmFeatures);
+			_addGeoJsonFeature(_activeLayer, clipped);
+			_merge(farmSource.getFeatures());
+		}
 
 		function _area(features) {
 			$log.info('calculating area of features ...', features);
