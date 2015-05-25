@@ -31,7 +31,9 @@ describe('farmbuild.webmapping module', function() {
         geoJsons = webmapping.toGeoJsons(loaded)
 
       expect(webmapping.validator.validate(loaded)).toBeTruthy()
-      expect(webmapping.validator.isGeoJsons(geoJsons)).toBeTruthy()
+
+      expect(webmapping.validator.isGeoJsons(geoJsons.farm)).toBeTruthy()
+      expect(webmapping.validator.isGeoJsons(geoJsons.paddocks)).toBeTruthy()
 
     }))
   })
@@ -40,20 +42,23 @@ describe('farmbuild.webmapping module', function() {
     it('Saving farmData', inject(function() {
 
       var susanFarmData = fixture.load(susanFarm),
+        source = angular.copy(susanFarmData),
         loaded = webmapping.load(angular.copy(susanFarmData)),
         geoJsons = webmapping.toGeoJsons(loaded),
         saved = webmapping.save(geoJsons)
-
 
       expect(angular.equals(loaded, susanFarmData)).toBeTruthy()
 
       log(loaded, saved)
 
-      expect(angular.equals(loaded.name, saved.name)).toBeTruthy()
-      expect(angular.equals(loaded.geometry, saved.geometry)).toBeTruthy()
+      expect(angular.equals(source.name, saved.name)).toBeTruthy()
+
+      expect(angular.equals(source.geometry, saved.geometry)).toBeTruthy()
+      expect(angular.equals(source.paddocks, saved.paddocks)).toBeTruthy()
 
     }))
   })
+
   function log(i1, i2) {
     $log.info('i1: %s, i2: %s', i1.name, i2.name)
   }
