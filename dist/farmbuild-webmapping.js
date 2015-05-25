@@ -431,7 +431,13 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
                 });
             }
             if (event.keyCode == 13) {
-                _merge(selectedFeatures);
+                if (selectedFeatures.getLength() > 1) {
+                    _merge(selectedFeatures);
+                }
+                if (selectedFeatures.getLength() === 1) {
+                    _activeLayer.getSource().removeFeature(selectedFeatures.item(0));
+                    _clip(selectedFeatures.item(0), paddocksSource, farmSource);
+                }
             }
             selectInteraction.getFeatures().clear();
             return false;

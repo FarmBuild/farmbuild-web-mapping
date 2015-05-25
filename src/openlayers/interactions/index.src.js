@@ -11,9 +11,9 @@ angular.module('farmbuild.webmapping')
 
 		function _createSelect(layer, map, paddocksSource, farmSource) {
 			var selectInteraction = new ol.interaction.Select({
-					addCondition: ol.events.condition.shiftKeyOnly,
-					layers: [layer]
-				});
+				addCondition: ol.events.condition.shiftKeyOnly,
+				layers: [layer]
+			});
 
 			$(document).on('keydown', function (event) {
 				var selectedFeatures = selectInteraction.getFeatures();
@@ -25,7 +25,13 @@ angular.module('farmbuild.webmapping')
 				}
 
 				if (event.keyCode == 13) {
-					_merge(selectedFeatures);
+					if (selectedFeatures.getLength() > 1) {
+						_merge(selectedFeatures);
+					}
+					if (selectedFeatures.getLength() === 1) {
+						_activeLayer.getSource().removeFeature(selectedFeatures.item(0));
+						_clip(selectedFeatures.item(0), paddocksSource, farmSource);
+					}
 				}
 
 				selectInteraction.getFeatures().clear();
