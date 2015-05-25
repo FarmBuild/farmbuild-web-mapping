@@ -1,66 +1,31 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webMappingSession) {
-    var _isDefined = validations.isDefined, webmapping;
-    function _fromFarmData(farmData) {
-        $log.info("Extracting farm and paddocks geometry from farmData ...");
-        var farm = farmData.geometry, paddocks = [];
-        if (!_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
-            return undefined;
-        }
-        angular.forEach(farmData.paddocks, function(val) {
-            paddocks.push({
-                type: "Feature",
-                geometry: val.geometry
-            });
-        });
-        return {
-            farm: {
-                type: "FeatureCollection",
-                features: [ {
-                    type: "Feature",
-                    geometry: farm
-                } ]
-            },
-            paddocks: {
-                type: "FeatureCollection",
-                features: paddocks
-            }
-        };
-    }
-    function _toFarmData(farmGeometry) {
-        $log.info("Writing farm and paddocks geometry to farmData ...");
-        var farm = data.geometry, paddocks = [];
-        angular.forEach(data.paddocks, function(val) {
-            paddocks.push(val.geometry);
-        });
-        return farmGeometry;
-    }
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession) {
+    var _isDefined = validations.isDefined, session = webMappingSession, webmapping = {
+        session: session,
+        farmdata: farmdata,
+        validator: webmappingValidator,
+        toGeoJsons: webmappingConverter.toGeoJsons
+    };
     $log.info("Welcome to Web Mapping... " + "this should only be initialised once! why we see twice in the example?");
-    function createDefault(farmData) {
-        return _fromFarmData(farmData);
-    }
+    webmapping.find = function() {
+        return session.find();
+    };
     function _load(farmData) {
         var loaded = farmdata.load(farmData);
         if (!_isDefined(loaded)) {
             return undefined;
         }
-        if (!loaded.hasOwnProperty("webMapping")) {
-            loaded.webMapping = createDefault(farmData);
-            loaded = farmdata.update(loaded);
-        }
-        return loaded;
+        return farmData;
     }
+    webmapping.load = _load;
     function _exportFarmData(toExport) {
         if (!toExport) {
             return undefined;
         }
         return _toFarmData(toExport);
     }
-    webmapping = {
-        exportFarmData: _exportFarmData,
-        load: _load
-    };
+    webmapping.exportFarmData = _exportFarmData;
     webmapping.version = "0.1.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
@@ -70,6 +35,51 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         window.farmbuild.webmapping = webmapping;
     }
     return webmapping;
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webmappingConverter", function(farmdata, validations, $log, webMappingSession) {
+    var _isDefined = validations.isDefined, webmappingConverter = {};
+    function createFeatureCollection(geometry) {}
+    function createFeature(geometry) {
+        return {
+            type: "Feature",
+            geometry: angular.copy(geometry),
+            properties: {}
+        };
+    }
+    function toGeoJsons(farmData) {
+        $log.info("Extracting farm and paddocks geometry from farmData ...");
+        var farm = farmData.geometry, paddocks = [];
+        if (!_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
+            return undefined;
+        }
+        angular.forEach(farmData.paddocks, function(val) {
+            paddocks.push(createFeature(val.geometry));
+        });
+        return {
+            farm: {
+                type: "FeatureCollection",
+                features: [ createFeature(farm) ]
+            },
+            paddocks: {
+                type: "FeatureCollection",
+                features: paddocks
+            }
+        };
+    }
+    webmappingConverter.toGeoJsons = toGeoJsons;
+    function toFarmData(geoJson) {
+        $log.info("Writing farm and paddocks geojson to farmData ...");
+        var farm = data.geometry, paddocks = [];
+        angular.forEach(data.paddocks, function(val) {
+            paddocks.push(val.geometry);
+        });
+        return geoJson;
+    }
+    webmappingConverter.toFarmData = toFarmData;
+    return webmappingConverter;
 });
 
 "use strict";
@@ -166,35 +176,6 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
             }), new ol.control.ScaleLine() ])
         });
         _size = _map.getSize();
-        _layerSelectionElement.addEventListener("change", function() {
-            var layer;
-            if (_layerSelectionElement.value === "paddocks") {
-                layer = _paddocksLayer;
-            }
-            if (_layerSelectionElement.value === "farm") {
-                layer = _farmLayer;
-            }
-            interactions.destroy(_map);
-            interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
-        });
-        _map.on("click", function(event) {
-            if (_layerSelectionElement.value === "none" || _layerSelectionElement.value === "") {
-                interactions.destroy(_map);
-                return;
-            }
-            var layer;
-            if (_layerSelectionElement.value === "paddocks") {
-                layer = _paddocksLayer;
-            }
-            if (_layerSelectionElement.value === "farm") {
-                layer = _farmLayer;
-            }
-            if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
-                interactions.enableEditing();
-            } else {
-                interactions.enableDrawing();
-            }
-        });
         return {
             map: _map,
             view: _view
@@ -204,8 +185,9 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
         var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
         return new google.maps.LatLng(transformed[1], transformed[0]);
     }
-    function _load(farmGeometry, paddocksGeometry) {
-        return _init(_targetElementId, _layerSelectionElementId, farmGeometry, paddocksGeometry);
+    function _transform(latLng, sourceProjection, destinationProjection) {
+        var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
+        return new google.maps.LatLng(transformed[1], transformed[0]);
     }
     function _exportGeometry() {
         var format = new ol.format["GeoJSON"](), data;
@@ -237,6 +219,8 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
             _view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], _projection, googlemapslayer.getProjection()));
             _view.setZoom(defaults.zoomNew);
         } else {
+            gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(_targetEl);
+            _targetEl.parentNode.removeChild(_targetEl);
             _view.fitExtent(_farmSource.getExtent(), _size);
         }
     }
@@ -292,7 +276,6 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
     }
     return {
         init: _init,
-        load: _load,
         exportGeometry: _exportGeometry,
         clear: _clear,
         center: _center,
@@ -318,42 +301,37 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         }
         return root.webMapping;
     }
-    webMappingSession.saveSection = function(section, value) {
-        var loaded = load();
-        if (!_isDefined(loaded)) {
-            $log.error("Unable to find an existing farmData! please create then save.");
-            return webMappingSession;
-        }
-        loaded[section] = value;
-        return save(loaded);
-    };
-    function save(toSave) {
-        var farmData = farmdata.session.find();
-        if (!_isDefined(farmData)) {
-            $log.error("Unable to find the farmData in the session!");
-            return undefined;
-        }
-        farmData.dateLastUpdated = new Date();
-        farmData.webMapping = toSave;
-        farmdata.session.save(farmData);
-        return toSave;
-    }
-    webMappingSession.save = save;
-    webMappingSession.loadSection = function(section) {
-        var loaded = load();
-        return loaded ? loaded[section] : null;
-    };
-    webMappingSession.isLoadFlagSet = function(location) {
-        var load = false;
-        if (location.href.split("?").length > 1 && location.href.split("?")[1].indexOf("load") === 0) {
-            load = location.href.split("?")[1].split("=")[1] === "true";
-        }
-        return load;
-    };
+    webMappingSession.isLoadFlagSet = farmdata.session.isLoadFlagSet;
     webMappingSession.find = function() {
         return farmdata.session.find();
     };
     return webMappingSession;
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webmappingValidator", function(validations, farmdata, $log) {
+    var webmappingValidator = {}, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isEmpty = validations.isEmpty;
+    if (!_isDefined(geojsonhint)) {
+        throw Error("geojsonhint must be available!");
+    }
+    function isGeoJsons(geoJson) {
+        return geojsonhint.hint(geoJson).length === 0;
+    }
+    webmappingValidator.isGeoJsons = isGeoJsons;
+    function _validate(farmData) {
+        $log.info("validating farmData...", farmData);
+        if (!farmdata.validate(farmData)) {
+            return false;
+        }
+        if (!_isDefined(farmData) || !_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
+            $log.error("invalid, must have geometry and paddocks: %j", farmData);
+            return false;
+        }
+        return true;
+    }
+    webmappingValidator.validate = _validate;
+    return webmappingValidator;
 });
 
 "use strict";

@@ -32,6 +32,7 @@
     ]
   },
   "area": 89.95,
+  "areaUnit":"hectare",
   "paddocks": [
     {
       "name": "DAMS",
