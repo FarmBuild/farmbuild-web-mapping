@@ -42,18 +42,18 @@ describe('farmbuild.webmapping module', function() {
       $log.info('errors %j', errors)
       expect(errors.length).toBe(0)
     }))
-//
-//    it('geojsonhint.hint should be true for geoJsonsInvalidFile', inject(function() {
-//      var val = fixture.load(geoJsonsInvalidFile)
-//
-//      $log.info('val.farm %j', val.farm)
-//      errors = geojsonhint.hint(val)
-//      $log.info('errors %j', errors)
-//      expect(errors.length).toBe(1)
-//
-//      expect(geojsonhint.hint(val.farm).length).toBe(1)
-//      expect(geojsonhint.hint(val.paddocks).length).toBe(1)
-//    }))
+
+    it('geojsonhint.hint should be true for geoJsonsInvalidFile', inject(function() {
+      var val = fixture.load(geoJsonsInvalidFile)
+
+      $log.info('val.farm %j', val.farm)
+      errors = geojsonhint.hint(val)
+      $log.info('errors %j', errors)
+      expect(errors.length).toBe(1)
+
+      expect(geojsonhint.hint(val.farm).length).toBe(1)
+      expect(geojsonhint.hint(val.paddocks).length).toBe(1)
+    }))
 
   })
 
