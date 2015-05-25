@@ -267,7 +267,7 @@ angular.module('farmbuild.webmapping')
 			}
 
 			if (_activeLayerName === 'paddocks' && _mode === 'donut-draw') {
-				_clipDonutPaddock(featureToClip);
+				_clipDonut(featureToClip);
 			}
 
 			if (_activeLayerName === 'farm') {
@@ -286,7 +286,7 @@ angular.module('farmbuild.webmapping')
 			_addGeoJsonFeature(_activeLayer, clipped);
 		};
 
-		function _clipDonutPaddock(donutFeature) {
+		function _clipDonut(donutFeature) {
 			var clipped, paddockFeature, paddockGeoJsonFeature;
 			paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
 			paddockGeoJsonFeature = _featureToGeoJson(paddockFeature);
