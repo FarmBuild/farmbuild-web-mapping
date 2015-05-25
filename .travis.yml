@@ -15,4 +15,3 @@ script:
   - npm -v
   - node -v
   - karma start karma.conf.js --no-auto-watch --single-run --reporters=dots --browsers=Firefox
-  - ./node_modules/.bin/protractor protractor.conf.js --browser=firefox

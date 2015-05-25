@@ -33,8 +33,6 @@ describe('farmbuild.webmapping module', function() {
       expect(webmappingValidator.validate(loaded)).toBeTruthy()
     }))
 
-
-
   })
 
   afterEach(function() {
