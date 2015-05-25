@@ -422,7 +422,20 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         var selectInteraction = new ol.interaction.Select({
             addCondition: ol.events.condition.shiftKeyOnly,
             layers: [ layer ]
-        }), selectedFeatures = selectInteraction.getFeatures();
+        });
+        $(document).on("keydown", function(event) {
+            var selectedFeatures = selectInteraction.getFeatures();
+            if (event.keyCode == 46 || event.keyCode == 8) {
+                selectedFeatures.forEach(function(selectedFeature) {
+                    _activeLayer.getSource().removeFeature(selectedFeature);
+                });
+            }
+            if (event.keyCode == 13) {
+                _merge(selectedFeatures);
+            }
+            selectInteraction.getFeatures().clear();
+            return false;
+        });
         function _init() {
             $log.info("select interaction init ...");
             map.addInteraction(selectInteraction);
@@ -564,7 +577,8 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     function _merge(features) {
         $log.info("merging features ...", features);
         var toMerge;
-        toMerge = _featuresToGeoJson(features);
+        _remove(features);
+        toMerge = _featuresToGeoJson(features.getArray());
         _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
     }
     function _erase(feature, features) {
@@ -601,12 +615,11 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     }
     function _remove(features) {
         $log.info("removing features ...", features);
-        if (_isDefined(features) || _isDefined(featuresLayer)) {
+        if (_isDefined(features)) {
             features.forEach(function(feature) {
                 _activeLayer.getSource().removeFeature(feature);
             });
         }
-        _select.getFeatures().clear();
     }
     function _selected() {
         $log.info("Selected features ...");

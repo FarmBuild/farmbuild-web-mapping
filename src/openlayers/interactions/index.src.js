@@ -13,41 +13,24 @@ angular.module('farmbuild.webmapping')
 			var selectInteraction = new ol.interaction.Select({
 					addCondition: ol.events.condition.shiftKeyOnly,
 					layers: [layer]
-				}),
-				selectedFeatures = selectInteraction.getFeatures();
-			//selectedFeatures.on('add', function (event) {
-			//	// grab the feature
-			//	var feature = event.element;
-			//	// ...listen for changes and save them
-			//	// listen to pressing of delete key, then delete selected features
-			//	$(document).on('keydown', function (event) {
-			//		if (event.keyCode == 46 || event.keyCode == 8) {
-			//			// remove all selected features from select_interaction and my_vectorlayer
-			//			selectedFeatures.forEach(function (selectedFeature) {
-			//				var selected_feature_id = selectedFeature.getId();
-			//				// remove from select_interaction
-			//				selectedFeatures.remove(selectedFeature);
-			//				// features aus vectorlayer entfernen
-			//				var vectorLayerFeatures = _activeLayer.getSource().getFeatures();
-			//				vectorLayerFeatures.forEach(function (source_feature) {
-			//					var source_feature_id = source_feature.getId();
-			//					if (source_feature_id === selected_feature_id) {
-			//						// remove from my_vectorlayer
-			//						_activeLayer.getSource().removeFeature(source_feature);
-			//						// save the changed data
-			//					}
-			//				});
-			//			});
-			//			// remove listener
-			//			$(document).off('keydown');
-			//		}
-			//		if (event.keyCode == 13) {
-			//
-			//			// remove listener
-			//			$(document).off('keydown');
-			//		}
-			//	});
-			//});
+				});
+
+			$(document).on('keydown', function (event) {
+				var selectedFeatures = selectInteraction.getFeatures();
+				if (event.keyCode == 46 || event.keyCode == 8) {
+					// remove all selected features from select_interaction and my_vectorlayer
+					selectedFeatures.forEach(function (selectedFeature) {
+						_activeLayer.getSource().removeFeature(selectedFeature);
+					})
+				}
+
+				if (event.keyCode == 13) {
+					_merge(selectedFeatures);
+				}
+
+				selectInteraction.getFeatures().clear();
+				return false;
+			});
 			//map.on('singleclick',function(event){
 			//	$log.info('selectInteraction change:active');
 			//	if(_isDefined(selectInteraction.getFeatures().item(0))) {
@@ -229,8 +212,10 @@ angular.module('farmbuild.webmapping')
 		function _merge(features) {
 			$log.info('merging features ...', features);
 			var toMerge;
-			toMerge = _featuresToGeoJson(features);
+			_remove(features);
+			toMerge = _featuresToGeoJson(features.getArray());
 			_addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
+
 		};
 
 		function _erase(feature, features) {
@@ -277,12 +262,11 @@ angular.module('farmbuild.webmapping')
 
 		function _remove(features) {
 			$log.info('removing features ...', features);
-			if (_isDefined(features) || _isDefined(featuresLayer)) {
+			if (_isDefined(features)) {
 				features.forEach(function (feature) {
 					_activeLayer.getSource().removeFeature(feature);
 				});
 			}
-			_select.getFeatures().clear();
 		};
 
 		function _selected() {
