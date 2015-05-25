@@ -180,24 +180,6 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
             interactions.destroy(_map);
             interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
         });
-        _map.on("click", function(event) {
-            if (_layerSelectionElement.value === "none" || _layerSelectionElement.value === "") {
-                interactions.destroy(_map);
-                return;
-            }
-            var layer;
-            if (_layerSelectionElement.value === "paddocks") {
-                layer = _paddocksLayer;
-            }
-            if (_layerSelectionElement.value === "farm") {
-                layer = _farmLayer;
-            }
-            if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
-                interactions.enableEditing();
-            } else {
-                interactions.enableDrawing();
-            }
-        });
         return {
             map: _map,
             view: _view
@@ -414,7 +396,7 @@ angular.module("farmbuild.webmapping").factory("googlemapslayer", function(valid
     };
 });
 
-"use strict";
+var DONUT, DRAW, EDIT;
 
 angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode;
@@ -487,17 +469,24 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         var drawInteraction = new ol.interaction.Draw({
             source: paddocksSource,
             type: "Polygon"
-        });
+        }), drawingStatus = false;
         function _init() {
             $log.info("draw interaction init ...");
             map.addInteraction(drawInteraction);
             drawInteraction.setActive(false);
             drawInteraction.on("drawend", function(e) {
+                $log.info("draw end ...");
                 var feature = e.feature;
                 _clip(feature, paddocksSource, farmSource);
                 setTimeout(function() {
                     paddocksSource.removeFeature(feature);
                 }, 100);
+                drawingStatus = false;
+            });
+            drawInteraction.on("drawstart", function(event) {
+                $log.info("draw start ...");
+                _select.interaction.getFeatures().clear();
+                drawingStatus = true;
             });
         }
         function _enable() {
@@ -506,11 +495,15 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         function _disable() {
             drawInteraction.setActive(false);
         }
+        function _isDrawing() {
+            return drawingStatus;
+        }
         return {
             init: _init,
             enable: _enable,
             disable: _disable,
-            interaction: drawInteraction
+            interaction: drawInteraction,
+            isDrawing: _isDrawing
         };
     }
     function _createSnap(paddocksSource, map) {
@@ -572,14 +565,13 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         return angular.fromJson(_geoJSONFormat.writeFeatures(features));
     }
     function _addGeoJsonFeature(layer, feature) {
-        try {
-            layer.getSource().addFeature(new ol.Feature({
-                geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
-            }));
-            _select.interaction.getFeatures().clear();
-        } catch (e) {
-            $log.error(e);
+        if (!_isDefined(feature)) {
+            return;
         }
+        layer.getSource().addFeature(new ol.Feature({
+            geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
+        }));
+        _select.interaction.getFeatures().clear();
     }
     function _merge(features) {
         $log.info("merging features ...", features);
@@ -603,7 +595,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             $log.error(e);
         }
     }
-    function _inverseErase(feature, features) {
+    function _intersect(feature, features) {
         try {
             features.forEach(function(layerFeature) {
                 var clipper = _featureToGeoJson(layerFeature);
@@ -617,8 +609,11 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     function _clip(feature, paddockSource, farmSource) {
         $log.info("clipping feature ...", feature);
         var featureToClip = _featureToGeoJson(feature);
-        if (_activeLayerName === "paddocks") {
+        if (_activeLayerName === "paddocks" && _mode === "draw") {
             _clipPaddocks(featureToClip, paddockSource, farmSource);
+        }
+        if (_activeLayerName === "paddocks" && _mode === "donut-draw") {
+            _clipDonutPaddock(featureToClip);
         }
         if (_activeLayerName === "farm") {
             _clipFarm(featureToClip, farmSource);
@@ -627,8 +622,16 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     function _clipPaddocks(featureToClip, paddockSource, farmSource) {
         var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures();
         clipped = _erase(featureToClip, paddocksFeatures);
-        clipped = _inverseErase(clipped, farmFeatures);
+        clipped = _intersect(clipped, farmFeatures);
         _addGeoJsonFeature(_activeLayer, clipped);
+    }
+    function _clipDonutPaddock(donutFeature) {
+        var clipped, paddockFeature, paddockGeoJsonFeature;
+        paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
+        paddockGeoJsonFeature = _featureToGeoJson(paddockFeature);
+        clipped = turf.erase(paddockGeoJsonFeature, donutFeature);
+        _addGeoJsonFeature(_activeLayer, clipped);
+        _activeLayer.getSource().removeFeature(paddockFeature);
     }
     function _clipFarm(featureToClip, farmSource) {
         var farmFeatures = farmSource.getFeatures(), clipped = _erase(featureToClip, farmFeatures);
@@ -663,28 +666,50 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         _draw.disable();
         _mode = "edit";
     }
+    function _isDrawing() {
+        return _draw.isDrawing();
+    }
+    function _isEditing() {
+        return _select.interaction.getFeatures().getLength() > 0;
+    }
     function _enableDrawing() {
         if (_mode === "draw") {
             return;
         }
         $log.info("drawing enabled");
-        _select.interaction.getFeatures().clear();
         _select.disable();
         _modify.disable();
         _draw.enable();
         _snap.enable();
         _mode = "draw";
     }
+    function _enableDonutDrawing() {
+        if (_mode === "donut-draw") {
+            return;
+        }
+        $log.info("donut drawing enabled");
+        _select.disable();
+        _modify.disable();
+        _draw.enable();
+        _snap.enable();
+        _mode = "donut-draw";
+    }
+    DONUT = _enableDonutDrawing;
+    DRAW = _enableDrawing;
+    EDIT = _enableEditing;
     return {
         init: _init,
         destroy: _destroy,
         enableDrawing: _enableDrawing,
         enableEditing: _enableEditing,
+        enableDonutDrawing: _enableDonutDrawing,
         merge: _merge,
         remove: _remove,
         clip: _clip,
         area: _area,
-        selected: _selected
+        selected: _selected,
+        isDrawing: _isDrawing,
+        isEditing: _isEditing
     };
 });
 

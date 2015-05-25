@@ -127,24 +127,30 @@ angular.module('farmbuild.webmapping')
 				interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
 			});
 
-			_map.on('click', function (event) {
-				if (_layerSelectionElement.value === 'none' || _layerSelectionElement.value === '') {
-					interactions.destroy(_map);
-					return;
-				}
-				var layer;
-				if (_layerSelectionElement.value === "paddocks") {
-					layer = _paddocksLayer;
-				}
-				if (_layerSelectionElement.value === "farm") {
-					layer = _farmLayer;
-				}
-				if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
-					interactions.enableEditing();
-				} else {
-					interactions.enableDrawing();
-				}
-			});
+			//_map.on('pointermove', function (event) {
+			//	var layer;
+			//	if (_layerSelectionElement.value === 'none' || _layerSelectionElement.value === '') {
+			//		return;
+			//	}
+			//	if (_layerSelectionElement.value === "paddocks") {
+			//		layer = _paddocksLayer;
+			//	}
+			//	if (_layerSelectionElement.value === "farm") {
+			//		layer = _farmLayer;
+			//	}
+			//	if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && !interactions.isDrawing()) {
+			//		interactions.enableEditing();
+			//	}
+			//	if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length === 0 && !interactions.isEditing()){
+			//		interactions.enableDrawing();
+			//	}
+			//});
+			//
+			//_map.on('dblclick', function (event) {
+			//	if (_paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && interactions.isEditing()){
+			//		interactions.enableDonutDrawing();
+			//	}
+			//});
 
 			return {
 				map: _map,
