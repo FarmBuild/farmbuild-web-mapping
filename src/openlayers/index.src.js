@@ -18,7 +18,7 @@ angular.module('farmbuild.webmapping')
             if(!_isDefined(farmSource) || !_isDefined(paddocksSource)){
                 return;
             }
-            var format = new ol.format['GeoJSON'](),
+            var format = new ol.format['GeoJSON']();
             try {
                 return format.writeFeatures(paddocksSource.getFeatures());
             } catch (e) {

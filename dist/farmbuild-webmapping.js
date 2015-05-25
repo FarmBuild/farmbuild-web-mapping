@@ -110,7 +110,7 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
         if (!_isDefined(farmSource) || !_isDefined(paddocksSource)) {
             return;
         }
-        var format = new ol.format["GeoJSON"](), data;
+        var format = new ol.format["GeoJSON"]();
         try {
             return format.writeFeatures(paddocksSource.getFeatures());
         } catch (e) {
@@ -314,7 +314,7 @@ var DONUT, DRAW, EDIT;
 
 angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode;
-    function _createSelect(layer, map, paddocksSource, farmSource) {
+    function _createSelect(map, farmSource, paddocksSource, layer) {
         var selectInteraction = new ol.interaction.Select({
             addCondition: ol.events.condition.shiftKeyOnly,
             layers: [ layer ]
@@ -357,7 +357,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             interaction: selectInteraction
         };
     }
-    function _createModify(select, map) {
+    function _createModify(map, select) {
         var modifyInteraction = new ol.interaction.Modify({
             features: select.interaction.getFeatures()
         });
@@ -379,7 +379,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             interaction: modifyInteraction
         };
     }
-    function _createDraw(paddocksSource, farmSource, map) {
+    function _createDraw(map, farmSource, paddocksSource) {
         var drawInteraction = new ol.interaction.Draw({
             source: paddocksSource,
             type: "Polygon"
@@ -420,10 +420,11 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             isDrawing: _isDrawing
         };
     }
-    function _createSnap(paddocksSource, map) {
+    function _createSnap(map, farmSource, paddocksSource) {
         var snapInteraction = new ol.interaction.Snap({
             source: paddocksSource
         });
+        snapInteraction.addFeature(farmSource.getFeatures()[0]);
         function _enable() {
             snapInteraction.setActive(true);
         }
@@ -461,10 +462,10 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         } else {
             return;
         }
-        _select = _createSelect(_activeLayer, map, paddocksLayer.getSource(), farmLayer.getSource());
-        _modify = _createModify(_select, map);
-        _draw = _createDraw(paddocksLayer.getSource(), farmLayer.getSource(), map);
-        _snap = _createSnap(paddocksLayer.getSource(), map);
+        _select = _createSelect(map, farmLayer.getSource(), paddocksLayer.getSource(), _activeLayer);
+        _modify = _createModify(map, _select);
+        _draw = _createDraw(map, farmLayer.getSource(), paddocksLayer.getSource());
+        _snap = _createSnap(map, farmLayer.getSource(), paddocksLayer.getSource());
         _mode = "";
         _activeLayerName = activeLayerName;
         _select.init();
@@ -527,7 +528,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             _clipPaddocks(featureToClip, paddockSource, farmSource);
         }
         if (_activeLayerName === "paddocks" && _mode === "donut-draw") {
-            _clipDonut(featureToClip);
+            _clipDonutPaddock(featureToClip);
         }
         if (_activeLayerName === "farm") {
             _clipFarm(featureToClip, farmSource);
@@ -539,7 +540,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         clipped = _intersect(clipped, farmFeatures);
         _addGeoJsonFeature(_activeLayer, clipped);
     }
-    function _clipDonut(donutFeature) {
+    function _clipDonutPaddock(donutFeature) {
         var clipped, paddockFeature, paddockGeoJsonFeature;
         paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
         paddockGeoJsonFeature = _featureToGeoJson(paddockFeature);
