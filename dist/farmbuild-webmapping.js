@@ -34,29 +34,45 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webmappingConverter", function(farmdata, validations, $log, webMappingSession) {
-    var _isDefined = validations.isDefined, webmappingConverter = {};
+angular.module("farmbuild.webmapping").factory("webmappingConverter", function(farmdata, validations, $log, webmappingValidator, webMappingSession) {
+    var _isDefined = validations.isDefined, webmappingConverter = {}, validator = webmappingValidator;
     function createFeatureCollection(geometry) {}
-    function createFeature(geometry) {
+    function convertCrs(geometry, crs) {
+        geometry.crs = {
+            type: "name",
+            properties: {
+                name: crs
+            }
+        };
+        return geometry;
+    }
+    function resetCrs(geometry) {
+        geometry.crs = geometry.crs.properties.name;
+        return geometry;
+    }
+    function createFeature(geometry, crs, name) {
         return {
             type: "Feature",
-            geometry: angular.copy(geometry),
-            properties: {}
+            geometry: angular.copy(convertCrs(geometry, crs)),
+            properties: {
+                name: name
+            }
         };
     }
     function toGeoJsons(farmData) {
         $log.info("Extracting farm and paddocks geometry from farmData ...");
-        var farm = farmData.geometry, paddocks = [];
-        if (!_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
+        var copied = angular.copy(farmData);
+        if (!validator.validate(copied)) {
             return undefined;
         }
-        angular.forEach(farmData.paddocks, function(val) {
-            paddocks.push(createFeature(val.geometry));
+        var farm = copied.geometry, paddocks = [];
+        copied.paddocks.forEach(function(paddock) {
+            paddocks.push(createFeature(paddock.geometry, farm.crs, paddock.name));
         });
         return {
             farm: {
                 type: "FeatureCollection",
-                features: [ createFeature(farm) ]
+                features: [ createFeature(farm, farm.crs, copied.name) ]
             },
             paddocks: {
                 type: "FeatureCollection",
@@ -68,9 +84,10 @@ angular.module("farmbuild.webmapping").factory("webmappingConverter", function(f
     function toFarmData(farmData, geoJsons) {
         $log.info("Converting geoJsons.farm.features[0] and paddocks geojson to farmData ...");
         var farmFeature = geoJsons.farm.features[0], paddocks = geoJsons.paddocks;
-        farmData.geometry = farmFeature.geometry;
+        farmData.geometry = resetCrs(farmFeature.geometry);
         paddocks.features.forEach(function(paddockFeature, i) {
             farmData.paddocks[i].geometry = paddockFeature.geometry;
+            delete farmData.paddocks[i].geometry.crs;
         });
         return farmData;
     }
@@ -344,8 +361,8 @@ angular.module("farmbuild.webmapping").factory("webmappingValidator", function(v
     if (!_isDefined(geojsonhint)) {
         throw Error("geojsonhint must be available!");
     }
-    function isGeoJsons(geoJson) {
-        var errors = geojsonhint.hint(geoJson), isGeoJson = errors.length === 0;
+    function isGeoJsons(geoJsons) {
+        var errors = geojsonhint.hint(typeof geoJsons === "string" ? geoJsons : angular.toJson(geoJsons)), isGeoJson = errors.length === 0;
         if (!isGeoJson) {
             $log.error("isGeoJsons errors: ", errors);
         }
@@ -357,8 +374,8 @@ angular.module("farmbuild.webmapping").factory("webmappingValidator", function(v
         if (!farmdata.validate(farmData)) {
             return false;
         }
-        if (!_isDefined(farmData) || !_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
-            $log.error("invalid, must have geometry and paddocks: %j", farmData);
+        if (!_isDefined(farmData) || !_isDefined(farmData.geometry) || !_isDefined(farmData.geometry.crs) || !_isDefined(farmData.paddocks)) {
+            $log.error("farmData must have geometry, geometry.crs, paddocks");
             return false;
         }
         return true;
