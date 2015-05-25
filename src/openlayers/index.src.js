@@ -4,7 +4,7 @@ angular.module('farmbuild.webmapping')
 	.factory('openLayers',
 	function (validations,
 	          $log,
-	          openlayersDraw,
+	          interactions,
 	          googlemapslayer) {
 		var defaults = {
 				centerNew: [-36.22488327137526, 145.5826132801325],
@@ -121,17 +121,30 @@ angular.module('farmbuild.webmapping')
 
 			_size = /** @type {ol.Size} */ (_map.getSize());
 
-			// Deselect all selections when layer is changed from farm to paddocks.
-//			_layerSelectionElement.addEventListener('change', function () {
-//				var layer;
-//				if (_layerSelectionElement.value === "paddocks") {
-//					layer = _paddocksLayer;
-//				}
-//				if (_layerSelectionElement.value === "farm") {
-//					layer = _farmLayer;
-//				}
-//				openlayersDraw.init(layer, _map);
-//			});
+			//Deselect all selections when layer is changed from farm to paddocks.
+			_layerSelectionElement.addEventListener('change', function () {
+				interactions.destroy(_map);
+				interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
+			});
+
+			_map.on('click', function (event) {
+				if (_layerSelectionElement.value === 'none' || _layerSelectionElement.value === '') {
+					interactions.destroy(_map);
+					return;
+				}
+				var layer;
+				if (_layerSelectionElement.value === "paddocks") {
+					layer = _paddocksLayer;
+				}
+				if (_layerSelectionElement.value === "farm") {
+					layer = _farmLayer;
+				}
+				if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
+					interactions.enableEditing();
+				} else {
+					interactions.enableDrawing();
+				}
+			});
 
 			return {
 				map: _map,
@@ -144,8 +157,9 @@ angular.module('farmbuild.webmapping')
 			return new google.maps.LatLng(transformed[1], transformed[0])
 		};
 
-		function _load(farmGeometry, paddocksGeometry) {
-			return _init(_targetElementId, _layerSelectionElementId, farmGeometry, paddocksGeometry);
+		function _transform(latLng, sourceProjection, destinationProjection) {
+			var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
+			return new google.maps.LatLng(transformed[1], transformed[0])
 		};
 
 		// replace this function by what you need
@@ -192,6 +206,8 @@ angular.module('farmbuild.webmapping')
 					_projection, googlemapslayer.getProjection()));
 				_view.setZoom(defaults.zoomNew);
 			} else {
+				gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(_targetEl);
+				_targetEl.parentNode.removeChild(_targetEl);
 				_view.fitExtent(_farmSource.getExtent(), _size);
 			}
 		};
@@ -209,7 +225,7 @@ angular.module('farmbuild.webmapping')
 			_view.setZoom(15);
 		};
 
-		function _paddocksLayer(paddocksGeometry){
+		function _paddocksLayer(paddocksGeometry) {
 			var _paddocksSource = new ol.source.Vector({
 				features: (new ol.format.GeoJSON()).readFeatures(paddocksGeometry, {
 					dataProjection: 'EPSG:4283',
@@ -231,7 +247,7 @@ angular.module('farmbuild.webmapping')
 			});
 		};
 
-		function _farmLayer(farmGeometry){
+		function _farmLayer(farmGeometry) {
 			var paddocksSource = new ol.source.Vector({
 				features: (new ol.format.GeoJSON()).readFeatures(farmGeometry, {
 					dataProjection: 'EPSG:4283',
@@ -255,7 +271,6 @@ angular.module('farmbuild.webmapping')
 
 		return {
 			init: _init,
-			load: _load,
 			exportGeometry: _exportGeometry,
 			clear: _clear,
 			center: _center,

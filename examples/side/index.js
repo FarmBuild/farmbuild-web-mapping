@@ -5,50 +5,46 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 	})
 
 	.controller('MapCtrl',
-  function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openLayers) {
+	function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openLayers) {
 
 		$scope.farmData = {};
 		$scope.farmChanged = false;
 		$scope.noResult = $scope.farmLoaded = false;
 
-		$scope.$watch('farmData', function(old,newVal){
-			if(!angular.equals(old,newVal)){
+		$scope.$watch('farmData', function (old, newVal) {
+			if (!angular.equals(old, newVal)) {
 				$scope.farmChanged = true;
 			}
 		}, true);
 
-    //webmapping.farmdata.findPaddock(id)
+		//webmapping.farmdata.findPaddock(id)
 
-    //geoJsons.paddocks.push
+		//geoJsons.paddocks.push
 
 		$scope.loadFarmData = function () {
-        $scope.farmData = webmapping.find();
+			$scope.farmData = webmapping.find();
 
-				var geoJsons = webmapping.toGeoJsons($scope.farmData);
+			var geoJsons = webmapping.toGeoJsons($scope.farmData);
 
-				if (!angular.isDefined(geoJsons)) {
-					$scope.noResult = true;
-					return;
-				}
+			if (!angular.isDefined(geoJsons)) {
+				$scope.noResult = true;
+				return;
+			}
 
-        gmap = googlemapslayer.init("gmap");
+			var gmap = googlemapslayer.init("gmap");
 
-        openLayers.init('olmap', 'layers');
+			openLayers.init('olmap', 'layers', geoJsons.farm, geoJsons.paddocks);
 
+			openLayers.integrateGMap(gmap);
 
-        openLayers.load(geoJsons.farm, geoJsons.paddocks);
-
-        window.setTimeout(function() {
-          openLayers.integrateGMap(gmap);
-
-        }, 1000)
-
-        $scope.farmLoaded = true;
+			googleaddresssearch.init('locationautocomplete');
+			
+			$scope.farmLoaded = true;
 
 			//webmapping.ga.track('AgSmart');
 		};
 
-    $scope.loadFarmData();
+		$scope.loadFarmData();
 
 		$scope.exportFarmData = function (farmData) {
 			var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
