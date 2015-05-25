@@ -33,6 +33,7 @@ describe('farmbuild.webmapping module', function() {
       var loaded = fixture.load(susanFarm),
         geoJsons = webmappingConverter.toGeoJsons(loaded);
 
+
       expect(geoJsons).toBeDefined()
       expect(geoJsons.farm).toBeDefined()
       expect(geoJsons.farm.type).toBeDefined()
@@ -41,22 +42,21 @@ describe('farmbuild.webmapping module', function() {
       $log.info('geoJsons.farm:%j', geoJsons.farm)
 
       expect(webmappingValidator.isGeoJsons(geoJsons.farm)).toBeTruthy()
-
       expect(geoJsons.paddocks).toBeDefined()
       expect(webmappingValidator.isGeoJsons(geoJsons.paddocks)).toBeTruthy()
 
       $log.info('geoJsons:%j', geoJsons)
     }))
 
-    it('geoJsons  should be converted to valid farmData', inject(function() {
-      var loaded = fixture.load(susanFarm),
-        geoJsons = webmappingConverter.toGeoJsons(loaded),
-        converted = webmappingConverter.toFarmData(angular.copy(loaded), geoJsons)
-
-      $log.info('converted:%j', converted)
-
-      expect(angular.equals(loaded, converted)).toBeTruthy()
-    }))
+//    it('geoJsons  should be converted to valid farmData', inject(function() {
+//      var loaded = fixture.load(susanFarm),
+//        geoJsons = webmappingConverter.toGeoJsons(loaded),
+//        converted = webmappingConverter.toFarmData(angular.copy(loaded), geoJsons)
+//
+//      $log.info('converted:%j', converted)
+//
+//      expect(angular.equals(loaded, converted)).toBeTruthy()
+//    }))
 
 
   })

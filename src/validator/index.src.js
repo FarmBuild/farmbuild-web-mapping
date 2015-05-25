@@ -29,8 +29,8 @@ angular.module('farmbuild.webmapping')
       throw Error('geojsonhint must be available!')
     }
 
-    function isGeoJsons(geoJson) {
-      var errors =  geojsonhint.hint(geoJson),
+    function isGeoJsons(geoJsons) {
+      var errors =  geojsonhint.hint((typeof geoJsons === 'string'?geoJsons:angular.toJson(geoJsons))),
         isGeoJson = errors.length === 0;
       if(!isGeoJson) {
         $log.error('isGeoJsons errors: ', errors)
@@ -47,10 +47,12 @@ angular.module('farmbuild.webmapping')
         return false;
       }
 
+
       if (!_isDefined(farmData) ||
           !_isDefined(farmData.geometry) ||
+          !_isDefined(farmData.geometry.crs) ||
           !_isDefined(farmData.paddocks)) {
-        $log.error('invalid, must have geometry and paddocks: %j', farmData);
+        $log.error('farmData must have geometry, geometry.crs, paddocks');
         return false;
       }
 
