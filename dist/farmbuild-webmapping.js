@@ -588,20 +588,32 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         var toMerge;
         _remove(features);
         toMerge = _featuresToGeoJson(features.getArray());
-        _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
+        try {
+            _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
+        } catch (e) {
+            $log.error(e);
+        }
     }
     function _erase(feature, features) {
-        features.forEach(function(layerFeature) {
-            var clipper = _featureToGeoJson(layerFeature);
-            feature = turf.erase(feature, clipper);
-        });
+        try {
+            features.forEach(function(layerFeature) {
+                var clipper = _featureToGeoJson(layerFeature);
+                feature = turf.erase(feature, clipper);
+            });
+        } catch (e) {
+            $log.error(e);
+        }
         return feature;
     }
     function _inverseErase(feature, features) {
-        features.forEach(function(layerFeature) {
-            var clipper = _featureToGeoJson(layerFeature);
-            feature = turf.intersect(feature, clipper);
-        });
+        try {
+            features.forEach(function(layerFeature) {
+                var clipper = _featureToGeoJson(layerFeature);
+                feature = turf.intersect(feature, clipper);
+            });
+        } catch (e) {
+            $log.error(e);
+        }
         return feature;
     }
     function _clip(feature, paddockSource, farmSource) {
