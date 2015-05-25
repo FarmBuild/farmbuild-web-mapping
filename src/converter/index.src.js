@@ -8,10 +8,6 @@
 
 'use strict';
 
-/**
- * webmappingConverter
- * @module webmappingConverter
- */
 angular.module('farmbuild.webmapping')
   .factory('webmappingConverter',
   function (farmdata,
