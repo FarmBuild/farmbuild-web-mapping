@@ -19,7 +19,7 @@ angular.module('farmbuild.webmapping')
   function (validations,
             farmdata,
             $log) {
-    var webmappingValidator = {},
+    var webmappingValidator = {geojsonhint:geojsonhint},
       _isDefined = validations.isDefined,
       _isArray = validations.isArray,
       _isPositiveNumber = validations.isPositiveNumber,
@@ -30,7 +30,12 @@ angular.module('farmbuild.webmapping')
     }
 
     function isGeoJsons(geoJson) {
-      return geojsonhint.hint(geoJson).length === 0;
+      var errors =  geojsonhint.hint(geoJson),
+        isGeoJson = errors.length === 0;
+      if(!isGeoJson) {
+        $log.error('isGeoJsons errors: ', errors)
+      }
+      return isGeoJson;
     }
 
     webmappingValidator.isGeoJsons = isGeoJsons;

@@ -1,24 +1,19 @@
 "use strict";
 
 angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession) {
+    $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webmapping = {
         session: session,
         farmdata: farmdata,
         validator: webmappingValidator,
-        toGeoJsons: webmappingConverter.toGeoJsons
-    };
-    $log.info("Welcome to Web Mapping... " + "this should only be initialised once! why we see twice in the example?");
-    webmapping.find = function() {
-        return session.find();
-    };
-    function _load(farmData) {
-        var loaded = farmdata.load(farmData);
-        if (!_isDefined(loaded)) {
-            return undefined;
+        toGeoJsons: webmappingConverter.toGeoJsons,
+        load: session.load,
+        find: session.find,
+        save: function(geoJsons) {
+            var farmData = session.find();
+            return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
         }
-        return farmData;
-    }
-    webmapping.load = _load;
+    };
     function _exportFarmData(toExport) {
         if (!toExport) {
             return undefined;
@@ -70,13 +65,14 @@ angular.module("farmbuild.webmapping").factory("webmappingConverter", function(f
         };
     }
     webmappingConverter.toGeoJsons = toGeoJsons;
-    function toFarmData(geoJson) {
-        $log.info("Writing farm and paddocks geojson to farmData ...");
-        var farm = data.geometry, paddocks = [];
-        angular.forEach(data.paddocks, function(val) {
-            paddocks.push(val.geometry);
+    function toFarmData(farmData, geoJsons) {
+        $log.info("Converting geoJsons.farm.features[0] and paddocks geojson to farmData ...");
+        var farmFeature = geoJsons.farm.features[0], paddocks = geoJsons.paddocks;
+        farmData.geometry = farmFeature.geometry;
+        paddocks.features.forEach(function(paddockFeature, i) {
+            farmData.paddocks[i].geometry = paddockFeature.geometry;
         });
-        return geoJson;
+        return farmData;
     }
     webmappingConverter.toFarmData = toFarmData;
     return webmappingConverter;
@@ -316,13 +312,22 @@ proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_d
 
 angular.module("farmbuild.webmapping").factory("webMappingSession", function($log, farmdata, validations) {
     var webMappingSession = {}, _isDefined = validations.isDefined;
-    function load() {
-        var root = farmdata.session.find();
-        if (!_isDefined(root)) {
+    function load(farmData) {
+        var loaded = farmdata.load(farmData);
+        if (!_isDefined(loaded)) {
             return undefined;
         }
-        return root.webMapping;
+        return farmData;
     }
+    webMappingSession.load = load;
+    function save(farmData) {
+        if (!_isDefined(farmData)) {
+            $log.error("Unable to save the undefined farmData!");
+            return undefined;
+        }
+        return farmdata.update(farmData);
+    }
+    webMappingSession.save = save;
     webMappingSession.isLoadFlagSet = farmdata.session.isLoadFlagSet;
     webMappingSession.find = function() {
         return farmdata.session.find();
@@ -333,12 +338,18 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webmappingValidator", function(validations, farmdata, $log) {
-    var webmappingValidator = {}, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isEmpty = validations.isEmpty;
+    var webmappingValidator = {
+        geojsonhint: geojsonhint
+    }, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isEmpty = validations.isEmpty;
     if (!_isDefined(geojsonhint)) {
         throw Error("geojsonhint must be available!");
     }
     function isGeoJsons(geoJson) {
-        return geojsonhint.hint(geoJson).length === 0;
+        var errors = geojsonhint.hint(geoJson), isGeoJson = errors.length === 0;
+        if (!isGeoJson) {
+            $log.error("isGeoJsons errors: ", errors);
+        }
+        return isGeoJson;
     }
     webmappingValidator.isGeoJsons = isGeoJsons;
     function _validate(farmData) {

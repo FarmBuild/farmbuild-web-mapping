@@ -15,38 +15,27 @@ angular.module('farmbuild.webmapping')
     var webMappingSession = {},
       _isDefined = validations.isDefined;
 
-    function load() {
-      var root = farmdata.session.find();
 
-      if(!_isDefined(root)) {
+    function load(farmData) {
+      var loaded = farmdata.load(farmData);
+
+      if (!_isDefined(loaded)) {
         return undefined;
       }
 
-      return root.webMapping;
+      return farmData;
+    };
+    webMappingSession.load = load;
+
+    function save(farmData) {
+      if(!_isDefined(farmData)) {
+        $log.error('Unable to save the undefined farmData!');
+        return undefined;
+      }
+      return farmdata.update(farmData);
     }
 
-//    function save(toSave) {
-//      var farmData = farmdata.session.find();
-//
-//      if(!_isDefined(farmData)) {
-//        $log.error('Unable to find the farmData in the session!');
-//        return undefined;
-//      }
-//
-//      farmData.dateLastUpdated = new Date();
-//
-//      farmData.webMapping = toSave;
-//      farmdata.session.save(farmData);
-//
-//      return toSave;
-//    }
-//    webMappingSession.save = save;
-
-//    webMappingSession.loadSection = function(section) {
-//      var loaded = load();
-//      return loaded?loaded[section]:null;
-//    }
-
+    webMappingSession.save = save;
 
     webMappingSession.isLoadFlagSet = farmdata.session.isLoadFlagSet;
 

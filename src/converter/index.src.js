@@ -25,6 +25,7 @@ angular.module('farmbuild.webmapping')
 
     }
 
+
     function createFeature(geometry) {
       return {
         "type": "Feature",
@@ -59,16 +60,18 @@ angular.module('farmbuild.webmapping')
     };
     webmappingConverter.toGeoJsons = toGeoJsons;
 
-    function toFarmData(geoJson) {
-      $log.info("Writing farm and paddocks geojson to farmData ...");
-      var farm = data.geometry,
-        paddocks = [];
+    function toFarmData(farmData, geoJsons) {
 
-      angular.forEach(data.paddocks, function (val) {
-        paddocks.push(val.geometry);
+      $log.info("Converting geoJsons.farm.features[0] and paddocks geojson to farmData ...");
+      var farmFeature = geoJsons.farm.features[0],
+        paddocks = geoJsons.paddocks;
+      farmData.geometry = farmFeature.geometry;
+
+      paddocks.features.forEach(function (paddockFeature, i) {
+        farmData.paddocks[i].geometry = (paddockFeature.geometry);
       });
 
-      return geoJson;
+      return farmData;
     };
     webmappingConverter.toFarmData = toFarmData;
 
