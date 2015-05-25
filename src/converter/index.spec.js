@@ -29,21 +29,45 @@ describe('farmbuild.webmapping module', function() {
       expect(webmappingConverter).toBeDefined()
     }))
 
-    it('Susan farm data should be converted to valid geoJson', inject(function() {
+    it('Susan farm data should be converted to valid geoJsons', inject(function() {
       var loaded = fixture.load(susanFarm),
-        geoJson = webmappingConverter.toGeoJsons(loaded);
-
-      expect(geoJson).toBeDefined()
-      expect(geoJson.farm).toBeDefined()
-      expect(webmappingValidator.isGeoJsons(geoJson.farm)).toBeDefined()
-
-      expect(geoJson.paddocks).toBeDefined()
-      expect(webmappingValidator.isGeoJsons(geoJson.paddocks)).toBeDefined()
+        geoJsons = webmappingConverter.toGeoJsons(loaded);
 
 
-      $log.info('geoJson:%j', geoJson)
+      expect(geoJsons).toBeDefined()
+      expect(geoJsons.farm).toBeDefined()
+      expect(geoJsons.farm.type).toBeDefined()
+      expect(geoJsons.farm.type).toBe('FeatureCollection')
+
+      $log.info('geoJsons.farm:%j', geoJsons.farm)
+
+      expect(webmappingValidator.isGeoJsons(geoJsons.farm)).toBeTruthy()
+      expect(geoJsons.paddocks).toBeDefined()
+      expect(webmappingValidator.isGeoJsons(geoJsons.paddocks)).toBeTruthy()
+      expect(geoJsons.paddocks.features[0].properties.name).toBeDefined()
+
+      $log.info('geoJsons:%j', geoJsons)
     }))
 
+    it('geoJsons  should be converted to valid farmData', inject(function() {
+      var loaded = fixture.load(susanFarm),
+        source = angular.copy(loaded),
+        geoJsons = webmappingConverter.toGeoJsons(loaded)
+
+      $log.info('loaded:%j', source.geometry.crs)
+
+      var converted = webmappingConverter.toFarmData(loaded, geoJsons)
+
+      $log.info('source:%j, converted:%j', source.geometry.crs, converted.geometry.crs)
+
+      expect(angular.equals(source.geometry.crs, loaded.geometry.crs)).toBeTruthy()
+      expect(angular.equals(source.geometry, loaded.geometry)).toBeTruthy()
+
+      $log.info('source:%j, converted:%j',
+        source.paddocks[0].geometry, converted.paddocks[0].geometry)
+      expect(angular.equals(source.paddocks, loaded.paddocks)).toBeTruthy()
+
+    }))
 
 
   })

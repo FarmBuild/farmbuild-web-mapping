@@ -14,6 +14,7 @@ module.exports = function(config){
       'src/converter/index.src.js',
       'src/index.src.js',
       'src/blank.spec.js',//use this as a basis of creating your module test
+      'src/validator/geojsonhint.spec.js',
       'src/validator/index.spec.js',
       'src/converter/index.spec.js',
       'src/index-load.spec.js',

@@ -23,19 +23,45 @@ describe('farmbuild.webmapping module', function() {
     webmapping = _webmapping_
   }))
 
-  describe('Loading susan farm data', function() {
+  describe('Loading susan farmData', function() {
     it('Loading from json file should create geoJson', inject(function() {
 
-      var loaded = fixture.load(susanFarm),
-        farmData = webmapping.load(loaded),
-        geoJsons = webmapping.toGeoJsons(farmData)
+      var susanFarmData = fixture.load(susanFarm),
+        loaded = webmapping.load(susanFarmData),
+        geoJsons = webmapping.toGeoJsons(loaded)
 
-      expect(webmapping.validator.validate(farmData)).toBeDefined()
+      expect(webmapping.validator.validate(loaded)).toBeTruthy()
 
-      expect(webmapping.validator.isGeoJsons(geoJsons)).toBeDefined()
+      expect(webmapping.validator.isGeoJsons(geoJsons.farm)).toBeTruthy()
+      expect(webmapping.validator.isGeoJsons(geoJsons.paddocks)).toBeTruthy()
 
     }))
   })
+
+  describe('Saving the farmData', function() {
+    it('Saving farmData', inject(function() {
+
+      var susanFarmData = fixture.load(susanFarm),
+        source = angular.copy(susanFarmData),
+        loaded = webmapping.load(angular.copy(susanFarmData)),
+        geoJsons = webmapping.toGeoJsons(loaded),
+        saved = webmapping.save(geoJsons)
+
+      expect(angular.equals(loaded, susanFarmData)).toBeTruthy()
+
+      log(loaded, saved)
+
+      expect(angular.equals(source.name, saved.name)).toBeTruthy()
+
+      expect(angular.equals(source.geometry, saved.geometry)).toBeTruthy()
+      expect(angular.equals(source.paddocks, saved.paddocks)).toBeTruthy()
+
+    }))
+  })
+
+  function log(i1, i2) {
+    $log.info('i1: %s, i2: %s', i1.name, i2.name)
+  }
 
   afterEach(function() {
     fixture.cleanup()

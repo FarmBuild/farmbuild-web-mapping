@@ -8,48 +8,59 @@
 
 'use strict';
 
-/**
- * webmappingConverter
- * @module webmappingConverter
- */
 angular.module('farmbuild.webmapping')
   .factory('webmappingConverter',
   function (farmdata,
             validations,
             $log,
+            webmappingValidator,
             webMappingSession) {
     var _isDefined = validations.isDefined,
-      webmappingConverter = {};
+      webmappingConverter = {},
+      validator = webmappingValidator;
 
     function createFeatureCollection(geometry) {
 
     }
 
-    function createFeature(geometry) {
+    function convertCrs(geometry, crs) {
+      geometry.crs = {"type": "name", "properties": {"name": crs}};
+      return geometry;
+    }
+
+    function resetCrs(geometry) {
+      geometry.crs = geometry.crs.properties.name;
+      return geometry;
+    }
+
+    function createFeature(geometry, crs, name) {
       return {
         "type": "Feature",
-        "geometry": angular.copy(geometry),
-        "properties": {}
+        "geometry": angular.copy(convertCrs(geometry, crs)),
+        "properties": {name:name}
       };
     }
 
+
     function toGeoJsons(farmData) {
       $log.info("Extracting farm and paddocks geometry from farmData ...");
-      var farm = farmData.geometry,
-        paddocks = [];
+      var copied = angular.copy(farmData)
 
-      if (!_isDefined(farmData.geometry) || !_isDefined(farmData.paddocks)) {
+      if (!validator.validate(copied)) {
         return undefined;
       }
 
-      angular.forEach(farmData.paddocks, function (val) {
-        paddocks.push(createFeature(val.geometry));
+      var farm = copied.geometry,
+        paddocks = [];
+
+      copied.paddocks.forEach(function (paddock) {
+        paddocks.push(createFeature(paddock.geometry, farm.crs, paddock.name));
       });
 
       return {
         farm: {
           "type": "FeatureCollection",
-          "features": [createFeature(farm)]
+          "features": [createFeature(farm, farm.crs, copied.name)]
         },
         paddocks: {
           "type": "FeatureCollection",
@@ -59,16 +70,19 @@ angular.module('farmbuild.webmapping')
     };
     webmappingConverter.toGeoJsons = toGeoJsons;
 
-    function toFarmData(geoJson) {
-      $log.info("Writing farm and paddocks geojson to farmData ...");
-      var farm = data.geometry,
-        paddocks = [];
+    function toFarmData(farmData, geoJsons) {
 
-      angular.forEach(data.paddocks, function (val) {
-        paddocks.push(val.geometry);
+      $log.info("Converting geoJsons.farm.features[0] and paddocks geojson to farmData ...");
+      var farmFeature = geoJsons.farm.features[0],
+        paddocks = geoJsons.paddocks;
+      farmData.geometry = resetCrs(farmFeature.geometry);
+
+      paddocks.features.forEach(function (paddockFeature, i) {
+        farmData.paddocks[i].geometry = paddockFeature.geometry;
+        delete farmData.paddocks[i].geometry.crs;
       });
 
-      return geoJson;
+      return farmData;
     };
     webmappingConverter.toFarmData = toFarmData;
 

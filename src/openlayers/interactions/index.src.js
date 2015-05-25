@@ -260,7 +260,7 @@ angular.module('farmbuild.webmapping')
 
 			var featureToClip = _featureToGeoJson(feature);
 
-			if (_activeLayerName === 'paddocks' && _mode === 'draw') {
+			if (_activeLayerName === 'paddocks' && (_mode === 'draw' || _mode === 'edit')) {
 				_clipPaddocks(featureToClip, paddockSource, farmSource);
 			}
 
