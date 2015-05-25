@@ -231,8 +231,7 @@ angular.module('farmbuild.webmapping')
 		function _inverseErase(feature, features) {
 			features.forEach(function (layerFeature) {
 				var clipper = _featureToGeoJson(layerFeature);
-				feature = turf.erase(clipper, feature);
-				feature = turf.erase(clipper, feature);
+				feature = turf.intersect(feature, clipper);
 			});
 			return feature;
 		};
