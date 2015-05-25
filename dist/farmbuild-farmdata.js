@@ -8,7 +8,7 @@ angular.injector([ "ng", "farmbuild.farmdata" ]);
 
 "use strict";
 
-angular.module("farmbuild.farmdata").factory("farmdata", function(farmdataSession, farmdataValidator, validations) {
+angular.module("farmbuild.farmdata").factory("farmdata", function($log, farmdataSession, farmdataValidator, validations) {
     var farmdata = {
         session: farmdataSession,
         validator: farmdataValidator
@@ -41,8 +41,8 @@ angular.module("farmbuild.farmdata").factory("farmdata", function(farmdataSessio
     farmdata.validate = function(farmData) {
         return farmdataValidator.validate(farmData);
     };
-    farmdata.create = function(name) {
-        return create(name);
+    farmdata.create = function(name, id) {
+        return create(name, id);
     };
     farmdata.load = farmdataSession.load;
     farmdata.find = farmdataSession.find;
@@ -93,13 +93,28 @@ angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, f
         }
         return farmdataSession.save(farmData).find();
     };
+    farmdataSession.isLoadFlagSet = function(location) {
+        var load = false;
+        if (location.href.split("?").length > 1 && location.href.split("?")[1].indexOf("load") === 0) {
+            load = location.href.split("?")[1].split("=")[1] === "true";
+        }
+        return load;
+    };
+    farmdataSession.setLoadFlag = function(location) {
+        var path = farmdataSession.clearLoadFlag(location);
+        return path + "?load=true";
+    };
+    farmdataSession.clearLoadFlag = function(location) {
+        var path = location.href.toString(), path = path.substring(0, path.indexOf("?"));
+        return path;
+    };
     return farmdataSession;
 });
 
 "use strict";
 
 angular.module("farmbuild.core").factory("farmdataValidator", function(validations, $log) {
-    var farmdataValidator = {}, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isEmpty = validations.isEmpty, _isObject = validations.isObject, _isString = validations.isString;
+    var farmdataValidator = {}, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isPositiveNumberOrZero = validations.isPositiveNumberOrZero, _isEmpty = validations.isEmpty, _isObject = validations.isObject, _isString = validations.isString, areaUnitDefault = "hectare";
     function errorLog() {}
     function _validate(farmData) {
         $log.info("validating farmData...");
@@ -111,8 +126,8 @@ angular.module("farmbuild.core").factory("farmdataValidator", function(validatio
             $log.error("farmData must be a javascript Object.");
             return false;
         }
-        if (!farmData.hasOwnProperty("name") || !_isString(farmData.name) || _isEmpty(farmData.name)) {
-            $log.error("farmData must have a name property and cannot be empty.");
+        if (!farmData.hasOwnProperty("name") || !_isString(farmData.name) || _isEmpty(farmData.name) || !_isDefined(farmData.area) || !_isPositiveNumberOrZero(farmData.area) || !angular.equals(farmData.areaUnit, areaUnitDefault)) {
+            $log.error("farmData must have name, area (positve number or zero) and areaUnit (must be " + areaUnitDefault + "): %j", farmData);
             return false;
         }
         return true;

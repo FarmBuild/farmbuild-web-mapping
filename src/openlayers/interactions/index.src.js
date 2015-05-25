@@ -48,13 +48,13 @@ angular.module('farmbuild.webmapping')
 			//		}
 			//	});
 			//});
-			map.on('singleclick',function(event){
-				$log.info('selectInteraction change:active');
-				if(_isDefined(selectInteraction.getFeatures().item(0))) {
-					_activeLayer.getSource().removeFeature(selectInteraction.getFeatures().item(0));
-					_clip(selectInteraction.getFeatures().item(0), paddocksSource, farmSource);
-				}
-			});
+			//map.on('singleclick',function(event){
+			//	$log.info('selectInteraction change:active');
+			//	if(_isDefined(selectInteraction.getFeatures().item(0))) {
+			//		_activeLayer.getSource().removeFeature(selectInteraction.getFeatures().item(0));
+			//		_clip(selectInteraction.getFeatures().item(0), paddocksSource, farmSource);
+			//	}
+			//});
 
 			function _init() {
 				$log.info('select interaction init ...');

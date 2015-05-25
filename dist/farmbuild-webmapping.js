@@ -176,6 +176,27 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
             }), new ol.control.ScaleLine() ])
         });
         _size = _map.getSize();
+        _layerSelectionElement.addEventListener("change", function() {
+            interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
+        });
+        _map.on("click", function(event) {
+            if (_layerSelectionElement.value === "none" || _layerSelectionElement.value === "") {
+                interactions.destroy(_map);
+                return;
+            }
+            var layer;
+            if (_layerSelectionElement.value === "paddocks") {
+                layer = _paddocksLayer;
+            }
+            if (_layerSelectionElement.value === "farm") {
+                layer = _farmLayer;
+            }
+            if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
+                interactions.enableEditing();
+            } else {
+                interactions.enableDrawing();
+            }
+        });
         return {
             map: _map,
             view: _view
@@ -401,13 +422,6 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             addCondition: ol.events.condition.shiftKeyOnly,
             layers: [ layer ]
         }), selectedFeatures = selectInteraction.getFeatures();
-        map.on("singleclick", function(event) {
-            $log.info("selectInteraction change:active");
-            if (_isDefined(selectInteraction.getFeatures().item(0))) {
-                _activeLayer.getSource().removeFeature(selectInteraction.getFeatures().item(0));
-                _clip(selectInteraction.getFeatures().item(0), paddocksSource, farmSource);
-            }
-        });
         function _init() {
             $log.info("select interaction init ...");
             map.addInteraction(selectInteraction);

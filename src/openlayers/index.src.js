@@ -121,17 +121,29 @@ angular.module('farmbuild.webmapping')
 
 			_size = /** @type {ol.Size} */ (_map.getSize());
 
-			// Deselect all selections when layer is changed from farm to paddocks.
-//			_layerSelectionElement.addEventListener('change', function () {
-//				var layer;
-//				if (_layerSelectionElement.value === "paddocks") {
-//					layer = _paddocksLayer;
-//				}
-//				if (_layerSelectionElement.value === "farm") {
-//					layer = _farmLayer;
-//				}
-//				openlayersDraw.init(layer, _map);
-//			});
+			//Deselect all selections when layer is changed from farm to paddocks.
+			_layerSelectionElement.addEventListener('change', function () {
+				interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
+			});
+
+			_map.on('click', function (event) {
+				if (_layerSelectionElement.value === 'none' || _layerSelectionElement.value === '') {
+					interactions.destroy(_map);
+					return;
+				}
+				var layer;
+				if (_layerSelectionElement.value === "paddocks") {
+					layer = _paddocksLayer;
+				}
+				if (_layerSelectionElement.value === "farm") {
+					layer = _farmLayer;
+				}
+				if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
+					interactions.enableEditing();
+				} else {
+					interactions.enableDrawing();
+				}
+			});
 
 			return {
 				map: _map,
