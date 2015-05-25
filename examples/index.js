@@ -26,7 +26,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				}
 
 				//location.href = webmapping.farmdata.session.setLoadFlag(location);
-				location.href = location.href + 'side/?load=true';
+				location.href = 'side/index.html?load=true';
 
 			} catch (e) {
 				console.error('farmbuild.webmapping.examples > load: Your file should be in json format: ', e);
