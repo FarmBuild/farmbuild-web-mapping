@@ -418,10 +418,17 @@ angular.module("farmbuild.webmapping").factory("googlemapslayer", function(valid
 
 angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode;
-    function _createSelect(layer, map) {
+    function _createSelect(layer, map, paddocksSource, farmSource) {
         var selectInteraction = new ol.interaction.Select({
             addCondition: ol.events.condition.shiftKeyOnly,
             layers: [ layer ]
+        }), selectedFeatures = selectInteraction.getFeatures();
+        map.on("singleclick", function(event) {
+            $log.info("selectInteraction change:active");
+            if (_isDefined(selectInteraction.getFeatures().item(0))) {
+                _activeLayer.getSource().removeFeature(selectInteraction.getFeatures().item(0));
+                _clip(selectInteraction.getFeatures().item(0), paddocksSource, farmSource);
+            }
         });
         function _init() {
             $log.info("select interaction init ...");
@@ -534,7 +541,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         } else {
             return;
         }
-        _select = _createSelect(_activeLayer, map);
+        _select = _createSelect(_activeLayer, map, paddocksLayer.getSource(), farmLayer.getSource());
         _modify = _createModify(_select, map);
         _draw = _createDraw(paddocksLayer.getSource(), farmLayer.getSource(), map);
         _snap = _createSnap(paddocksLayer.getSource(), map);

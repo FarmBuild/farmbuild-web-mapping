@@ -9,10 +9,51 @@ angular.module('farmbuild.webmapping')
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode;
 
-		function _createSelect(layer, map) {
+		function _createSelect(layer, map, paddocksSource, farmSource) {
 			var selectInteraction = new ol.interaction.Select({
-				addCondition: ol.events.condition.shiftKeyOnly,
-				layers: [layer]
+					addCondition: ol.events.condition.shiftKeyOnly,
+					layers: [layer]
+				}),
+				selectedFeatures = selectInteraction.getFeatures();
+			//selectedFeatures.on('add', function (event) {
+			//	// grab the feature
+			//	var feature = event.element;
+			//	// ...listen for changes and save them
+			//	// listen to pressing of delete key, then delete selected features
+			//	$(document).on('keydown', function (event) {
+			//		if (event.keyCode == 46 || event.keyCode == 8) {
+			//			// remove all selected features from select_interaction and my_vectorlayer
+			//			selectedFeatures.forEach(function (selectedFeature) {
+			//				var selected_feature_id = selectedFeature.getId();
+			//				// remove from select_interaction
+			//				selectedFeatures.remove(selectedFeature);
+			//				// features aus vectorlayer entfernen
+			//				var vectorLayerFeatures = _activeLayer.getSource().getFeatures();
+			//				vectorLayerFeatures.forEach(function (source_feature) {
+			//					var source_feature_id = source_feature.getId();
+			//					if (source_feature_id === selected_feature_id) {
+			//						// remove from my_vectorlayer
+			//						_activeLayer.getSource().removeFeature(source_feature);
+			//						// save the changed data
+			//					}
+			//				});
+			//			});
+			//			// remove listener
+			//			$(document).off('keydown');
+			//		}
+			//		if (event.keyCode == 13) {
+			//
+			//			// remove listener
+			//			$(document).off('keydown');
+			//		}
+			//	});
+			//});
+			map.on('singleclick',function(event){
+				$log.info('selectInteraction change:active');
+				if(_isDefined(selectInteraction.getFeatures().item(0))) {
+					_activeLayer.getSource().removeFeature(selectInteraction.getFeatures().item(0));
+					_clip(selectInteraction.getFeatures().item(0), paddocksSource, farmSource);
+				}
 			});
 
 			function _init() {
@@ -150,7 +191,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 
-			_select = _createSelect(_activeLayer, map);
+			_select = _createSelect(_activeLayer, map, paddocksLayer.getSource(), farmLayer.getSource());
 			_modify = _createModify(_select, map);
 			_draw = _createDraw(paddocksLayer.getSource(), farmLayer.getSource(), map);
 			_snap = _createSnap(paddocksLayer.getSource(), map);
