@@ -22,6 +22,7 @@ angular.module('farmbuild.webmapping')
 					selectedFeatures.forEach(function (selectedFeature) {
 						_activeLayer.getSource().removeFeature(selectedFeature);
 					})
+					selectInteraction.getFeatures().clear();
 				}
 
 				if (event.keyCode == 13) {
@@ -32,18 +33,13 @@ angular.module('farmbuild.webmapping')
 						_activeLayer.getSource().removeFeature(selectedFeatures.item(0));
 						_clip(selectedFeatures.item(0), paddocksSource, farmSource);
 					}
+					selectInteraction.getFeatures().clear();
 				}
 
-				selectInteraction.getFeatures().clear();
+				event.preventDefault();
+				event.stopPropagation();
 				return false;
 			});
-			//map.on('singleclick',function(event){
-			//	$log.info('selectInteraction change:active');
-			//	if(_isDefined(selectInteraction.getFeatures().item(0))) {
-			//		_activeLayer.getSource().removeFeature(selectInteraction.getFeatures().item(0));
-			//		_clip(selectInteraction.getFeatures().item(0), paddocksSource, farmSource);
-			//	}
-			//});
 
 			function _init() {
 				$log.info('select interaction init ...');

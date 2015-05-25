@@ -429,6 +429,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
                 selectedFeatures.forEach(function(selectedFeature) {
                     _activeLayer.getSource().removeFeature(selectedFeature);
                 });
+                selectInteraction.getFeatures().clear();
             }
             if (event.keyCode == 13) {
                 if (selectedFeatures.getLength() > 1) {
@@ -438,8 +439,10 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
                     _activeLayer.getSource().removeFeature(selectedFeatures.item(0));
                     _clip(selectedFeatures.item(0), paddocksSource, farmSource);
                 }
+                selectInteraction.getFeatures().clear();
             }
-            selectInteraction.getFeatures().clear();
+            event.preventDefault();
+            event.stopPropagation();
             return false;
         });
         function _init() {
