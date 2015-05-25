@@ -44,6 +44,7 @@ describe('farmbuild.webmapping module', function() {
       expect(webmappingValidator.isGeoJsons(geoJsons.farm)).toBeTruthy()
       expect(geoJsons.paddocks).toBeDefined()
       expect(webmappingValidator.isGeoJsons(geoJsons.paddocks)).toBeTruthy()
+      expect(geoJsons.paddocks.features[0].properties.name).toBeDefined()
 
       $log.info('geoJsons:%j', geoJsons)
     }))

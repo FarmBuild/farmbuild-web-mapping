@@ -37,11 +37,11 @@ angular.module('farmbuild.webmapping')
       return geometry;
     }
 
-    function createFeature(geometry, crs) {
+    function createFeature(geometry, crs, name) {
       return {
         "type": "Feature",
         "geometry": angular.copy(convertCrs(geometry, crs)),
-        "properties": {}
+        "properties": {name:name}
       };
     }
 
@@ -57,14 +57,14 @@ angular.module('farmbuild.webmapping')
       var farm = copied.geometry,
         paddocks = [];
 
-      angular.forEach(copied.paddocks, function (val) {
-        paddocks.push(createFeature(val.geometry, farm.crs));
+      copied.paddocks.forEach(function (paddock) {
+        paddocks.push(createFeature(paddock.geometry, farm.crs, paddock.name));
       });
 
       return {
         farm: {
           "type": "FeatureCollection",
-          "features": [createFeature(farm, farm.crs)]
+          "features": [createFeature(farm, farm.crs, copied.name)]
         },
         paddocks: {
           "type": "FeatureCollection",
