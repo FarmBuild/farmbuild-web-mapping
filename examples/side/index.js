@@ -1,105 +1,135 @@
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
-	.run(function ($rootScope) {
-		$rootScope.appVersion = farmbuild.examples.webmapping.version;
-	})
+    .run(function ($rootScope) {
+        $rootScope.appVersion = farmbuild.examples.webmapping.version;
+    })
 
-	.controller('MapCtrl',
-	function ($scope, $log, $location, webmapping, googleaddresssearch, googlemapslayer, openLayers) {
+    .controller('MapCtrl',
+    function ($scope, $log, $location, webmapping, googleaddresssearch, openLayers, interactions) {
 
-		$scope.farmData = {};
-		$scope.farmChanged = false;
-		$scope.noResult = $scope.farmLoaded = false;
+        var dataProjectionCode = 'EPSG:4283',
+            featureProjectionCode = 'EPSG:3857',
+            dataProjection = ol.proj.get({code: dataProjectionCode}),
+            maxZoom = 21,
+            defaults = {
+                centerNew: [-36.22488327137526, 145.5826132801325],
+                zoomNew: 6
+            },
+            layerSelectionElement = document.getElementById('layers'),
+            gmap = new google.maps.Map(document.getElementById('gmap'), {
+                disableDefaultUI: true,
+                keyboardShortcuts: false,
+                draggable: false,
+                disableDoubleClickZoom: true,
+                scrollwheel: false,
+                streetViewControl: false,
+                mapTypeId: google.maps.MapTypeId.SATELLITE
+            });
 
-		$scope.$watch('farmData', function (old, newVal) {
-			if (!angular.equals(old, newVal)) {
-				$scope.farmChanged = true;
-			}
-		}, true);
+        $scope.farmData = {};
+        $scope.farmChanged = false;
+        $scope.noResult = $scope.farmLoaded = false;
 
-		//webmapping.farmdata.findPaddock(id)
 
-		//geoJsons.paddocks.push
+        $scope.loadFarmData = function () {
+            $scope.farmData = webmapping.find();
 
-		$scope.loadFarmData = function () {
-			$scope.farmData = webmapping.find();
+            var geoJsons = webmapping.toGeoJsons($scope.farmData);
 
-			var geoJsons = webmapping.toGeoJsons($scope.farmData);
+            if (!angular.isDefined(geoJsons)) {
+                $scope.noResult = true;
+                return;
+            }
 
-			if (!angular.isDefined(geoJsons)) {
-				$scope.noResult = true;
-				return;
-			}
+            var farmLayer = openLayers.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
+                paddocksLayer = openLayers.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
 
-			var gmap = googlemapslayer.init("gmap");
+            var map = new ol.Map({
+                layers: [paddocksLayer, farmLayer],
+                target: 'olmap',
+                view: new ol.View({
+                    rotation: 0,
+                    projection: dataProjection,
+                    maxZoom: maxZoom
+                }),
+                interactions: ol.interaction.defaults({
+                    altShiftDragRotate: false,
+                    dragPan: false,
+                    rotate: false,
+                    mouseWheelZoom: true
+                }).extend([new ol.interaction.DragPan({kinetic: null})]),
+                controls: ol.control.defaults({
+                    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
+                        collapsible: false
+                    })
+                }).extend([
+                    new ol.control.ZoomToExtent({
+                        extent: farmLayer.getSource().getExtent()
+                    }),
+                    new ol.control.ScaleLine()
+                ])
+            });
 
-			openLayers.init('olmap', 'layers', geoJsons.farm, geoJsons.paddocks);
+            openLayers.integrateGMap(gmap, map, dataProjectionCode);
 
-			openLayers.integrateGMap(gmap);
+            googleaddresssearch.init('locationautocomplete');
 
-			googleaddresssearch.init('locationautocomplete');
-			
-			$scope.farmLoaded = true;
+            $scope.farmLoaded = true;
 
-			//webmapping.ga.track('AgSmart');
-		};
+            //webmapping.ga.track('AgSmart');
 
-		$scope.loadFarmData();
 
-		$scope.exportFarmData = function (farmData) {
-			var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
-			window.open(url, '_blank');
-			window.focus();
-		};
+            map.on('pointermove', function (event) {
+                var layer;
+                if (layerSelectionElement.value === 'none' || layerSelectionElement.value === '') {
+                    return;
+                }
+                if (layerSelectionElement.value === "paddocks") {
+                    layer = paddocksLayer;
+                }
+                if (layerSelectionElement.value === "farm") {
+                    layer = farmLayer;
+                }
+                if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && !interactions.isDrawing()) {
+                    interactions.enableEditing();
+                }
+                if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length === 0 && !interactions.isEditing()) {
+                    interactions.enableDrawing();
+                }
+            });
 
-		$scope.apply = function () {
-			$log.info('apply...');
-			$scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
-			$scope.farmChanged = false;
-		};
+            map.on('dblclick', function (event) {
+                if (paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && interactions.isEditing()) {
+                    interactions.enableDonutDrawing();
+                }
+            });
 
-		$scope.cancel = function () {
-			$log.info('cancel...');
-			$scope.farmData = findInSessionStorage();
-			$scope.farmChanged = false;
-		};
+            //Deselect all selections when layer is changed from farm to paddocks.
+            layerSelectionElement.addEventListener('change', function () {
+                interactions.destroy(map);
+                interactions.init(map, farmLayer, paddocksLayer, layerSelectionElement.value);
+            });
 
-//		$scope.defineFarm = function () {
-//			$log.info('defineFarm...');
-//			$scope.farmLoaded = true;
-//			$scope.farmChanged = false;
-//			$scope.saveToSessionStorage('farmData', {});
-//		};
+        };
 
-//		$scope.saveToSessionStorage = function (key, value) {
-//			sessionStorage.setItem(key, value);
-//		};
+        $scope.loadFarmData();
 
-//		$scope.deleteFromSessionStorage = function (key, value) {
-//			sessionStorage.clear();
-//			$scope.farmData = {};
-//			openLayers.clear();
-//			$scope.farmChanged = true;
-//		};
-//
-//		function findInSessionStorage() {
-//			return angular.fromJson(sessionStorage.getItem('farmData'));
-//		};
+        $scope.exportFarmData = function (farmData) {
+            var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
+            window.open(url, '_blank');
+            window.focus();
+        };
 
-//		function init() {
-//			gmap = googlemapslayer.init("gmap");
-//
-//			openLayers.init('olmap', 'layers');
-//
-//			openLayers.integrateGMap(gmap);
-//
-//			googleaddresssearch.init('locationautocomplete');
-//
-////			if(findInSessionStorage() && findInSessionStorage().name && findInSessionStorage().geometry){
-////				$scope.loadFarmData(findInSessionStorage())
-////			}
-//		};
-//
-//		init();
+        $scope.apply = function () {
+            $log.info('apply...');
+            $scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
+            $scope.farmChanged = false;
+        };
 
-	});
+        $scope.cancel = function () {
+            $log.info('cancel...');
+            $scope.farmData = findInSessionStorage();
+            $scope.farmChanged = false;
+        };
+
+    });

@@ -16,7 +16,7 @@ angular.module('farmbuild.webmapping')
     .factory('googleaddresssearch',
     function (validations,
               $log,
-              openLayers, googlemapslayer) {
+              openLayers) {
         var countryRestrict = {'country': 'au'};
 
         function _init(targetElementId) {
@@ -53,7 +53,7 @@ angular.module('farmbuild.webmapping')
 
 
         function _center(latLng) {
-            var googleMapProjection = googlemapslayer.getProjection(),
+            var googleProjection = 'EPSG:3857',
                 openLayerProjection = openLayers.getProjection(),
                 centerPoint = _transform(latLng, openLayerProjection, googleMapProjection);
             openLayers.center(centerPoint);

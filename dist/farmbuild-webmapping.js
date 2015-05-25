@@ -97,185 +97,73 @@ angular.module("farmbuild.webmapping").factory("webmappingConverter", function(f
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("openLayers", function(validations, $log, interactions, googlemapslayer) {
-    var defaults = {
-        centerNew: [ -36.22488327137526, 145.5826132801325 ],
-        zoomNew: 6
-    }, _map, _paddocksLayer, _farmLayer, _size, _view, _paddocksSource, _farmSource, _targetElementId, _layerSelectionElementId, _isNew, _targetEl = document.getElementById("olmap"), _projection = "EPSG:4326", _isDefined = validations.isDefined;
-    function _init(targetElementId, layerSelectionElementId, farmGeometry, paddocksGeometry) {
-        var isNew;
-        if (!_isDefined(farmGeometry)) {
-            paddocksGeometry = {
-                type: "FeatureCollection",
-                features: []
-            };
-            farmGeometry = {
-                type: "FeatureCollection",
-                features: []
-            };
-            isNew = true;
-        }
-        _targetElementId = targetElementId;
-        _layerSelectionElementId = layerSelectionElementId;
-        _isNew = isNew;
-        if (_isDefined(_map) && _map.setTarget) {
-            _map.setTarget(null);
-            _map = null;
-        }
-        var _layerSelectionElement = document.getElementById(layerSelectionElementId);
-        proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs");
-        var projection = ol.proj.get({
-            code: "EPSG:4283"
-        });
-        _view = new ol.View({
-            rotation: 0,
-            projection: projection,
-            maxZoom: 21
-        });
-        _paddocksSource = new ol.source.Vector({
-            features: new ol.format.GeoJSON().readFeatures(paddocksGeometry, {
-                dataProjection: "EPSG:4283",
-                featureProjection: "EPSG:3857"
-            })
-        });
-        _farmSource = new ol.source.Vector({
-            features: new ol.format.GeoJSON().readFeatures(farmGeometry, {
-                dataProjection: "EPSG:4283",
-                featureProjection: "EPSG:3857"
-            })
-        });
-        _paddocksLayer = new ol.layer.Vector({
-            source: _paddocksSource,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: "rgba(255, 255, 255, 0.3)"
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#319FD3",
-                    width: 1
-                })
-            })
-        });
-        _farmLayer = new ol.layer.Vector({
-            source: _farmSource,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: "rgba(255, 255, 255, 0)"
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#ff6600",
-                    width: 3
-                })
-            })
-        });
-        _map = new ol.Map({
-            layers: [ _paddocksLayer, _farmLayer ],
-            target: targetElementId,
-            view: _view,
-            interactions: ol.interaction.defaults({
-                altShiftDragRotate: false,
-                dragPan: false,
-                rotate: false,
-                mouseWheelZoom: true
-            }).extend([ new ol.interaction.DragPan({
-                kinetic: null
-            }) ]),
-            controls: ol.control.defaults({
-                attributionOptions: {
-                    collapsible: false
-                }
-            }).extend([ new ol.control.ZoomToExtent({
-                extent: _farmSource.getExtent()
-            }), new ol.control.ScaleLine() ])
-        });
-        _size = _map.getSize();
-        _layerSelectionElement.addEventListener("change", function() {
-            interactions.destroy(_map);
-            interactions.init(_map, _farmLayer, _paddocksLayer, _layerSelectionElement.value);
-        });
-        return {
-            map: _map,
-            view: _view
-        };
-    }
+angular.module("farmbuild.webmapping").factory("openLayers", function(validations, $log) {
+    var _isDefined = validations.isDefined;
     function _transform(latLng, sourceProjection, destinationProjection) {
+        if (!_isDefined(latLng) || !_isDefined(sourceProjection) || !_isDefined(destinationProjection)) {
+            return;
+        }
         var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
         return new google.maps.LatLng(transformed[1], transformed[0]);
     }
-    function _transform(latLng, sourceProjection, destinationProjection) {
-        var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
-        return new google.maps.LatLng(transformed[1], transformed[0]);
-    }
-    function _exportGeometry() {
+    function _exportGeometry(farmSource, paddocksSource) {
+        if (!_isDefined(farmSource) || !_isDefined(paddocksSource)) {
+            return;
+        }
         var format = new ol.format["GeoJSON"](), data;
         try {
-            data = format.writeFeatures(_paddocksLayer.getSource().getFeatures());
-        } catch (e) {}
-        return JSON.stringify(data, null, 4);
+            return format.writeFeatures(paddocksSource.getFeatures());
+        } catch (e) {
+            $log.error(e);
+        }
     }
-    function _clear() {
-        _paddocksSource.clear();
-        _farmSource.clear();
+    function _clear(farmSource, paddocksSource) {
+        if (!_isDefined(farmSource) || !_isDefined(paddocksSource)) {
+            return;
+        }
+        $log.info("clearing source ...");
+        paddocksSource.clear();
+        farmSource.clear();
     }
-    function _integrateGMap(gmap) {
-        _view.on("change:center", function() {
-            var center = ol.proj.transform(_view.getCenter(), googlemapslayer.getProjection(), _projection);
+    function _integrateGMap(gmap, map, dataProjection) {
+        if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
+            return;
+        }
+        $log.info("integrating google map ...");
+        var view = map.getView(), targetElement = map.getTargetElement(), googleProjection = "EPSG:3857";
+        view.on("change:center", function() {
+            var center = ol.proj.transform(view.getCenter(), googleProjection, dataProjection);
             gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
         });
-        _view.on("change:resolution", function() {
-            gmap.setZoom(_view.getZoom());
+        view.on("change:resolution", function() {
+            gmap.setZoom(view.getZoom());
         });
         window.onresize = function() {
-            var center = _transform(_view.getCenter(), googlemapslayer.getProjection(), _projection);
+            var center = _transform(view.getCenter(), googleProjection, dataProjection);
             google.maps.event.trigger(gmap, "resize");
             gmap.setCenter(center);
         };
-        if (_isNew) {
-            gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(_targetEl);
-            _targetEl.parentNode.removeChild(_targetEl);
-            _view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], _projection, googlemapslayer.getProjection()));
-            _view.setZoom(defaults.zoomNew);
-        } else {
-            gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(_targetEl);
-            _targetEl.parentNode.removeChild(_targetEl);
-            _view.fitExtent(_farmSource.getExtent(), _size);
+        gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+        targetElement.parentNode.removeChild(targetElement);
+        view.fitExtent(map.getLayers().item(1).getSource().getExtent(), map.getSize());
+    }
+    function _center(coordinates, map) {
+        if (!_isDefined(coordinates) || !_isDefined(map)) {
+            return;
         }
+        $log.info("centring view ...");
+        map.getView().setCenter(coordinates);
+        map.getView().setZoom(15);
     }
-    function _getView() {
-        return _view;
-    }
-    function _getProjection() {
-        return _projection;
-    }
-    function _center(coordinates) {
-        _view.setCenter(coordinates);
-        _view.setZoom(15);
-    }
-    function _paddocksLayer(paddocksGeometry) {
-        var _paddocksSource = new ol.source.Vector({
-            features: new ol.format.GeoJSON().readFeatures(paddocksGeometry, {
-                dataProjection: "EPSG:4283",
-                featureProjection: "EPSG:3857"
-            })
-        });
-        return new ol.layer.Vector({
-            source: _paddocksSource,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: "rgba(255, 255, 255, 0.3)"
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#319FD3",
-                    width: 1
-                })
-            })
-        });
-    }
-    function _farmLayer(farmGeometry) {
+    function _paddocksLayer(paddocksGeometry, dataProjection, featureProjection) {
+        if (!_isDefined(paddocksGeometry) || !_isDefined(dataProjection) || !_isDefined(featureProjection)) {
+            return;
+        }
+        $log.info("creating paddocks vector layer ...", dataProjection, featureProjection);
         var paddocksSource = new ol.source.Vector({
-            features: new ol.format.GeoJSON().readFeatures(farmGeometry, {
-                dataProjection: "EPSG:4283",
-                featureProjection: "EPSG:3857"
+            features: new ol.format.GeoJSON().readFeatures(paddocksGeometry, {
+                dataProjection: dataProjection,
+                featureProjection: featureProjection
             })
         });
         return new ol.layer.Vector({
@@ -291,13 +179,35 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
             })
         });
     }
+    function _farmLayer(farmGeometry, dataProjection, featureProjection) {
+        if (!_isDefined(farmGeometry) || !_isDefined(dataProjection) || !_isDefined(featureProjection)) {
+            return;
+        }
+        $log.info("creating farm vector layer ...", dataProjection, featureProjection);
+        var farmSource = new ol.source.Vector({
+            features: new ol.format.GeoJSON().readFeatures(farmGeometry, {
+                dataProjection: dataProjection,
+                featureProjection: featureProjection
+            })
+        });
+        return new ol.layer.Vector({
+            source: farmSource,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: "rgba(255, 255, 255, 0)"
+                }),
+                stroke: new ol.style.Stroke({
+                    color: "#ff6600",
+                    width: 3
+                })
+            })
+        });
+    }
     return {
-        init: _init,
         exportGeometry: _exportGeometry,
         clear: _clear,
         center: _center,
         integrateGMap: _integrateGMap,
-        getProjection: _getProjection,
         paddocksLayer: _paddocksLayer,
         farmLayer: _farmLayer
     };
@@ -368,7 +278,7 @@ angular.module("farmbuild.webmapping").factory("webmappingValidator", function(v
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(validations, $log, openLayers, googlemapslayer) {
+angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(validations, $log, openLayers) {
     var countryRestrict = {
         country: "au"
     };
@@ -392,35 +302,11 @@ angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(v
         return ol.proj.transform([ latLng.lng(), latLng.lat() ], sourceProjection, destinationProjection);
     }
     function _center(latLng) {
-        var googleMapProjection = googlemapslayer.getProjection(), openLayerProjection = openLayers.getProjection(), centerPoint = _transform(latLng, openLayerProjection, googleMapProjection);
+        var googleProjection = "EPSG:3857", openLayerProjection = openLayers.getProjection(), centerPoint = _transform(latLng, openLayerProjection, googleMapProjection);
         openLayers.center(centerPoint);
     }
     return {
         init: _init
-    };
-});
-
-"use strict";
-
-angular.module("farmbuild.webmapping").factory("googlemapslayer", function(validations, $log) {
-    var _projection = "EPSG:3857";
-    function _init(targetElementId) {
-        return new google.maps.Map(document.getElementById(targetElementId), {
-            disableDefaultUI: true,
-            keyboardShortcuts: false,
-            draggable: false,
-            disableDoubleClickZoom: true,
-            scrollwheel: false,
-            streetViewControl: false,
-            mapTypeId: google.maps.MapTypeId.SATELLITE
-        });
-    }
-    function _getProjection() {
-        return _projection;
-    }
-    return {
-        init: _init,
-        getProjection: _getProjection
     };
 });
 
@@ -641,7 +527,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             _clipPaddocks(featureToClip, paddockSource, farmSource);
         }
         if (_activeLayerName === "paddocks" && _mode === "donut-draw") {
-            _clipDonutPaddock(featureToClip);
+            _clipDonut(featureToClip);
         }
         if (_activeLayerName === "farm") {
             _clipFarm(featureToClip, farmSource);
@@ -653,7 +539,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         clipped = _intersect(clipped, farmFeatures);
         _addGeoJsonFeature(_activeLayer, clipped);
     }
-    function _clipDonutPaddock(donutFeature) {
+    function _clipDonut(donutFeature) {
         var clipped, paddockFeature, paddockGeoJsonFeature;
         paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
         paddockGeoJsonFeature = _featureToGeoJson(paddockFeature);
