@@ -35,11 +35,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			openLayers.init('olmap', 'layers', geoJsons.farm, geoJsons.paddocks);
 
-			window.setTimeout(function () {
-				openLayers.integrateGMap(gmap);
+			openLayers.integrateGMap(gmap);
 
-			}, 1000)
-
+			googleaddresssearch.init('locationautocomplete');
+			
 			$scope.farmLoaded = true;
 
 			//webmapping.ga.track('AgSmart');
