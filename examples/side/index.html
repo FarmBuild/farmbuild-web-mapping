@@ -14,15 +14,9 @@
 <div ng-controller="MapCtrl">
     <modal ng-if="noResult"
            ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
-<<<<<<< HEAD
-    <div class="col-md-2 col-lg-2">
-=======
     <div class="col-md-3 col-lg-3">
-        <startup ng-show="!farmLoaded" ng-include="'startup/startup.tpl.html'"></startup>
->>>>>>> a55d5ccb23d8bd841e0d417dd94c5651516091c5
-        <farm-details ng-hide="!farmLoaded" ng-include="'../farm-details/farm-details.tpl.html'"></farm-details>
-        <hr/>
-        <paddock-details  ng-include="'../paddock-details.tpl.html'"></paddock-details>
+        <paddock-details  ng-include="'paddock-details.tpl.html'"></paddock-details>
+        <farm-details ng-hide="!farmLoaded" ng-include="'farm-details.tpl.html'"></farm-details>
     </div>
     <div class="col-md-9 col-lg-9">
         <div id="map" class="map">

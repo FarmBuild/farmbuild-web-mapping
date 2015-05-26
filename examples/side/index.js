@@ -1,6 +1,5 @@
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
-<<<<<<< HEAD
 	.run(function ($rootScope) {
 		$rootScope.appVersion = farmbuild.examples.webmapping.version;
 	})
@@ -126,10 +125,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.loadFarmData();
 
 		$scope.exportFarmData = function (farmData) {
-			var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
-			window.open(url, '_blank');
-			window.focus();
+			webmapping.export(document, farmData);
 		};
+
+		$scope.clear = function () {
+			$scope.farmData ={};
+			webmapping.session.clear();
+			location.href = '../index.html'
+		}
 
 		$scope.apply = function () {
 			$log.info('apply...');
@@ -171,151 +174,3 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 	});
-=======
-    .run(function ($rootScope) {
-        $rootScope.appVersion = farmbuild.examples.webmapping.version;
-    })
-
-    .controller('MapCtrl',
-    function ($scope, $log, $location, farmdata, webmapping,
-              googleaddresssearch, openLayers, interactions, $filter) {
-
-        var dataProjectionCode = 'EPSG:4283',
-            featureProjectionCode = 'EPSG:3857',
-            dataProjection = ol.proj.get({code: dataProjectionCode}),
-            maxZoom = 21,
-            defaults = {
-                centerNew: [-36.22488327137526, 145.5826132801325],
-                zoomNew: 6
-            },
-            layerSelectionElement = document.getElementById('layers'),
-            gmap = new google.maps.Map(document.getElementById('gmap'), {
-                disableDefaultUI: true,
-                keyboardShortcuts: false,
-                draggable: false,
-                disableDoubleClickZoom: true,
-                scrollwheel: false,
-                streetViewControl: false,
-                mapTypeId: google.maps.MapTypeId.SATELLITE
-            });
-
-        $scope.farmData = {};
-        $scope.farmChanged = false;
-        $scope.noResult = $scope.farmLoaded = false;
-
-        $scope.clear = function () {
-          $scope.farmData ={};
-          webmapping.session.clear();
-          location.href = '../index.html'
-        }
-
-        $scope.loadFarmData = function () {
-            $scope.farmData = webmapping.find();
-
-            var geoJsons = webmapping.toGeoJsons($scope.farmData);
-
-            if (!angular.isDefined(geoJsons)) {
-                $scope.noResult = true;
-                return;
-            }
-
-            var farmLayer = openLayers.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
-                paddocksLayer = openLayers.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
-
-            var map = new ol.Map({
-                layers: [paddocksLayer, farmLayer],
-                target: 'olmap',
-                view: new ol.View({
-                    rotation: 0,
-                    projection: dataProjection,
-                    maxZoom: maxZoom
-                }),
-                interactions: ol.interaction.defaults({
-                    altShiftDragRotate: false,
-                    dragPan: false,
-                    rotate: false,
-                    mouseWheelZoom: true
-                }).extend([new ol.interaction.DragPan({kinetic: null})]),
-                controls: ol.control.defaults({
-                    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-                        collapsible: false
-                    })
-                }).extend([
-                    new ol.control.ZoomToExtent({
-                        extent: farmLayer.getSource().getExtent()
-                    }),
-                    new ol.control.ScaleLine()
-                ])
-            });
-
-            openLayers.integrateGMap(gmap, map, dataProjectionCode);
-
-            googleaddresssearch.init('locationautocomplete');
-
-            $scope.farmLoaded = true;
-
-            //webmapping.ga.track('AgSmart');
-
-
-            map.on('pointermove', function (event) {
-                var layer;
-                if (layerSelectionElement.value === 'none' || layerSelectionElement.value === '') {
-                    return;
-                }
-                if (layerSelectionElement.value === "paddocks") {
-                    layer = paddocksLayer;
-                }
-                if (layerSelectionElement.value === "farm") {
-                    layer = farmLayer;
-                }
-                if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && !interactions.isDrawing()) {
-                    interactions.enableEditing();
-                }
-                if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length === 0 && !interactions.isEditing()) {
-                    interactions.enableDrawing();
-                }
-            });
-
-            map.on('dblclick', function (event) {
-                if (paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && interactions.isEditing()) {
-                    interactions.enableDonutDrawing();
-                }
-            });
-
-            //Deselect all selections when layer is changed from farm to paddocks.
-            layerSelectionElement.addEventListener('change', function () {
-                interactions.destroy(map);
-                interactions.init(map, farmLayer, paddocksLayer, layerSelectionElement.value);
-            });
-
-        };
-
-        $scope.loadFarmData();
-
-        $scope.exportFarmData = function (farmData) {
-          webmapping.export(document, farmData);
-//          var a = document.createElement("a");
-//          a.id='downloadFarmData';
-//          document.body.appendChild(a);
-//          var name = 'farmdata-'+farmData.name.replace(/\W+/g, "")+'-'+$filter('date')(new Date(), 'yyyyMMddHHmmss')+'.json';
-//          angular.element("a#downloadFarmData").attr({
-//            "download": name,
-//            "href": 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2))
-//          }).get(0).click();
-
-        };
-
-        $scope.apply = function () {
-            $log.info('apply...');
-            $scope.saveToSessionStorage('farmData', angular.toJson($scope.farmData));
-            $scope.farmChanged = false;
-        };
-
-        $scope.cancel = function () {
-            $log.info('cancel...');
-            $scope.farmData = findInSessionStorage();
-            $scope.farmChanged = false;
-        };
-
-    });
->>>>>>> a55d5ccb23d8bd841e0d417dd94c5651516091c5
