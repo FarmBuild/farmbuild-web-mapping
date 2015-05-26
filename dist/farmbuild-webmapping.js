@@ -232,7 +232,9 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
 
 "use strict";
 
-proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs");
+farmbuild.farmdata.crsSupported.forEach(function(crs) {
+    proj4.defs(crs.name, crs.projection);
+});
 
 "use strict";
 
