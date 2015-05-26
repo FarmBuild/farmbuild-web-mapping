@@ -20,8 +20,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
             webmappingValidator,
             webmappingConverter,
 	          webMappingSession,
-						interactions,
-	) {
+						interactions) {
     $log.info('Welcome to Web Mapping...');
 
     var _isDefined = validations.isDefined,
@@ -60,6 +59,15 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
           var farmData = session.find();
           return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
         },
+        /**
+         * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json
+         * It creates <a> element with 'download' attribute, the data is attached to href
+         * and invoke click() function so the user gets the file save dialogue or something equivalent.
+         * @method export
+         * @param {object} document
+         * @param {object} farmData
+         */
+        export: session.export,
 
 				findPaddockByName: function(name){
 

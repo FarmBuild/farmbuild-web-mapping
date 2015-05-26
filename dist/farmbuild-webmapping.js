@@ -12,7 +12,9 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         save: function(geoJsons) {
             var farmData = session.find();
             return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
-        }
+        },
+        "export": session.export,
+        findPaddockByName: function(name) {}
     };
     function _exportFarmData(toExport) {
         if (!toExport) {
@@ -238,9 +240,13 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         return farmdata.update(farmData);
     }
     webMappingSession.save = save;
+    webMappingSession.clear = farmdata.session.clear;
     webMappingSession.isLoadFlagSet = farmdata.session.isLoadFlagSet;
     webMappingSession.find = function() {
         return farmdata.session.find();
+    };
+    webMappingSession.export = function(document, farmData) {
+        return farmdata.session.export(document, save(farmData));
     };
     return webMappingSession;
 });

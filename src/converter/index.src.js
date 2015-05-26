@@ -76,6 +76,7 @@ angular.module('farmbuild.webmapping')
       var farmFeature = geoJsons.farm.features[0],
         paddocks = geoJsons.paddocks;
       farmData.geometry = resetCrs(farmFeature.geometry);
+      //farmData.area =
 
       paddocks.features.forEach(function (paddockFeature, i) {
         farmData.paddocks[i].geometry = paddockFeature.geometry;
