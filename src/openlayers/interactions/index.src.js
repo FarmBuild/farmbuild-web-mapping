@@ -3,143 +3,12 @@
 angular.module('farmbuild.webmapping')
 	.factory('interactions',
 	function (validations,
-	          $log) {
+	          $log,
+	          selectInteraction, modifyInteraction, drawInteraction, snapInteraction) {
 		var _isDefined = validations.isDefined,
 			_geoJSONFormat = new ol.format['GeoJSON'](),
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode;
-
-		function _createSelect(map, layer) {
-			var selectInteraction = new ol.interaction.Select({
-				addCondition: ol.events.condition.shiftKeyOnly,
-				layers: [layer]
-			});
-
-			function _init() {
-				$log.info('select interaction init ...');
-				map.addInteraction(selectInteraction);
-				selectInteraction.setActive(false);
-			}
-
-			function _enable() {
-				selectInteraction.setActive(true);
-			}
-
-			function _disable() {
-				selectInteraction.setActive(false);
-			}
-
-			return {
-				init: _init,
-				enable: _enable,
-				disable: _disable,
-				interaction: selectInteraction
-			}
-		};
-
-		function _createModify(map, select) {
-			var modifyInteraction = new ol.interaction.Modify({
-				features: select.interaction.getFeatures()
-			});
-
-			function _init() {
-				$log.info('modify interaction init ...');
-				map.addInteraction(modifyInteraction);
-				modifyInteraction.setActive(false);
-			}
-
-			function _enable() {
-				modifyInteraction.setActive(true);
-			}
-
-			function _disable() {
-				modifyInteraction.setActive(false);
-			}
-
-			return {
-				init: _init,
-				enable: _enable,
-				disable: _disable,
-				interaction: modifyInteraction
-			}
-		};
-
-		function _createDraw(map, farmSource, paddocksSource) {
-			var drawInteraction = new ol.interaction.Draw({
-				source: paddocksSource,
-				type: /** @type {ol.geom.GeometryType} */ ('Polygon')
-			}), drawingStatus = false;
-
-			function _init() {
-				$log.info('draw interaction init ...');
-				map.addInteraction(drawInteraction);
-				drawInteraction.setActive(false);
-				drawInteraction.on('drawend', function (e) {
-					$log.info('draw end ...');
-					var feature = e.feature;
-					_clip(feature, paddocksSource, farmSource);
-					setTimeout(function () {
-						paddocksSource.removeFeature(feature);
-					}, 100);
-					drawingStatus = false;
-				});
-				drawInteraction.on('drawstart', function (event) {
-					$log.info('draw start ...');
-					_select.interaction.getFeatures().clear();
-					drawingStatus = true;
-				});
-			}
-
-			function _enable() {
-				drawInteraction.setActive(true);
-			}
-
-			function _disable() {
-				drawInteraction.setActive(false);
-			}
-
-			function _isDrawing() {
-				return drawingStatus;
-			}
-
-			return {
-				init: _init,
-				enable: _enable,
-				disable: _disable,
-				interaction: drawInteraction,
-				isDrawing: _isDrawing
-			}
-		};
-
-		function _createSnap(map, farmSource, paddocksSource) {
-
-			var snapInteraction = new ol.interaction.Snap({
-				source: paddocksSource
-			});
-
-			snapInteraction.addFeature(farmSource.getFeatures()[0]);
-
-			function _enable() {
-				snapInteraction.setActive(true);
-			}
-
-			function _disable() {
-				snapInteraction.setActive(false);
-			}
-
-			function _init() {
-				$log.info('snap interaction init ...');
-				map.addInteraction(snapInteraction);
-				snapInteraction.setActive(false);
-			}
-
-			return {
-				init: _init,
-				enable: _enable,
-				disable: _disable,
-				interaction: snapInteraction
-			}
-		};
 
 		// Remove all interactions of map
 		function _destroy(map) {
@@ -171,16 +40,16 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 
-			_select = _createSelect(map, _activeLayer);
-			_modify = _createModify(map, _select);
-			_draw = _createDraw(map, farmLayer.getSource(), paddocksLayer.getSource());
-			_snap = _createSnap(map, farmLayer.getSource(), paddocksLayer.getSource());
+			_select = selectInteraction.create(map, _activeLayer);
+			_modify = modifyInteraction.create(map, _select);
+			_draw = drawInteraction.create(map, farmLayer.getSource(), paddocksLayer.getSource());
+			_snap = snapInteraction.create(map, farmLayer.getSource(), paddocksLayer.getSource());
 			_mode = '';
 			_activeLayerName = activeLayerName;
 
 			_select.init();
 			_modify.init();
-			_draw.init();
+			_draw.init(_clip, _select);
 			_snap.init();
 
 		};
@@ -329,20 +198,6 @@ angular.module('farmbuild.webmapping')
 			_mode = 'edit';
 		};
 
-		function _isDrawing() {
-			if (!-_isDefined(_mode)) {
-				return;
-			}
-			return _draw.isDrawing();
-		};
-
-		function _isEditing() {
-			if (!-_isDefined(_mode)) {
-				return;
-			}
-			return _select.interaction.getFeatures().getLength() > 0;
-		};
-
 		function _enableDrawing() {
 			if (!-_isDefined(_mode) || _mode === 'draw') {
 				return;
@@ -365,6 +220,20 @@ angular.module('farmbuild.webmapping')
 			_draw.enable();
 			_snap.enable();
 			_mode = 'donut-draw';
+		};
+
+		function _isDrawing() {
+			if (!-_isDefined(_mode)) {
+				return;
+			}
+			return _draw.isDrawing();
+		};
+
+		function _isEditing() {
+			if (!-_isDefined(_mode)) {
+				return;
+			}
+			return _select.interaction.getFeatures().getLength() > 0;
 		};
 
 		return {
