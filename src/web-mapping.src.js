@@ -68,6 +68,17 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
          * @param {object} farmData
          */
         export: session.export,
+        /**
+         * Creates a new farmdata block as Javascript object with the specified name.
+         * @method create
+         * @param {!string} name - The name of the farm
+         * @param {string} id - The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
+         * with the external system
+         * @returns {Object} the farmdata object, undefined if the required fields are not provided
+         * @public
+         * @static
+         */
+        create: farmdata.create,
 
 				findPaddockByName: function(name){
 

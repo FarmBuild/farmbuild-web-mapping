@@ -11,7 +11,7 @@
 </head>
 <body ng-controller="FarmCtrl">
 <content>
-    <modal ng-if="noResult" ng-include="'modal-validation-error/modal-validation-error.html'"></modal>
+    <modal ng-if="noResult" ng-include="'modal-validation-error/modal-validation-error.tpl.html'"></modal>
     <h3>
         FarmBuild Web Mapping
         <small>(angularJS)</small>
@@ -38,6 +38,13 @@
                 <input name="id" ng-model="farmNew.id" class="form-control">
             </form-item>
 
+            <form-item class="form-group col-md-6">
+              <label>Projection (CRS) *</label>
+              <select ng-options="item.name as item.label for item in crsSupported"
+                      ng-model="farmNew.crs"
+                      class="form-control">
+              </select>
+            </form-item>
 
             <buttons class="col-md-12">
                 <button type="submit" class="btn btn-primary">Create</button>

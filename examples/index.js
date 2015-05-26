@@ -7,10 +7,21 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 	.controller('FarmCtrl', function ($scope, $log, webmapping) {
 
-		$scope.farmData = {};
+		$scope.farmData = {},
+    $scope.crsSupported = webmapping.farmdata.crsSupported,
+    $scope.farmNew = {crs:$scope.crsSupported[0].name};
 
 		$scope.createNew = function(farmNew) {
-			$log.info('$scope.loadFarmData $fileContent..');
+			$log.info('$scope.createNew %j', farmNew);
+      var created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs);
+
+      if(!created) {
+        $scope.noResult = true;
+        return;
+      }
+
+      webmapping.load(created);
+      directToSide();
 		}
 
 		$scope.loadFarmData = function ($fileContent) {
@@ -25,28 +36,15 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 					return;
 				}
 
-				//location.href = webmapping.farmdata.session.setLoadFlag(location);
-				location.href = 'side/index.html?load=true';
-
+				directToSide();
 			} catch (e) {
 				console.error('farmbuild.webmapping.examples > load: Your file should be in json format: ', e);
 				$scope.noResult = true;
 			}
 		};
-
-		$scope.exportFarmData = function (farmData) {
-			var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
-			window.open(url, '_blank');
-			window.focus();
-		};
-
-		$scope.clear = function () {
-			$scope.farmData ={};
-			webmapping.farmdata.session.clear();
-			var path = location.href.toString(),
-				path = path.substring(0, path.indexOf('?'));
-			location.href = path;
-		}
+    function directToSide() {
+      location.href = 'side/index.html?load=true';
+    }
 
 		if (webmapping.session.isLoadFlagSet(location)) {
 			var farmData = webmapping.find();

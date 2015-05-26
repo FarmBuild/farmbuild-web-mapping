@@ -59,9 +59,26 @@ angular.module('farmbuild.webmapping')
                 gmap.setCenter(center);
             };
 
+            var defaults = {
+              centerNew: [-36.22488327137526, 145.5826132801325],
+              zoomNew: 6
+            }
+            var extent = map.getLayers().item(1).getSource().getExtent();
+
+            $log.info('farm extent: %j', extent)
+
+            if (extent[0] === Infinity) {
+              gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+              targetElement.parentNode.removeChild(targetElement);
+              view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]],
+                dataProjection, googleProjection));
+              view.setZoom(defaults.zoomNew);
+              return;
+            }
+
             gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
             targetElement.parentNode.removeChild(targetElement);
-            view.fitExtent(map.getLayers().item(1).getSource().getExtent(), map.getSize());
+            view.fitExtent(extent, map.getSize());
         };
 
         function _center(coordinates, map) {
