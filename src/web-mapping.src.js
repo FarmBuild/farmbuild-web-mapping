@@ -19,7 +19,9 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	          $log,
             webmappingValidator,
             webmappingConverter,
-	          webMappingSession) {
+	          webMappingSession,
+						interactions,
+	) {
     $log.info('Welcome to Web Mapping...');
 
     var _isDefined = validations.isDefined,
@@ -57,7 +59,12 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
         save: function(geoJsons) {
           var farmData = session.find();
           return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
-        }};
+        },
+
+				findPaddockByName: function(name){
+
+				}
+			};
 
 		function _exportFarmData(toExport) {
 			if (!toExport) {
@@ -67,6 +74,8 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 		};
 
 		webmapping.exportFarmData = _exportFarmData;
+
+		webmapping.actions = interactions;
 
 		// Provide a shortcut for modules
 		webmapping.version = '0.1.0';

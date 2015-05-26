@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, interactions) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webmapping = {
         session: session,
@@ -21,6 +21,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         return _toFarmData(toExport);
     }
     webmapping.exportFarmData = _exportFarmData;
+    webmapping.actions = interactions;
     webmapping.version = "0.1.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
@@ -282,27 +283,27 @@ angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(v
     var countryRestrict = {
         country: "au"
     };
-    function _init(targetElementId) {
+    function _init(targetElementId, dataProjection) {
         var autocomplete = new google.maps.places.Autocomplete(document.getElementById(targetElementId), {
             componentRestrictions: countryRestrict
         });
         google.maps.event.addListener(autocomplete, "place_changed", function() {
-            _onPlaceChanged(autocomplete);
+            _onPlaceChanged(autocomplete, dataProjection);
         });
     }
-    function _onPlaceChanged(autocomplete) {
+    function _onPlaceChanged(autocomplete, dataProjection) {
         var place = autocomplete.getPlace(), latLng;
         if (!place.geometry) {
             return;
         }
         latLng = place.geometry.location;
-        _center(latLng);
+        _center(latLng, dataProjection);
     }
     function _transform(latLng, sourceProjection, destinationProjection) {
         return ol.proj.transform([ latLng.lng(), latLng.lat() ], sourceProjection, destinationProjection);
     }
-    function _center(latLng) {
-        var googleProjection = "EPSG:3857", openLayerProjection = openLayers.getProjection(), centerPoint = _transform(latLng, openLayerProjection, googleMapProjection);
+    function _center(latLng, dataProjection) {
+        var googleMapProjection = "EPSG:3857", centerPoint = _transform(latLng, dataProjection, googleMapProjection);
         openLayers.center(centerPoint);
     }
     return {
@@ -323,7 +324,6 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             var selectedFeatures = selectInteraction.getFeatures();
             if (event.keyCode == 46 || event.keyCode == 8) {
                 _remove(selectedFeatures);
-                selectInteraction.getFeatures().clear();
             }
             if (event.keyCode == 13) {
                 if (selectedFeatures.getLength() > 1) {
@@ -335,9 +335,6 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
                 }
                 selectInteraction.getFeatures().clear();
             }
-            event.preventDefault();
-            event.stopPropagation();
-            return false;
         });
         function _init() {
             $log.info("select interaction init ...");
@@ -491,7 +488,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     function _merge(features) {
         $log.info("merging features ...", features);
         var toMerge;
-        _remove(features);
+        _remove(features, false);
         toMerge = _featuresToGeoJson(features);
         try {
             _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
@@ -528,7 +525,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             _clipPaddocks(featureToClip, paddockSource, farmSource);
         }
         if (_activeLayerName === "paddocks" && _mode === "donut-draw") {
-            _clipDonutPaddock(featureToClip);
+            _clipDonut(featureToClip);
         }
         if (_activeLayerName === "farm") {
             _clipFarm(featureToClip, farmSource);
@@ -540,7 +537,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         clipped = _intersect(clipped, farmFeatures);
         _addGeoJsonFeature(_activeLayer, clipped);
     }
-    function _clipDonutPaddock(donutFeature) {
+    function _clipDonut(donutFeature) {
         var clipped, paddockFeature, paddockGeoJsonFeature;
         paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
         paddockGeoJsonFeature = _featureToGeoJson(paddockFeature);
@@ -558,12 +555,18 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         var geoJsonFeatures = _featuresToGeoJson(features);
         return turf.area(geoJsonFeatures) * 1e-4;
     }
-    function _remove(features) {
+    function _remove(features, deselect) {
+        if (!_isDefined(deselect)) {
+            deselect = true;
+        }
         $log.info("removing features ...", features);
         if (_isDefined(features)) {
             features.forEach(function(feature) {
                 _activeLayer.getSource().removeFeature(feature);
             });
+        }
+        if (deselect) {
+            _select.interaction.getFeatures().clear();
         }
     }
     function _selected() {

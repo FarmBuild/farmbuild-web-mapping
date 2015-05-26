@@ -15,8 +15,9 @@
     <modal ng-if="noResult"
            ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
     <div class="col-md-2 col-lg-2">
-        <startup ng-show="!farmLoaded" ng-include="'startup/startup.tpl.html'"></startup>
         <farm-details ng-hide="!farmLoaded" ng-include="'../farm-details/farm-details.tpl.html'"></farm-details>
+        <hr/>
+        <paddock-details  ng-include="'../paddock-details.tpl.html'"></paddock-details>
     </div>
     <div class="col-md-10 col-lg-10">
         <div id="map" class="map">

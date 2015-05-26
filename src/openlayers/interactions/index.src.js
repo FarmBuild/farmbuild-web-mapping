@@ -19,7 +19,6 @@ angular.module('farmbuild.webmapping')
 				var selectedFeatures = selectInteraction.getFeatures();
 				if (event.keyCode == 46 || event.keyCode == 8) {
 					_remove(selectedFeatures);
-					selectInteraction.getFeatures().clear();
 				}
 
 				if (event.keyCode == 13) {
@@ -33,9 +32,9 @@ angular.module('farmbuild.webmapping')
 					selectInteraction.getFeatures().clear();
 				}
 
-				event.preventDefault();
-				event.stopPropagation();
-				return false;
+				//event.preventDefault();
+				//event.stopPropagation();
+				//return false;
 			});
 
 			function _init() {
@@ -223,7 +222,7 @@ angular.module('farmbuild.webmapping')
 		function _merge(features) {
 			$log.info('merging features ...', features);
 			var toMerge;
-			_remove(features);
+			_remove(features, false);
 			toMerge = _featuresToGeoJson(features);
 			try {
 				_addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
@@ -308,12 +307,18 @@ angular.module('farmbuild.webmapping')
 			return turf.area(geoJsonFeatures) * 0.0001;
 		};
 
-		function _remove(features) {
+		function _remove(features, deselect) {
+			if(!_isDefined(deselect)){
+				deselect = true;
+			}
 			$log.info('removing features ...', features);
 			if (_isDefined(features)) {
 				features.forEach(function (feature) {
 					_activeLayer.getSource().removeFeature(feature);
 				});
+			}
+			if(deselect) {
+				_select.interaction.getFeatures().clear();
 			}
 		};
 

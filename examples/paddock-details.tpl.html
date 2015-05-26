@@ -1,0 +1,26 @@
+<form>
+    <form-section>
+        <form-item class="form-group">
+            <label for="farmName">Paddock's Name:</label>
+            <input type="text" id="farmName" class="form-control"
+                   ng-model="selectedPaddockName"
+                   required
+                    />
+        </form-item>
+        <button class="btn btn-primary" ng-click="clipSelectedPaddock()" ng-show="farmData.name">
+            Clip
+        </button>
+        <button class="btn btn-primary" ng-click="exportFarmData(farmData)" ng-show="farmData.name">
+            Merge
+        </button>
+        <button class="btn btn-danger" ng-click="removeSelectedPaddocks()" ng-show="farmData.name">
+            Remove
+        </button>
+        <button class="btn btn-primary" ng-click="apply()" ng-disabled="!farmChanged">
+            Apply
+        </button>
+        <button class="btn btn-default" ng-click="cancel()" ng-disabled="!farmChanged">
+            Cancel
+        </button>
+    </form-section>
+</form>
