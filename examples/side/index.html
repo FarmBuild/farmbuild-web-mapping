@@ -14,11 +14,11 @@
 <div ng-controller="MapCtrl">
     <modal ng-if="noResult"
            ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
-    <div class="col-md-2 col-lg-2">
+    <div class="col-md-3 col-lg-3">
         <startup ng-show="!farmLoaded" ng-include="'startup/startup.tpl.html'"></startup>
         <farm-details ng-hide="!farmLoaded" ng-include="'../farm-details/farm-details.tpl.html'"></farm-details>
     </div>
-    <div class="col-md-10 col-lg-10">
+    <div class="col-md-9 col-lg-9">
         <div id="map" class="map">
             <input type="text" id="locationautocomplete" class="address-search addon"
                    ng-hide="!farmLoaded || noResult">

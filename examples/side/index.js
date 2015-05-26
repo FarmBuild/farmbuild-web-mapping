@@ -5,7 +5,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
     })
 
     .controller('MapCtrl',
-    function ($scope, $log, $location, webmapping, googleaddresssearch, openLayers, interactions) {
+    function ($scope, $log, $location, farmdata, webmapping,
+              googleaddresssearch, openLayers, interactions, $filter) {
 
         var dataProjectionCode = 'EPSG:4283',
             featureProjectionCode = 'EPSG:3857',
@@ -30,6 +31,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         $scope.farmChanged = false;
         $scope.noResult = $scope.farmLoaded = false;
 
+        $scope.clear = function () {
+          $scope.farmData ={};
+          webmapping.session.clear();
+          location.href = '../index.html'
+        }
 
         $scope.loadFarmData = function () {
             $scope.farmData = webmapping.find();
@@ -115,9 +121,16 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         $scope.loadFarmData();
 
         $scope.exportFarmData = function (farmData) {
-            var url = 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2));
-            window.open(url, '_blank');
-            window.focus();
+          webmapping.export(document, farmData);
+//          var a = document.createElement("a");
+//          a.id='downloadFarmData';
+//          document.body.appendChild(a);
+//          var name = 'farmdata-'+farmData.name.replace(/\W+/g, "")+'-'+$filter('date')(new Date(), 'yyyyMMddHHmmss')+'.json';
+//          angular.element("a#downloadFarmData").attr({
+//            "download": name,
+//            "href": 'data:application/json;charset=utf8,' + encodeURIComponent(JSON.stringify(farmData, undefined, 2))
+//          }).get(0).click();
+
         };
 
         $scope.apply = function () {

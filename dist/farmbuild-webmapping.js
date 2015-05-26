@@ -12,7 +12,8 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         save: function(geoJsons) {
             var farmData = session.find();
             return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
-        }
+        },
+        "export": session.export
     };
     function _exportFarmData(toExport) {
         if (!toExport) {
@@ -237,9 +238,13 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         return farmdata.update(farmData);
     }
     webMappingSession.save = save;
+    webMappingSession.clear = farmdata.session.clear;
     webMappingSession.isLoadFlagSet = farmdata.session.isLoadFlagSet;
     webMappingSession.find = function() {
         return farmdata.session.find();
+    };
+    webMappingSession.export = function(document, farmData) {
+        return farmdata.session.export(document, save(farmData));
     };
     return webMappingSession;
 });
@@ -528,7 +533,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             _clipPaddocks(featureToClip, paddockSource, farmSource);
         }
         if (_activeLayerName === "paddocks" && _mode === "donut-draw") {
-            _clipDonutPaddock(featureToClip);
+            _clipDonut(featureToClip);
         }
         if (_activeLayerName === "farm") {
             _clipFarm(featureToClip, farmSource);
@@ -540,7 +545,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         clipped = _intersect(clipped, farmFeatures);
         _addGeoJsonFeature(_activeLayer, clipped);
     }
-    function _clipDonutPaddock(donutFeature) {
+    function _clipDonut(donutFeature) {
         var clipped, paddockFeature, paddockGeoJsonFeature;
         paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
         paddockGeoJsonFeature = _featureToGeoJson(paddockFeature);

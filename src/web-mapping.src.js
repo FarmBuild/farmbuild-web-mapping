@@ -57,7 +57,17 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
         save: function(geoJsons) {
           var farmData = session.find();
           return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
-        }};
+        },
+        /**
+         * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json
+         * It creates <a> element with 'download' attribute, the data is attached to href
+         * and invoke click() function so the user gets the file save dialogue or something equivalent.
+         * @method export
+         * @param {object} document
+         * @param {object} farmData
+         */
+        export: session.export
+      };
 
 		function _exportFarmData(toExport) {
 			if (!toExport) {
