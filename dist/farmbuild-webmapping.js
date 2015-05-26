@@ -110,13 +110,13 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
         var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
         return new google.maps.LatLng(transformed[1], transformed[0]);
     }
-    function _exportGeometry(farmSource, paddocksSource) {
-        if (!_isDefined(farmSource) || !_isDefined(paddocksSource)) {
+    function _exportGeometry(source) {
+        if (!_isDefined(source)) {
             return;
         }
         var format = new ol.format["GeoJSON"]();
         try {
-            return format.writeFeatures(paddocksSource.getFeatures());
+            return format.writeFeatures(source.getFeatures());
         } catch (e) {
             $log.error(e);
         }
@@ -464,10 +464,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     function _erase(feature, features) {
         try {
             features.forEach(function(layerFeature) {
-                if (layerFeature.getGeometry().getCoordinates().length > 0) {
-                    var clipper = _featureToGeoJson(layerFeature);
-                    feature = turf.erase(feature, clipper);
-                }
+                var clipper = _featureToGeoJson(layerFeature);
+                feature = turf.erase(feature, clipper);
             });
             return feature;
         } catch (e) {
@@ -477,10 +475,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     function _intersect(feature, features) {
         try {
             features.forEach(function(layerFeature) {
-                if (layerFeature.getGeometry().getCoordinates().length > 0) {
-                    var clipper = _featureToGeoJson(layerFeature);
-                    feature = turf.intersect(feature, clipper);
-                }
+                var clipper = _featureToGeoJson(layerFeature);
+                feature = turf.intersect(feature, clipper);
             });
             return feature;
         } catch (e) {

@@ -14,13 +14,13 @@ angular.module('farmbuild.webmapping')
             return new google.maps.LatLng(transformed[1], transformed[0])
         };
 
-        function _exportGeometry(farmSource, paddocksSource) {
-            if(!_isDefined(farmSource) || !_isDefined(paddocksSource)){
+        function _exportGeometry(source) {
+            if(!_isDefined(source)){
                 return;
             }
             var format = new ol.format['GeoJSON']();
             try {
-                return format.writeFeatures(paddocksSource.getFeatures());
+                return format.writeFeatures(source.getFeatures());
             } catch (e) {
                 $log.error(e);
             }

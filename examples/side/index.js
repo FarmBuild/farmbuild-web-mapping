@@ -72,7 +72,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		function createOpenLayerMap(crsName, geoJsons) {
 			farmLayer = openLayers.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
 				paddocksLayer = openLayers.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
-      var dataProjection = ol.proj.get({code: crsName});
+			var dataProjection = ol.proj.get({code: crsName});
 
 			return new ol.Map({
 				layers: [paddocksLayer, farmLayer],
@@ -181,10 +181,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			if (event.keyCode == 13) {
 				if (selectedFeatures.getLength() > 1) {
-					$scope.mergeSelectedPaddocks();
+					mergeSelectedPaddocks();
 				}
 				if (selectedFeatures.getLength() === 1) {
-					$scope.clipSelectedPaddock();
+					clipSelectedPaddock();
 				}
 			}
 		}
@@ -194,6 +194,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			var selectedPaddock = interactions.selectedFeatures().item(0);
 			paddocksLayer.getSource().removeFeature(selectedPaddock);
 			interactions.clip(selectedPaddock, paddocksLayer.getSource(), farmLayer.getSource());
+			$scope.farmChanged = false;
+		};
+
+		function mergeSelectedPaddocks() {
+			$log.info('Merging selected paddocks...');
+			interactions.merge(interactions.selectedFeatures());
 			$scope.farmChanged = false;
 		};
 
@@ -212,6 +218,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.apply = function () {
 			$log.info('apply changes to farm data ...');
 			clipSelectedPaddock();
+			var paddocksGeometry = angular.fromJson(openLayers.exportGeometry(paddocksLayer.getSource()));
+			var farmGeometry = angular.fromJson(openLayers.exportGeometry(farmLayer.getSource()));
+			farmGeometry.features[0].geometry.crs = {
+				properties: {
+					name : "EPSG:4283"
+				}
+			};
+			webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 		};
@@ -220,12 +234,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$log.info('removing selected paddock(s)...');
 			var selectedPaddocks = interactions.selectedFeatures();
 			interactions.remove(selectedPaddocks);
-			$scope.farmChanged = false;
-		};
-
-		$scope.mergeSelectedPaddocks = function () {
-			$log.info('Merging selected paddocks...');
-			interactions.merge(interactions.selectedFeatures());
 			$scope.farmChanged = false;
 		};
 
