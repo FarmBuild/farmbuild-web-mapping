@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, interactions) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, webMappingProjections, webMappingInteractions) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webmapping = {
         session: session,
@@ -24,7 +24,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         return _toFarmData(toExport);
     }
     webmapping.exportFarmData = _exportFarmData;
-    webmapping.actions = interactions;
+    webmapping.actions = webMappingInteractions;
     webmapping.version = "0.1.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
@@ -232,8 +232,14 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
 
 "use strict";
 
-farmbuild.farmdata.crsSupported.forEach(function(crs) {
-    proj4.defs(crs.name, crs.projection);
+angular.module("farmbuild.webmapping").factory("webMappingProjections", function($log, farmdata) {
+    var webMappingProjections = {
+        supported: farmbuild.farmdata.crsSupported
+    };
+    farmbuild.farmdata.crsSupported.forEach(function(crs) {
+        proj4.defs(crs.name, crs.projection);
+    });
+    return webMappingProjections;
 });
 
 "use strict";
@@ -385,7 +391,7 @@ angular.module("farmbuild.webmapping").factory("drawInteraction", function(valid
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log, selectInteraction, modifyInteraction, drawInteraction, snapInteraction) {
+angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, selectInteraction, modifyInteraction, drawInteraction, snapInteraction) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
@@ -428,7 +434,10 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         return angular.fromJson(_geoJSONFormat.writeFeature(feature));
     }
     function _featuresToGeoJson(features) {
-        return angular.fromJson(_geoJSONFormat.writeFeatures(features.getArray()));
+        if (features.getArray) {
+            return angular.fromJson(_geoJSONFormat.writeFeatures(features.getArray()));
+        }
+        return angular.fromJson(_geoJSONFormat.writeFeatures(features));
     }
     function _addGeoJsonFeature(layer, feature) {
         if (!_isDefined(feature)) {
@@ -455,8 +464,10 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     function _erase(feature, features) {
         try {
             features.forEach(function(layerFeature) {
-                var clipper = _featureToGeoJson(layerFeature);
-                feature = turf.erase(feature, clipper);
+                if (layerFeature.getGeometry().getCoordinates().length > 0) {
+                    var clipper = _featureToGeoJson(layerFeature);
+                    feature = turf.erase(feature, clipper);
+                }
             });
             return feature;
         } catch (e) {
@@ -466,8 +477,10 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
     function _intersect(feature, features) {
         try {
             features.forEach(function(layerFeature) {
-                var clipper = _featureToGeoJson(layerFeature);
-                feature = turf.intersect(feature, clipper);
+                if (layerFeature.getGeometry().getCoordinates().length > 0) {
+                    var clipper = _featureToGeoJson(layerFeature);
+                    feature = turf.intersect(feature, clipper);
+                }
             });
             return feature;
         } catch (e) {

@@ -20,7 +20,8 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
             webmappingValidator,
             webmappingConverter,
 	          webMappingSession,
-						interactions) {
+	          webMappingProjections,
+						webMappingInteractions) {
     $log.info('Welcome to Web Mapping...');
 
     var _isDefined = validations.isDefined,
@@ -94,7 +95,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 
 		webmapping.exportFarmData = _exportFarmData;
 
-		webmapping.actions = interactions;
+		webmapping.actions = webMappingInteractions;
 
 		// Provide a shortcut for modules
 		webmapping.version = '0.1.0';

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-	.factory('interactions',
+	.factory('webMappingInteractions',
 	function (validations,
 	          $log,
 	          selectInteraction, modifyInteraction, drawInteraction, snapInteraction) {
@@ -60,7 +60,10 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _featuresToGeoJson(features) {
-			return angular.fromJson(_geoJSONFormat.writeFeatures(features.getArray()));
+			if(features.getArray) {
+				return angular.fromJson(_geoJSONFormat.writeFeatures(features.getArray()));
+			}
+			return angular.fromJson(_geoJSONFormat.writeFeatures(features));
 		};
 
 		function _addGeoJsonFeature(layer, feature) {

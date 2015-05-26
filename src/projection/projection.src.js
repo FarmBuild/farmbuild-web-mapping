@@ -7,17 +7,13 @@
 // * @version 0.1.0
 // */
 //
-//'use strict';
-//
-//angular.module('farmbuild.webmapping')
-//  .factory('webMappingProjections',
-//  function ($log, farmdata) {
-//    var webMappingProjections = {supported:[]}
-//    //proj4.defs("EPSG:4283", "+proj=longlat +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +no_defs");
-//    return webMappingProjections;
-//
-//  });
 
-farmbuild.farmdata.crsSupported.forEach(function(crs) {
-  proj4.defs(crs.name, crs.projection);
-})
+angular.module('farmbuild.webmapping')
+  .factory('webMappingProjections',
+  function ($log, farmdata) {
+    var webMappingProjections = {supported:farmbuild.farmdata.crsSupported}
+    farmbuild.farmdata.crsSupported.forEach(function(crs) {
+      proj4.defs(crs.name, crs.projection);
+    });
+    return webMappingProjections;
+  });
