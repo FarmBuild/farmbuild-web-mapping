@@ -15,28 +15,6 @@ angular.module('farmbuild.webmapping')
 				layers: [layer]
 			});
 
-			$(document).on('keydown', function (event) {
-				var selectedFeatures = selectInteraction.getFeatures();
-				if (event.keyCode == 46 || event.keyCode == 8) {
-					_remove(selectedFeatures);
-				}
-
-				if (event.keyCode == 13) {
-					if (selectedFeatures.getLength() > 1) {
-						_merge(selectedFeatures.getArray());
-					}
-					if (selectedFeatures.getLength() === 1) {
-						_activeLayer.getSource().removeFeature(selectedFeatures.item(0));
-						_clip(selectedFeatures.item(0), paddocksSource, farmSource);
-					}
-					selectInteraction.getFeatures().clear();
-				}
-
-				//event.preventDefault();
-				//event.stopPropagation();
-				//return false;
-			});
-
 			function _init() {
 				$log.info('select interaction init ...');
 				map.addInteraction(selectInteraction);

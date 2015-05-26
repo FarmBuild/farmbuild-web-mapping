@@ -16,7 +16,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				zoomNew: 6
 			},
 			layerSelectionElement = document.getElementById('layers'),
-			gmap = new google.maps.Map(document.getElementById('gmap'), {
+			gmapElement = document.getElementById('gmap'),
+			gmap = new google.maps.Map(gmapElement, {
 				disableDefaultUI: true,
 				keyboardShortcuts: false,
 				draggable: false,
@@ -49,6 +50,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			var map = new ol.Map({
 				layers: [paddocksLayer, farmLayer],
 				target: 'olmap',
+				keyboardEventTarget: gmapElement,
 				view: new ol.View({
 					rotation: 0,
 					projection: dataProjection,
@@ -172,5 +174,24 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.farmData = findInSessionStorage();
 			$scope.farmChanged = false;
 		};
+
+		gmapElement.addEventListener('keydown', function (event) {
+			var selectedFeatures = interactions.selected();
+			if (event.keyCode == 46 || event.keyCode == 8) {
+				$scope.removeSelectedPaddocks();
+				event.preventDefault();
+				event.stopPropagation();
+			}
+
+			if (event.keyCode == 13) {
+				if (selectedFeatures.getLength() > 1) {
+					$scope.mergeSelectedPaddocks();
+				}
+				if (selectedFeatures.getLength() === 1) {
+					$scope.clipSelectedPaddock();
+				}
+			}
+
+		});
 
 	});
