@@ -317,7 +317,7 @@ angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(v
     };
 });
 
-var DONUT, DRAW, EDIT;
+"use strict";
 
 angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode;
@@ -436,6 +436,8 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         map.addInteraction(new ol.interaction.DragPan({
             kinetic: null
         }));
+        _select = undefined, _modify = undefined, _draw = undefined, _snap = undefined, 
+        _activeLayer = undefined, _activeLayerName = undefined, _mode = undefined;
     }
     function _init(map, farmLayer, paddocksLayer, activeLayerName) {
         $log.info("interactions init ...");
@@ -464,12 +466,13 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         return angular.fromJson(_geoJSONFormat.writeFeature(feature));
     }
     function _featuresToGeoJson(features) {
-        return angular.fromJson(_geoJSONFormat.writeFeatures(features));
+        return angular.fromJson(_geoJSONFormat.writeFeatures(features.getArray()));
     }
     function _addGeoJsonFeature(layer, feature) {
         if (!_isDefined(feature)) {
             return;
         }
+        $log.info("adding feature ...", feature);
         layer.getSource().addFeature(new ol.Feature({
             geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
         }));
@@ -482,6 +485,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         toMerge = _featuresToGeoJson(features);
         try {
             _addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
+            _select.interaction.getFeatures().clear();
         } catch (e) {
             $log.error(e);
         }
@@ -559,12 +563,15 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
             _select.interaction.getFeatures().clear();
         }
     }
-    function _selected() {
-        $log.info("Selected features ...");
+    function _selectedFeatures() {
+        if (!_isDefined(_select) || !_isDefined(_select.interaction)) {
+            return;
+        }
+        $log.info("Selected features ...", _select.interaction.getFeatures());
         return _select.interaction.getFeatures();
     }
     function _enableEditing() {
-        if (_mode === "edit") {
+        if (!-_isDefined(_mode) || _mode === "edit") {
             return;
         }
         $log.info("editing enabled");
@@ -575,13 +582,19 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         _mode = "edit";
     }
     function _isDrawing() {
+        if (!-_isDefined(_mode)) {
+            return;
+        }
         return _draw.isDrawing();
     }
     function _isEditing() {
+        if (!-_isDefined(_mode)) {
+            return;
+        }
         return _select.interaction.getFeatures().getLength() > 0;
     }
     function _enableDrawing() {
-        if (_mode === "draw") {
+        if (!-_isDefined(_mode) || _mode === "draw") {
             return;
         }
         $log.info("drawing enabled");
@@ -592,7 +605,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         _mode = "draw";
     }
     function _enableDonutDrawing() {
-        if (_mode === "donut-draw") {
+        if (!-_isDefined(_mode) || _mode === "donut-draw") {
             return;
         }
         $log.info("donut drawing enabled");
@@ -602,9 +615,6 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         _snap.enable();
         _mode = "donut-draw";
     }
-    DONUT = _enableDonutDrawing;
-    DRAW = _enableDrawing;
-    EDIT = _enableEditing;
     return {
         init: _init,
         destroy: _destroy,
@@ -615,7 +625,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         remove: _remove,
         clip: _clip,
         area: _area,
-        selected: _selected,
+        selectedFeatures: _selectedFeatures,
         isDrawing: _isDrawing,
         isEditing: _isEditing
     };

@@ -17,17 +17,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			},
 			layerSelectionElement = document.getElementById('layers'),
 			gmapElement = document.getElementById('gmap'),
-			gmap = new google.maps.Map(gmapElement, {
-				disableDefaultUI: true,
-				keyboardShortcuts: false,
-				draggable: false,
-				disableDoubleClickZoom: true,
-				scrollwheel: false,
-				streetViewControl: false,
-				mapTypeId: google.maps.MapTypeId.SATELLITE
-			}),
+			gmap,
 			farmLayer,
-			paddocksLayer;
+			paddocksLayer,
+			olmap;
 
 		$scope.farmData = {};
 		$scope.farmChanged = false;
@@ -44,10 +37,40 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 
+			olmap = createOpenLayerMap(geoJsons);
+
+			gmap = createGoogleMap();
+
+			openLayers.integrateGMap(gmap, olmap, dataProjectionCode);
+
+			googleaddresssearch.init('locationautocomplete', dataProjectionCode);
+
+			$scope.farmLoaded = true;
+
+			//webmapping.ga.track('AgSmart');
+
+			layerSelectionElement.addEventListener('change', selectLayer);
+
+			gmapElement.addEventListener('keydown', keyboardActions);
+
+		};
+
+		function createGoogleMap() {
+			return new google.maps.Map(gmapElement, {
+				disableDefaultUI: true,
+				keyboardShortcuts: false,
+				draggable: false,
+				disableDoubleClickZoom: true,
+				scrollwheel: false,
+				streetViewControl: false,
+				mapTypeId: google.maps.MapTypeId.SATELLITE
+			})
+		}
+
+		function createOpenLayerMap(geoJsons) {
 			farmLayer = openLayers.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
 				paddocksLayer = openLayers.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
-
-			var map = new ol.Map({
+			return new ol.Map({
 				layers: [paddocksLayer, farmLayer],
 				target: 'olmap',
 				keyboardEventTarget: gmapElement,
@@ -72,57 +95,82 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 					}),
 					new ol.control.ScaleLine()
 				])
-			});
+			})
+		}
 
-			openLayers.integrateGMap(gmap, map, dataProjectionCode);
+		function mapOnPointerMove(event) {
+			var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
+				paddocksSource = paddocksLayer.getSource();
+			if (selectedLayer === "paddocks") {
+				selectedLayer = paddocksLayer;
+			}
+			if (selectedLayer === "farm") {
+				selectedLayer = farmLayer;
+			}
+			if (paddocksSource.getFeaturesAtCoordinate(coordinate).length > 0 && !interactions.isDrawing()) {
+				interactions.enableEditing();
+			}
+			if (selectedLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length === 0 && !interactions.isEditing()) {
+				interactions.enableDrawing();
+			}
+		}
 
-			googleaddresssearch.init('locationautocomplete', dataProjectionCode);
+		function mapOnDblClick(event) {
+			var coordinate = event.coordinate,
+				paddocksSource = paddocksLayer.getSource();
+			if (paddocksSource.getFeaturesAtCoordinate(coordinate).length > 0 && interactions.isEditing()) {
+				interactions.enableDonutDrawing();
+			}
+		}
 
-			$scope.farmLoaded = true;
+		function mapOnClick(event) {
+			var coordinate = event.coordinate,
+				paddocksSource = paddocksLayer.getSource();
+			if (paddocksSource.getFeaturesAtCoordinate(coordinate).length > 0) {
+				$scope.selectedPaddockName = paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate)[0].getProperties().name;
+				$scope.$apply();
+				$log.info('Paddock selected: ' + $scope.selectedPaddockName);
+			}
+		}
 
-			//webmapping.ga.track('AgSmart');
+		function selectLayer() {
+			var selectedLayer = this.value;
 
+			if (selectedLayer === 'none' || selectedLayer === '') {
+				interactions.destroy(olmap);
+				olmap.un('pointermove', mapOnPointerMove);
+				olmap.un('dblclick', mapOnDblClick);
+				olmap.un('click', mapOnClick);
+				return;
+			}
 
-			map.on('pointermove', function (event) {
-				var layer;
-				if (layerSelectionElement.value === 'none' || layerSelectionElement.value === '') {
-					return;
+			interactions.init(olmap, farmLayer, paddocksLayer, selectedLayer);
+			olmap.on('pointermove', mapOnPointerMove);
+			olmap.on('dblclick', mapOnDblClick);
+			olmap.on('click', mapOnClick);
+		}
+
+		function keyboardActions(event) {
+			var selectedFeatures = interactions.selectedFeatures();
+			if (!selectedFeatures) {
+				return;
+			}
+			if (event.keyCode == 46 || event.keyCode == 8) {
+				$scope.removeSelectedPaddocks();
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
+			}
+
+			if (event.keyCode == 13) {
+				if (selectedFeatures.getLength() > 1) {
+					$scope.mergeSelectedPaddocks();
 				}
-				if (layerSelectionElement.value === "paddocks") {
-					layer = paddocksLayer;
+				if (selectedFeatures.getLength() === 1) {
+					$scope.clipSelectedPaddock();
 				}
-				if (layerSelectionElement.value === "farm") {
-					layer = farmLayer;
-				}
-				if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && !interactions.isDrawing()) {
-					interactions.enableEditing();
-				}
-				if (layer.getSource().getFeaturesAtCoordinate(event.coordinate).length === 0 && !interactions.isEditing()) {
-					interactions.enableDrawing();
-				}
-			});
-
-			map.on('dblclick', function (event) {
-				if (paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0 && interactions.isEditing()) {
-					interactions.enableDonutDrawing();
-				}
-			});
-
-			map.on('click', function (event) {
-				if (paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length > 0) {
-					$scope.selectedPaddockName = paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate)[0].getProperties().name;
-					$scope.$apply();
-					$log.info('Paddock selected: ' + $scope.selectedPaddockName);
-				}
-			});
-
-			//Deselect all selections when layer is changed from farm to paddocks.
-			layerSelectionElement.addEventListener('change', function () {
-				interactions.destroy(map);
-				interactions.init(map, farmLayer, paddocksLayer, layerSelectionElement.value);
-			});
-
-		};
+			}
+		}
 
 		$scope.loadFarmData();
 
@@ -131,7 +179,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.clear = function () {
-			$scope.farmData ={};
+			$scope.farmData = {};
 			webmapping.session.clear();
 			location.href = '../index.html'
 		}
@@ -144,28 +192,22 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.removeSelectedPaddocks = function () {
 			$log.info('removing selected paddock(s)...');
-			var selectedPaddocks = interactions.selected();
+			var selectedPaddocks = interactions.selectedFeatures();
 			interactions.remove(selectedPaddocks);
 			$scope.farmChanged = false;
 		};
 
 		$scope.clipSelectedPaddock = function () {
 			$log.info('Clipping selected paddock...');
-			var selectedPaddock = interactions.selected().item(0);
-			if (interactions.selected().getLength() === 1) {
-				paddocksLayer.getSource().removeFeature(selectedPaddock);
-				interactions.clip(selectedPaddock, paddocksLayer.getSource(), farmLayer.getSource());
-			}
+			var selectedPaddock = interactions.selectedFeatures().item(0);
+			paddocksLayer.getSource().removeFeature(selectedPaddock);
+			interactions.clip(selectedPaddock, paddocksLayer.getSource(), farmLayer.getSource());
 			$scope.farmChanged = false;
 		};
 
 		$scope.mergeSelectedPaddocks = function () {
 			$log.info('Merging selected paddocks...');
-			var selectedPaddock = interactions.selected().item(0);
-			if (interactions.selected().getLength() > 1) {
-				paddocksLayer.getSource().removeFeature(selectedPaddock);
-				interactions.clip(selectedPaddock, paddocksLayer.getSource(), farmLayer.getSource());
-			}
+			interactions.merge(interactions.selectedFeatures());
 			$scope.farmChanged = false;
 		};
 
@@ -174,24 +216,5 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.farmData = findInSessionStorage();
 			$scope.farmChanged = false;
 		};
-
-		gmapElement.addEventListener('keydown', function (event) {
-			var selectedFeatures = interactions.selected();
-			if (event.keyCode == 46 || event.keyCode == 8) {
-				$scope.removeSelectedPaddocks();
-				event.preventDefault();
-				event.stopPropagation();
-			}
-
-			if (event.keyCode == 13) {
-				if (selectedFeatures.getLength() > 1) {
-					$scope.mergeSelectedPaddocks();
-				}
-				if (selectedFeatures.getLength() === 1) {
-					$scope.clipSelectedPaddock();
-				}
-			}
-
-		});
 
 	});

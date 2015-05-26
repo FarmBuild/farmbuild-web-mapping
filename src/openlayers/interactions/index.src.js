@@ -1,4 +1,4 @@
-var DONUT, DRAW, EDIT;
+'use strict';
 
 angular.module('farmbuild.webmapping')
 	.factory('interactions',
@@ -146,6 +146,9 @@ angular.module('farmbuild.webmapping')
 			$log.info('destroying all interactions ...');
 			map.getInteractions().clear();
 			map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
+			_select = undefined, _modify = undefined, _draw = undefined,
+				_snap = undefined, _activeLayer = undefined,
+				_activeLayerName = undefined, _mode = undefined;
 		};
 
 		function _init(map, farmLayer, paddocksLayer, activeLayerName) {
@@ -184,13 +187,14 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _featuresToGeoJson(features) {
-			return angular.fromJson(_geoJSONFormat.writeFeatures(features));
+			return angular.fromJson(_geoJSONFormat.writeFeatures(features.getArray()));
 		};
 
 		function _addGeoJsonFeature(layer, feature) {
 			if (!_isDefined(feature)) {
 				return;
 			}
+			$log.info('adding feature ...', feature);
 			layer.getSource().addFeature(new ol.Feature({
 				geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
 			}));
@@ -204,6 +208,7 @@ angular.module('farmbuild.webmapping')
 			toMerge = _featuresToGeoJson(features);
 			try {
 				_addGeoJsonFeature(_activeLayer, turf.merge(toMerge));
+				_select.interaction.getFeatures().clear();
 			} catch (e) {
 				$log.error(e);
 			}
@@ -286,7 +291,7 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _remove(features, deselect) {
-			if(!_isDefined(deselect)){
+			if (!_isDefined(deselect)) {
 				deselect = true;
 			}
 			$log.info('removing features ...', features);
@@ -295,18 +300,21 @@ angular.module('farmbuild.webmapping')
 					_activeLayer.getSource().removeFeature(feature);
 				});
 			}
-			if(deselect) {
+			if (deselect) {
 				_select.interaction.getFeatures().clear();
 			}
 		};
 
-		function _selected() {
-			$log.info('Selected features ...');
+		function _selectedFeatures() {
+			if (!_isDefined(_select) || !_isDefined(_select.interaction)) {
+				return;
+			}
+			$log.info('Selected features ...', _select.interaction.getFeatures());
 			return _select.interaction.getFeatures();
 		};
 
 		function _enableEditing() {
-			if (_mode === 'edit') {
+			if (!-_isDefined(_mode) || _mode === 'edit') {
 				return;
 			}
 			$log.info('editing enabled');
@@ -318,15 +326,21 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _isDrawing() {
+			if (!-_isDefined(_mode)) {
+				return;
+			}
 			return _draw.isDrawing();
 		};
 
 		function _isEditing() {
+			if (!-_isDefined(_mode)) {
+				return;
+			}
 			return _select.interaction.getFeatures().getLength() > 0;
 		};
 
 		function _enableDrawing() {
-			if (_mode === 'draw') {
+			if (!-_isDefined(_mode) || _mode === 'draw') {
 				return;
 			}
 			$log.info('drawing enabled');
@@ -338,7 +352,7 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _enableDonutDrawing() {
-			if (_mode === 'donut-draw') {
+			if (!-_isDefined(_mode) || _mode === 'donut-draw') {
 				return;
 			}
 			$log.info('donut drawing enabled');
@@ -348,10 +362,6 @@ angular.module('farmbuild.webmapping')
 			_snap.enable();
 			_mode = 'donut-draw';
 		};
-
-		DONUT = _enableDonutDrawing;
-		DRAW = _enableDrawing;
-		EDIT = _enableEditing;
 
 		return {
 			init: _init,
@@ -363,7 +373,7 @@ angular.module('farmbuild.webmapping')
 			remove: _remove,
 			clip: _clip,
 			area: _area,
-			selected: _selected,
+			selectedFeatures: _selectedFeatures,
 			isDrawing: _isDrawing,
 			isEditing: _isEditing
 		}
