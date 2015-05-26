@@ -10,7 +10,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		var dataProjectionCode = 'EPSG:4283',
 			featureProjectionCode = 'EPSG:3857',
 			openLayersProjectionCode = 'EPSG:4326',
-			dataProjection = ol.proj.get({code: dataProjectionCode}),
 			maxZoom = 21,
 			defaults = {
 				centerNew: [-36.22488327137526, 145.5826132801325],
@@ -38,7 +37,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 
-			olmap = createOpenLayerMap(geoJsons);
+			olmap = createOpenLayerMap($scope.farmData.geometry.crs, geoJsons);
 
 			gmap = createGoogleMap();
 
@@ -68,9 +67,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			})
 		}
 
-		function createOpenLayerMap(geoJsons) {
+		function createOpenLayerMap(crsName, geoJsons) {
 			farmLayer = openLayers.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
 				paddocksLayer = openLayers.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
+      var dataProjection = ol.proj.get({code: crsName});
+
 			return new ol.Map({
 				layers: [paddocksLayer, farmLayer],
 				target: 'olmap',
