@@ -9,7 +9,7 @@ angular.module('farmbuild.webmapping')
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode;
 
-		function _createSelect(map, farmSource, paddocksSource, layer) {
+		function _createSelect(map, layer) {
 			var selectInteraction = new ol.interaction.Select({
 				addCondition: ol.events.condition.shiftKeyOnly,
 				layers: [layer]
@@ -146,9 +146,13 @@ angular.module('farmbuild.webmapping')
 			$log.info('destroying all interactions ...');
 			map.getInteractions().clear();
 			map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
-			_select = undefined, _modify = undefined, _draw = undefined,
-				_snap = undefined, _activeLayer = undefined,
-				_activeLayerName = undefined, _mode = undefined;
+			_select = undefined;
+			_modify = undefined;
+			_draw = undefined;
+			_snap = undefined;
+			_activeLayer = undefined;
+			_activeLayerName = undefined;
+			_mode = undefined;
 		};
 
 		function _init(map, farmLayer, paddocksLayer, activeLayerName) {
@@ -167,7 +171,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 
-			_select = _createSelect(map, farmLayer.getSource(), paddocksLayer.getSource(), _activeLayer);
+			_select = _createSelect(map, _activeLayer);
 			_modify = _createModify(map, _select);
 			_draw = _createDraw(map, farmLayer.getSource(), paddocksLayer.getSource());
 			_snap = _createSnap(map, farmLayer.getSource(), paddocksLayer.getSource());

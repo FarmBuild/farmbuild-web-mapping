@@ -9,6 +9,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		var dataProjectionCode = 'EPSG:4283',
 			featureProjectionCode = 'EPSG:3857',
+			openLayersProjectionCode = 'EPSG:4326',
 			dataProjection = ol.proj.get({code: dataProjectionCode}),
 			maxZoom = 21,
 			defaults = {
@@ -43,7 +44,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			openLayers.integrateGMap(gmap, olmap, dataProjectionCode);
 
-			googleaddresssearch.init('locationautocomplete', dataProjectionCode);
+			googleaddresssearch.init('locationautocomplete', openLayersProjectionCode, olmap);
 
 			$scope.farmLoaded = true;
 
@@ -100,37 +101,43 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		function mapOnPointerMove(event) {
 			var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
-				paddocksSource = paddocksLayer.getSource();
+				featuresAtCoordinate;
 			if (selectedLayer === "paddocks") {
 				selectedLayer = paddocksLayer;
 			}
 			if (selectedLayer === "farm") {
 				selectedLayer = farmLayer;
 			}
-			if (paddocksSource.getFeaturesAtCoordinate(coordinate).length > 0 && !interactions.isDrawing()) {
+			featuresAtCoordinate = selectedLayer.getSource().getFeaturesAtCoordinate(coordinate);
+			if (featuresAtCoordinate.length > 0 && !interactions.isDrawing()) {
 				interactions.enableEditing();
 			}
-			if (selectedLayer.getSource().getFeaturesAtCoordinate(event.coordinate).length === 0 && !interactions.isEditing()) {
+			if (featuresAtCoordinate.length === 0 && !interactions.isEditing()) {
 				interactions.enableDrawing();
 			}
 		}
 
 		function mapOnDblClick(event) {
 			var coordinate = event.coordinate,
-				paddocksSource = paddocksLayer.getSource();
-			if (paddocksSource.getFeaturesAtCoordinate(coordinate).length > 0 && interactions.isEditing()) {
+				paddocksSource = paddocksLayer.getSource(),
+				paddocksAtCoordinate = paddocksSource.getFeaturesAtCoordinate(coordinate);
+			if (paddocksAtCoordinate.length > 0 && interactions.isEditing()) {
 				interactions.enableDonutDrawing();
 			}
 		}
 
 		function mapOnClick(event) {
 			var coordinate = event.coordinate,
-				paddocksSource = paddocksLayer.getSource();
-			if (paddocksSource.getFeaturesAtCoordinate(coordinate).length > 0) {
-				$scope.selectedPaddockName = paddocksLayer.getSource().getFeaturesAtCoordinate(event.coordinate)[0].getProperties().name;
+				paddocksSource = paddocksLayer.getSource(),
+				paddocksAtCoordinate = paddocksSource.getFeaturesAtCoordinate(coordinate);
+			if (paddocksAtCoordinate.length < 1) {
+				$scope.selectedPaddockName = '';
 				$scope.$apply();
-				$log.info('Paddock selected: ' + $scope.selectedPaddockName);
+				return;
 			}
+			$scope.selectedPaddockName = paddocksAtCoordinate[0].getProperties().name;
+			$log.info('Paddock selected: ' + $scope.selectedPaddockName);
+			$scope.$apply();
 		}
 
 		function selectLayer() {
@@ -144,6 +151,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 
+			interactions.destroy(olmap);
 			interactions.init(olmap, farmLayer, paddocksLayer, selectedLayer);
 			olmap.on('pointermove', mapOnPointerMove);
 			olmap.on('dblclick', mapOnDblClick);

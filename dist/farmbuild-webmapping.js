@@ -289,28 +289,28 @@ angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(v
     var countryRestrict = {
         country: "au"
     };
-    function _init(targetElementId, dataProjection) {
+    function _init(targetElementId, openLayersProjection, olmap) {
         var autocomplete = new google.maps.places.Autocomplete(document.getElementById(targetElementId), {
             componentRestrictions: countryRestrict
         });
         google.maps.event.addListener(autocomplete, "place_changed", function() {
-            _onPlaceChanged(autocomplete, dataProjection);
+            _onPlaceChanged(autocomplete, openLayersProjection, olmap);
         });
     }
-    function _onPlaceChanged(autocomplete, dataProjection) {
+    function _onPlaceChanged(autocomplete, openLayersProjection, olmap) {
         var place = autocomplete.getPlace(), latLng;
         if (!place.geometry) {
             return;
         }
         latLng = place.geometry.location;
-        _center(latLng, dataProjection);
+        _center(latLng, openLayersProjection, olmap);
     }
     function _transform(latLng, sourceProjection, destinationProjection) {
         return ol.proj.transform([ latLng.lng(), latLng.lat() ], sourceProjection, destinationProjection);
     }
-    function _center(latLng, dataProjection) {
-        var googleMapProjection = "EPSG:3857", centerPoint = _transform(latLng, dataProjection, googleMapProjection);
-        openLayers.center(centerPoint);
+    function _center(latLng, openLayersProjection, olmap) {
+        var googleMapProjection = "EPSG:3857", centerPoint = _transform(latLng, openLayersProjection, googleMapProjection);
+        openLayers.center(centerPoint, olmap);
     }
     return {
         init: _init
@@ -321,7 +321,7 @@ angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(v
 
 angular.module("farmbuild.webmapping").factory("interactions", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode;
-    function _createSelect(map, farmSource, paddocksSource, layer) {
+    function _createSelect(map, layer) {
         var selectInteraction = new ol.interaction.Select({
             addCondition: ol.events.condition.shiftKeyOnly,
             layers: [ layer ]
@@ -436,8 +436,13 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         map.addInteraction(new ol.interaction.DragPan({
             kinetic: null
         }));
-        _select = undefined, _modify = undefined, _draw = undefined, _snap = undefined, 
-        _activeLayer = undefined, _activeLayerName = undefined, _mode = undefined;
+        _select = undefined;
+        _modify = undefined;
+        _draw = undefined;
+        _snap = undefined;
+        _activeLayer = undefined;
+        _activeLayerName = undefined;
+        _mode = undefined;
     }
     function _init(map, farmLayer, paddocksLayer, activeLayerName) {
         $log.info("interactions init ...");
@@ -451,7 +456,7 @@ angular.module("farmbuild.webmapping").factory("interactions", function(validati
         } else {
             return;
         }
-        _select = _createSelect(map, farmLayer.getSource(), paddocksLayer.getSource(), _activeLayer);
+        _select = _createSelect(map, _activeLayer);
         _modify = _createModify(map, _select);
         _draw = _createDraw(map, farmLayer.getSource(), paddocksLayer.getSource());
         _snap = _createSnap(map, farmLayer.getSource(), paddocksLayer.getSource());
