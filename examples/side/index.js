@@ -14,8 +14,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			layerSelectionElement = document.getElementById('layers'),
 			gmapElement = document.getElementById('gmap'),
 			gmap,
-			farmLayer,
-			paddocksLayer,
 			olmap,
 			actions = webmapping.actions,
 			olHelper = webmapping.olHelper,
@@ -68,7 +66,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		function createOpenLayerMap(crsName, geoJsons) {
-			farmLayer = olHelper.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
+			var farmLayer = olHelper.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
 				paddocksLayer = olHelper.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
 			var dataProjection = ol.proj.get({code: crsName});
 
@@ -104,10 +102,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
 				featureAtCoordinate;
 			if (selectedLayer === "paddocks") {
-				selectedLayer = paddocksLayer;
+				selectedLayer = olmap.getLayers().item(0);
 			}
 			if (selectedLayer === "farm") {
-				selectedLayer = farmLayer;
+				selectedLayer = olmap.getLayers().item(1);
 			}
 			featureAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, selectedLayer);
 			if (featureAtCoordinate && !actions.isDrawing()) {
@@ -120,7 +118,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		function mapOnDblClick(event) {
 			var coordinate = event.coordinate,
-				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, paddocksLayer);
+				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));
 			if (paddockAtCoordinate && actions.isEditing()) {
 				actions.enableDonutDrawing();
 			}
@@ -131,9 +129,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.$apply();
 		}
 
+		function onFarmChanged(e) {
+			$scope.farmChanged = true;
+			$scope.$apply();
+		}
+
 		function mapOnClick(event) {
 			var coordinate = event.coordinate,
-				paddockAtCoordinate =  webmapping.paddocks.findByCoordinate(coordinate, paddocksLayer);
+				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));
 			if (!paddockAtCoordinate) {
 				$scope.selectedPaddockName = '';
 				$scope.$apply();
@@ -156,11 +159,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 
 			actions.destroy(olmap);
-			actions.init(olmap, farmLayer, paddocksLayer, selectedLayer);
+			actions.init(olmap, olmap.getLayers().item(1), olmap.getLayers().item(0), selectedLayer);
 			olmap.on('pointermove', mapOnPointerMove);
 			olmap.on('dblclick', mapOnDblClick);
 			olmap.on('click', mapOnClick);
-			paddocksLayer.getSource().on('changefeature', onPaddockChanged)
+			olmap.getLayers().item(0).getSource().on('changefeature', onPaddockChanged);
+			olmap.getLayers().item(1).getSource().on('changefeature', onFarmChanged);
 		}
 
 		function keyboardActions(event) {
@@ -178,15 +182,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			if (event.keyCode == 13) {
 
-				if(actions.isDrawing()){
+				if (actions.isDrawing()) {
 					actions.finishDrawing();
-				}
-
-				if (selectedFeatures.getLength() > 1) {
-					mergeSelectedPaddocks();
-				}
-
-				if (selectedFeatures.getLength() === 1) {
+				} else {
 					clipSelectedPaddock();
 				}
 
@@ -204,18 +202,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		};
 
-		function mergeSelectedPaddocks() {
-			$log.info('Merging selected paddocks...');
-			actions.merge(actions.selectedFeatures());
-			$scope.farmChanged = false;
-		};
-
 		function clipSelectedPaddock() {
 			$log.info('Clipping selected paddock...');
 			var selectedPaddock = actions.selectedFeatures().item(0);
-			paddocksLayer.getSource().removeFeature(selectedPaddock);
-			actions.clip(selectedPaddock, paddocksLayer.getSource(), farmLayer.getSource());
-			$scope.farmChanged = false;
+			if (selectedPaddock) {
+				olmap.getLayers().item(0).getSource().removeFeature(selectedPaddock);
+				actions.clip(selectedPaddock, olmap.getLayers().item(0).getSource(), olmap.getLayers().item(1).getSource());
+			}
 		};
 
 		$scope.loadFarmData();
@@ -232,13 +225,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.apply = function () {
 			$log.info('apply changes to farm data ...');
-			if(actions.isDrawing()) {
+			if (actions.isDrawing()) {
 				actions.finishDrawing();
 			} else {
 				clipSelectedPaddock();
 			}
-			var paddocksGeometry = olHelper.exportGeometry(paddocksLayer.getSource(), dataProjectionCode, featureProjectionCode);
-			var farmGeometry = olHelper.exportGeometry(farmLayer.getSource(),  dataProjectionCode, featureProjectionCode);
+			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjectionCode, featureProjectionCode);
+			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjectionCode, featureProjectionCode);
 			farmGeometry.features[0].geometry.crs = {
 				properties: {
 					name: "EPSG:4283"
@@ -253,13 +246,35 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$log.info('removing selected paddock(s)...');
 			var selectedPaddocks = actions.selectedFeatures();
 			actions.remove(selectedPaddocks);
-			$scope.farmChanged = false;
+			$scope.paddockChanged = false;
+			onFarmChanged();
 		};
 
 		$scope.cancel = function () {
 			$log.info('cancel...');
-			$scope.farmData = findInSessionStorage();
+			var selectedLayer = layerSelectionElement.value;
+			$scope.farmData = webmapping.find();
+			var geoJsons = webmapping.toGeoJsons($scope.farmData);
+			if (!angular.isDefined(geoJsons)) {
+				$scope.noResult = true;
+				return;
+			}
+			actions.destroy(olmap);
+			olmap.un('pointermove', mapOnPointerMove);
+			olmap.un('dblclick', mapOnDblClick);
+			olmap.un('click', mapOnClick);
+
+			olHelper.reload(olmap, geoJsons, dataProjectionCode, featureProjectionCode);
+
+			actions.init(olmap, olmap.getLayers().item(1), olmap.getLayers().item(0), selectedLayer);
+			olmap.on('pointermove', mapOnPointerMove);
+			olmap.on('dblclick', mapOnDblClick);
+			olmap.on('click', mapOnClick);
+			olmap.getLayers().item(0).getSource().on('changefeature', onPaddockChanged);
+			olmap.getLayers().item(1).getSource().on('changefeature', onFarmChanged);
+
 			$scope.farmChanged = false;
+			$scope.paddockChanged = false;
 		};
 
 	});

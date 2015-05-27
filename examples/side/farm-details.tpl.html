@@ -27,16 +27,17 @@
         </button>
     </wrapper>
 
-    <button class="btn btn-primary" ng-click="exportFarmData(farmData)">
-        Export farm data
-    </button>
+    <wrapper ng-show="!farmChanged && !paddockChanged">
 
-    <a id="download"></a>
+        <button class="btn btn-primary" ng-click="exportFarmData(farmData)">
+            Export farm data
+        </button>
 
+        <a id="download"></a>
+    </wrapper>
     <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
         Clear session
     </button>
-
     <hr>
     <a href="../index.html">Load or create another farmData</a>
 </form-section>

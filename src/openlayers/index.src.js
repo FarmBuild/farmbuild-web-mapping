@@ -145,13 +145,21 @@ angular.module('farmbuild.webmapping')
             });
         };
 
+        function _reload(map, geoJson, dataProjectionCode, featureProjectionCode){
+            var layers = map.getLayers();
+            layers.clear();
+            map.addLayer(_paddocksLayer(geoJson.paddocks, dataProjectionCode, featureProjectionCode));
+            map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
+        };
+
         return {
             exportGeometry: _exportGeometry,
             clear: _clear,
             center: _center,
             integrateGMap: _integrateGMap,
             paddocksLayer: _paddocksLayer,
-            farmLayer: _farmLayer
+            farmLayer: _farmLayer,
+            reload: _reload
         }
 
     });
