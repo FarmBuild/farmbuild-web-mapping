@@ -17,8 +17,8 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	function (farmdata,
 	          validations,
 	          $log,
-            webmappingValidator,
-            webmappingConverter,
+            geoJsonValidator,
+            farmdataConverter,
 	          webMappingSession,
 	          webMappingProjections,
 						webMappingInteractions,
@@ -32,8 +32,8 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 			webMapping = {
         session:session,
         farmdata: farmdata,
-        validator:webmappingValidator,
-        toGeoJsons:webmappingConverter.toGeoJsons,
+        validator:geoJsonValidator,
+        toGeoJsons:farmdataConverter.toGeoJsons,
 				actions: webMappingInteractions,
 				paddocks:  webMappingPaddocks,
 				olHelper: webMappingOpenLayersHelper,
@@ -65,7 +65,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
          */
         save: function(geoJsons) {
           var farmData = session.find();
-          return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
+          return session.save(farmdataConverter.toFarmData(farmData, geoJsons));
         },
         /**
          * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json

@@ -4,20 +4,25 @@ module.exports = function(config){
     basePath : '',
 
     files : [
+      'lib/ol/ol.js',
       'bower_components/farmbuild-core/dist/farmbuild-core.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/farmbuild-farmdata/dist/farmbuild-farmdata.js',
+      'bower_components/proj4/dist/proj4.js',
       'node_modules/geojsonhint/geojsonhint.js',
       'src/web-mapping.src.js',
       'src/session/index.src.js',
-      'src/validator/index.src.js',
-      'src/converter/index.src.js',
+      'src/interactions/*.src.js',
+      'src/transformations/*.src.js',
+      'src/measurement/*.src.js',
+      'src/paddocks/*.src.js',
+      'src/openlayers/*.src.js',
+      'src/google/**/*.src.js',
+      'src/projections/index.src.js',
       'src/index.src.js',
-      'src/blank.spec.js',//use this as a basis of creating your module test
-      'src/validator/geojsonhint.spec.js',
-      'src/validator/index.spec.js',
-      'src/converter/index.spec.js',
-      'src/index-load.spec.js',
+//      'src/blank.spec.js',//use this as a basis of creating your module test
+      'src/index-load-save.spec.js',
+      'src/index-load-edit-save.spec.js',
 //      'src/**/*.spec.js',
       {pattern: 'examples/data/*.json'}
     ],
