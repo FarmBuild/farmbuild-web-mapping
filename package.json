@@ -6,7 +6,6 @@
   "repository": "https://github.com/FarmBuild/farmbuild-dairy-nutrient-calculator",
   "license": "MIT",
   "dependencies": {
-    "geojsonhint": "^1.0",
     "mkdirp": "^0.5.1"
   },
   "devDependencies": {
