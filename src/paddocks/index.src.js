@@ -15,15 +15,16 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined;
 
 		function _findByCoordinate(coordinate, vectorLayer) {
-			if(!_isDefined(coordinate) || !_isDefined(vectorLayer)){
-
+			var found;
+			if (!_isDefined(coordinate) || !_isDefined(vectorLayer)) {
+				return;
 			}
-			$log.info('looking up for paddock at ', coordinate);
 			var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
-			if(paddocks && paddocks.length > 0) {
-				return vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
+			if (paddocks && paddocks.length > 0) {
+				found = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
 			}
-			return undefined;
+			$log.info('looking up for a paddock at ', coordinate, found);
+			return found;
 		}
 
 		return {
