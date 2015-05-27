@@ -418,13 +418,16 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
         return new google.maps.LatLng(transformed[1], transformed[0]);
     }
-    function _exportGeometry(source) {
+    function _exportGeometry(source, dataProjection, featureProjection) {
         if (!_isDefined(source)) {
             return;
         }
         var format = new ol.format["GeoJSON"]();
         try {
-            return format.writeFeatures(source.getFeatures());
+            return format.writeFeaturesObject(source.getFeatures(), {
+                dataProjection: dataProjection,
+                featureProjection: featureProjection
+            });
         } catch (e) {
             $log.error(e);
         }
@@ -540,8 +543,11 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log) {
+angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log, validations) {
+    var _isDefined = validations.isDefined;
     function _findByCoordinate(coordinate, vectorLayer) {
+        if (!_isDefined(coordinate) || !_isDefined(vectorLayer)) {}
+        $log.info("looking up for paddock at ", coordinate);
         var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
         if (paddocks && paddocks.length > 0) {
             return vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];

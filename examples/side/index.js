@@ -241,14 +241,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			} else {
 				clipSelectedPaddock();
 			}
-			var paddocksGeometry = angular.fromJson(olHelper.exportGeometry(paddocksLayer.getSource()));
-			var farmGeometry = angular.fromJson(olHelper.exportGeometry(farmLayer.getSource()));
+			var paddocksGeometry = olHelper.exportGeometry(paddocksLayer.getSource(), dataProjectionCode, featureProjectionCode);
+			var farmGeometry = olHelper.exportGeometry(farmLayer.getSource(),  dataProjectionCode, featureProjectionCode);
 			farmGeometry.features[0].geometry.crs = {
 				properties: {
 					name: "EPSG:4283"
 				}
 			};
-			webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
+			$scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 		};
