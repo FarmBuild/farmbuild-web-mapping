@@ -21,7 +21,10 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
             webmappingConverter,
 	          webMappingSession,
 	          webMappingProjections,
-						webMappingInteractions) {
+						webMappingInteractions,
+	          webMappingPaddocks,
+	          webMappingOpenLayersHelper,
+	          webMappingGoogleAddressSearch) {
     $log.info('Welcome to Web Mapping...');
 
     var _isDefined = validations.isDefined,
@@ -31,6 +34,10 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
         farmdata: farmdata,
         validator:webmappingValidator,
         toGeoJsons:webmappingConverter.toGeoJsons,
+				actions: webMappingInteractions,
+				paddocks:  webMappingPaddocks,
+				olHelper: webMappingOpenLayersHelper,
+				googleAddressSearch: webMappingGoogleAddressSearch,
         /**
          * Loads the specified farmData into session
          * @method load
@@ -79,11 +86,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
          * @public
          * @static
          */
-        create: farmdata.create,
-
-				findPaddockByName: function(name){
-
-				}
+        create: farmdata.create
 			};
 
 		function _exportFarmData(toExport) {
@@ -94,8 +97,6 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 		};
 
 		webmapping.exportFarmData = _exportFarmData;
-
-		webmapping.actions = webMappingInteractions;
 
 		// Provide a shortcut for modules
 		webmapping.version = '0.1.0';

@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-    .factory('openLayers',
+    .factory('webMappingOpenLayersHelper',
     function (validations,
               $log) {
         var _isDefined = validations.isDefined;

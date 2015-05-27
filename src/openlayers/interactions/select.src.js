@@ -7,8 +7,11 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined;
 
 		function _create(map, layer) {
+
 			var selectInteraction = new ol.interaction.Select({
-				addCondition: ol.events.condition.shiftKeyOnly,
+				addCondition: ol.events.condition.never,
+				toggleCondition: ol.events.condition.never,
+				multi: false,
 				layers: [layer]
 			});
 
@@ -32,6 +35,7 @@ angular.module('farmbuild.webmapping')
 				disable: _disable,
 				interaction: selectInteraction
 			}
+
 		};
 
 		return {

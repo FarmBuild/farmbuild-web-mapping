@@ -1,12 +1,16 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, webMappingProjections, webMappingInteractions) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webmapping = {
         session: session,
         farmdata: farmdata,
         validator: webmappingValidator,
         toGeoJsons: webmappingConverter.toGeoJsons,
+        actions: webMappingInteractions,
+        paddocks: webMappingPaddocks,
+        olHelper: webMappingOpenLayersHelper,
+        googleAddressSearch: webMappingGoogleAddressSearch,
         load: session.load,
         find: session.find,
         save: function(geoJsons) {
@@ -14,8 +18,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
             return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
         },
         "export": session.export,
-        create: farmdata.create,
-        findPaddockByName: function(name) {}
+        create: farmdata.create
     };
     function _exportFarmData(toExport) {
         if (!toExport) {
@@ -24,7 +27,6 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         return _toFarmData(toExport);
     }
     webmapping.exportFarmData = _exportFarmData;
-    webmapping.actions = webMappingInteractions;
     webmapping.version = "0.1.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
@@ -101,7 +103,7 @@ angular.module("farmbuild.webmapping").factory("webmappingConverter", function(f
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("openLayers", function(validations, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, $log) {
     var _isDefined = validations.isDefined;
     function _transform(latLng, sourceProjection, destinationProjection) {
         if (!_isDefined(latLng) || !_isDefined(sourceProjection) || !_isDefined(destinationProjection)) {
@@ -232,6 +234,23 @@ angular.module("farmbuild.webmapping").factory("openLayers", function(validation
 
 "use strict";
 
+angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log, collections) {
+    function _add() {}
+    function _remove() {}
+    function _edit() {}
+    function _find() {}
+    function _validate() {}
+    return {
+        add: _add,
+        remove: _remove,
+        edit: _edit,
+        find: _find,
+        validate: _validate
+    };
+});
+
+"use strict";
+
 angular.module("farmbuild.webmapping").factory("webMappingProjections", function($log, farmdata) {
     var webMappingProjections = {
         supported: farmbuild.farmdata.crsSupported
@@ -307,7 +326,7 @@ angular.module("farmbuild.webmapping").factory("webmappingValidator", function(v
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(validations, $log, openLayers) {
+angular.module("farmbuild.webmapping").factory("webMappingGoogleAddressSearch", function(validations, $log, webMappingOpenLayersHelper) {
     var countryRestrict = {
         country: "au"
     };
@@ -332,7 +351,7 @@ angular.module("farmbuild.webmapping").factory("googleaddresssearch", function(v
     }
     function _center(latLng, openLayersProjection, olmap) {
         var googleMapProjection = "EPSG:3857", centerPoint = _transform(latLng, openLayersProjection, googleMapProjection);
-        openLayers.center(centerPoint, olmap);
+        webMappingOpenLayersHelper.center(centerPoint, olmap);
     }
     return {
         init: _init
@@ -639,7 +658,9 @@ angular.module("farmbuild.webmapping").factory("selectInteraction", function(val
     var _isDefined = validations.isDefined;
     function _create(map, layer) {
         var selectInteraction = new ol.interaction.Select({
-            addCondition: ol.events.condition.shiftKeyOnly,
+            addCondition: ol.events.condition.never,
+            toggleCondition: ol.events.condition.never,
+            multi: false,
             layers: [ layer ]
         });
         function _init() {
