@@ -103,7 +103,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		function mapOnPointerMove(event) {
 			var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
 				featureAtCoordinate;
-			if (selectedLayer === "paddocks" || selectedLayer === "paddocksMulti") {
+			if (selectedLayer === "paddocks") {
 				selectedLayer = paddocksLayer;
 			}
 			if (selectedLayer === "farm") {
@@ -145,11 +145,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		function selectLayer() {
-			var selectedLayer = this.value, multi = (selectedLayer === 'paddocksMulti');
-
-			if (selectedLayer === "paddocksMulti") {
-				selectedLayer = 'paddocks';
-			}
+			var selectedLayer = this.value;
 
 			if (selectedLayer === 'none' || selectedLayer === '') {
 				actions.destroy(olmap);
@@ -160,7 +156,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 
 			actions.destroy(olmap);
-			actions.init(olmap, farmLayer, paddocksLayer, selectedLayer, multi);
+			actions.init(olmap, farmLayer, paddocksLayer, selectedLayer);
 			olmap.on('pointermove', mapOnPointerMove);
 			olmap.on('dblclick', mapOnDblClick);
 			olmap.on('click', mapOnClick);
