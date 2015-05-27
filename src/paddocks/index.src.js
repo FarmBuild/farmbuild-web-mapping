@@ -11,9 +11,14 @@
 
 angular.module('farmbuild.webmapping')
 	.factory('webMappingPaddocks',
-	function ($log) {
+	function ($log, validations) {
+		var _isDefined = validations.isDefined;
 
 		function _findByCoordinate(coordinate, vectorLayer) {
+			if(!_isDefined(coordinate) || !_isDefined(vectorLayer)){
+
+			}
+			$log.info('looking up for paddock at ', coordinate);
 			var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
 			if(paddocks && paddocks.length > 0) {
 				return vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];

@@ -7,38 +7,51 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined,
 			_geoJSONFormat = new ol.format['GeoJSON']();
 
-			function _featureToGeoJson(olFeature) {
-			return angular.fromJson(_geoJSONFormat.writeFeature(olFeature));
+			function _openLayerFeatureToGeoJson(olFeature) {
+			return _geoJSONFormat.writeFeatureObject(olFeature);
 		};
 
-		function _featuresToGeoJson(olFeatures) {
+		function _openLayerFeaturesToGeoJson(olFeatures) {
 			if(olFeatures.getArray) {
-				return angular.fromJson(_geoJSONFormat.writeFeatures(olFeatures.getArray()));
+				return _geoJSONFormat.writeFeaturesObject(olFeatures.getArray());
 			}
-			return angular.fromJson(_geoJSONFormat.writeFeatures(olFeatures));
+			return _geoJSONFormat.writeFeaturesObject(olFeatures);
+		};
+
+		function _geoJsonToOpenLayerFeature(feature, properties) {
+			if (!_isDefined(feature)) {
+				return;
+			}
+			$log.info('Converting geoJson to openlayer feature ...', feature);
+			properties.geometry = new ol.geom[feature.geometry.type](feature.geometry.coordinates);
+			return new ol.Feature(properties);
 		};
 
 		function _erase(olFeature, olFeatures) {
-			var feature = _featureToGeoJson(olFeature);
+			$log.info('erasing feature', olFeature);
+			var feature = _openLayerFeatureToGeoJson(olFeature),
+				properties = olFeature.getProperties();
 			try {
 				olFeatures.forEach(function (layerFeature) {
-					var clipper = _featureToGeoJson(layerFeature);
+					var clipper = _openLayerFeatureToGeoJson(layerFeature);
 					feature = turf.erase(feature, clipper);
 				});
-				return feature;
+				return _geoJsonToOpenLayerFeature(feature, properties);
 			} catch (e) {
 				$log.error(e);
 			}
 		};
 
 		function _intersect(olFeature, olFeatures) {
-			var feature = _featureToGeoJson(olFeature);
+			$log.info('intersecting feature', olFeatures);
+			var feature = _openLayerFeatureToGeoJson(olFeature),
+				properties = olFeature.getProperties();
 			try {
 				olFeatures.forEach(function (layerFeature) {
-					var clipper = _featureToGeoJson(layerFeature);
+					var clipper = _openLayerFeatureToGeoJson(layerFeature);
 					feature = turf.intersect(feature, clipper);
 				});
-				return feature;
+				return _geoJsonToOpenLayerFeature(feature, properties);
 			} catch (e) {
 				$log.error(e);
 			}
@@ -46,10 +59,11 @@ angular.module('farmbuild.webmapping')
 
 		function _merge(olFeatures) {
 			$log.info('merging features ...', olFeatures);
-			var toMerge;
-			toMerge = _featuresToGeoJson(olFeatures);
+			var properties, toMerge;
+			toMerge = _openLayerFeaturesToGeoJson(olFeatures);
+			properties = {name: 'merged ' + (new Date()).getTime()};
 			try {
-				return turf.merge(toMerge);
+				return _geoJsonToOpenLayerFeature(turf.merge(toMerge), properties);
 			} catch (e) {
 				$log.error(e);
 			}

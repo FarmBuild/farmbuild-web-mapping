@@ -1,12 +1,12 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webMapping = {
         session: session,
         farmdata: farmdata,
-        validator: webmappingValidator,
-        toGeoJsons: webmappingConverter.toGeoJsons,
+        validator: geoJsonValidator,
+        toGeoJsons: farmdataConverter.toGeoJsons,
         actions: webMappingInteractions,
         paddocks: webMappingPaddocks,
         olHelper: webMappingOpenLayersHelper,
@@ -15,7 +15,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         find: session.find,
         save: function(geoJsons) {
             var farmData = session.find();
-            return session.save(webmappingConverter.toFarmData(farmData, geoJsons));
+            return session.save(farmdataConverter.toFarmData(farmData, geoJsons));
         },
         "export": session.export,
         create: farmdata.create
@@ -29,69 +29,6 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         window.farmbuild.webmapping = webMapping;
     }
     return webMapping;
-});
-
-"use strict";
-
-angular.module("farmbuild.webmapping").factory("webmappingConverter", function(farmdata, validations, $log, webmappingValidator, webMappingSession) {
-    var _isDefined = validations.isDefined, webmappingConverter = {}, validator = webmappingValidator;
-    function createFeatureCollection(geometry) {}
-    function convertCrs(geometry, crs) {
-        geometry.crs = {
-            type: "name",
-            properties: {
-                name: crs
-            }
-        };
-        return geometry;
-    }
-    function resetCrs(geometry) {
-        geometry.crs = geometry.crs.properties.name;
-        return geometry;
-    }
-    function createFeature(geometry, crs, name) {
-        return {
-            type: "Feature",
-            geometry: angular.copy(convertCrs(geometry, crs)),
-            properties: {
-                name: name
-            }
-        };
-    }
-    function toGeoJsons(farmData) {
-        $log.info("Extracting farm and paddocks geometry from farmData ...");
-        var copied = angular.copy(farmData);
-        if (!validator.validate(copied)) {
-            return undefined;
-        }
-        var farm = copied.geometry, paddocks = [];
-        copied.paddocks.forEach(function(paddock) {
-            paddocks.push(createFeature(paddock.geometry, farm.crs, paddock.name));
-        });
-        return {
-            farm: {
-                type: "FeatureCollection",
-                features: [ createFeature(farm, farm.crs, copied.name) ]
-            },
-            paddocks: {
-                type: "FeatureCollection",
-                features: paddocks
-            }
-        };
-    }
-    webmappingConverter.toGeoJsons = toGeoJsons;
-    function toFarmData(farmData, geoJsons) {
-        $log.info("Converting geoJsons.farm.features[0] and paddocks geojson to farmData ...");
-        var farmFeature = geoJsons.farm.features[0], paddocks = geoJsons.paddocks;
-        farmData.geometry = resetCrs(farmFeature.geometry);
-        paddocks.features.forEach(function(paddockFeature, i) {
-            farmData.paddocks[i].geometry = paddockFeature.geometry;
-            delete farmData.paddocks[i].geometry.crs;
-        });
-        return farmData;
-    }
-    webmappingConverter.toFarmData = toFarmData;
-    return webmappingConverter;
 });
 
 "use strict";
@@ -111,7 +48,7 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
                 $log.info("draw end ...");
                 var feature = e.feature;
                 feature.setProperties({
-                    name: "parham"
+                    name: "new " + new Date().getTime()
                 });
                 clipFn(feature, paddocksSource, farmSource);
                 setTimeout(function() {
@@ -163,10 +100,13 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, transform = webMappingTransformations;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
-        map.getInteractions().clear();
-        map.addInteraction(new ol.interaction.DragPan({
-            kinetic: null
-        }));
+        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
+            return;
+        }
+        map.removeInteraction(_select.interaction);
+        map.removeInteraction(_modify.interaction);
+        map.removeInteraction(_draw.interaction);
+        map.removeInteraction(_snap.interaction);
         _select = undefined;
         _modify = undefined;
         _draw = undefined;
@@ -198,18 +138,15 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _draw.init(_clip, _select);
         _snap.init();
     }
-    function _addGeoJsonFeature(layer, feature, name) {
+    function _addFeature(layer, feature) {
         if (!_isDefined(feature)) {
             return;
         }
         $log.info("adding feature ...", feature);
-        layer.getSource().addFeature(new ol.Feature({
-            geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates),
-            name: name
-        }));
+        layer.getSource().addFeature(feature);
         _clearSelections();
     }
-    function _remove(features, deselect) {
+    function _removeFeatures(features, deselect) {
         if (!_isDefined(deselect)) {
             deselect = true;
         }
@@ -238,29 +175,27 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     function _clipPaddocks(featureToClip, paddockSource, farmSource) {
         var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name;
         clipped = transform.erase(featureToClip, paddocksFeatures);
-        clipped = transform.intersect(new ol.Feature({
-            geometry: new ol.geom[clipped.geometry.type](clipped.geometry.coordinates)
-        }), farmFeatures);
-        _addGeoJsonFeature(_activeLayer, clipped, name);
+        clipped = transform.intersect(clipped, farmFeatures);
+        _addFeature(_activeLayer, clipped, name);
     }
     function _clipDonut(donutFeature) {
         var clipped, paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0], name = donutFeature.getProperties().name;
         clipped = turf.erase(paddockFeature, donutFeature);
-        _addGeoJsonFeature(_activeLayer, clipped, name);
+        _addFeature(_activeLayer, clipped, name);
         _activeLayer.getSource().removeFeature(paddockFeature);
     }
     function _clipFarm(featureToClip, farmSource) {
         var farmFeatures = farmSource.getFeatures(), clipped = transform.erase(featureToClip, farmFeatures), name = featureToClip.getProperties().name;
-        _addGeoJsonFeature(_activeLayer, clipped);
-        _remove(farmFeatures, false);
+        _addFeature(_activeLayer, clipped);
+        _removeFeatures(farmFeatures, false);
         clipped = transform.merge(farmSource.getFeatures());
-        _addGeoJsonFeature(_activeLayer, clipped, name);
+        _addFeature(_activeLayer, clipped, name);
         _clearSelections();
     }
     function _merge(features) {
         $log.info("merging features ...", features);
-        _remove(features, false);
-        _addGeoJsonFeature(_activeLayer, transform.merge(features));
+        _removeFeatures(features, false);
+        _addFeature(_activeLayer, transform.merge(features));
         _clearSelections();
     }
     function _selectedFeatures() {
@@ -338,7 +273,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         enableDonutDrawing: _enableDonutDrawing,
         clip: _clip,
         merge: _merge,
-        remove: _remove,
+        remove: _removeFeatures,
         selectedFeatures: _selectedFeatures,
         isDrawing: _isDrawing,
         isEditing: _isEditing,
@@ -624,7 +559,7 @@ angular.module("farmbuild.webmapping").factory("webMappingProjections", function
     var webMappingProjections = {
         supported: farmbuild.farmdata.crsSupported
     };
-    farmbuild.farmdata.crsSupported.forEach(function(crs) {
+    farmdata.crsSupported.forEach(function(crs) {
         proj4.defs(crs.name, crs.projection);
     });
     return webMappingProjections;
@@ -665,45 +600,58 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
 
 angular.module("farmbuild.webmapping").factory("webMappingTransformations", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
-    function _featureToGeoJson(olFeature) {
-        return angular.fromJson(_geoJSONFormat.writeFeature(olFeature));
+    function _openLayerFeatureToGeoJson(olFeature) {
+        return _geoJSONFormat.writeFeatureObject(olFeature);
     }
-    function _featuresToGeoJson(olFeatures) {
+    function _openLayerFeaturesToGeoJson(olFeatures) {
         if (olFeatures.getArray) {
-            return angular.fromJson(_geoJSONFormat.writeFeatures(olFeatures.getArray()));
+            return _geoJSONFormat.writeFeaturesObject(olFeatures.getArray());
         }
-        return angular.fromJson(_geoJSONFormat.writeFeatures(olFeatures));
+        return _geoJSONFormat.writeFeaturesObject(olFeatures);
+    }
+    function _geoJsonToOpenLayerFeature(feature, properties) {
+        if (!_isDefined(feature)) {
+            return;
+        }
+        $log.info("Converting geoJson to openlayer feature ...", feature);
+        properties.geometry = new ol.geom[feature.geometry.type](feature.geometry.coordinates);
+        return new ol.Feature(properties);
     }
     function _erase(olFeature, olFeatures) {
-        var feature = _featureToGeoJson(olFeature);
+        $log.info("erasing feature", olFeature);
+        var feature = _openLayerFeatureToGeoJson(olFeature), properties = olFeature.getProperties();
         try {
             olFeatures.forEach(function(layerFeature) {
-                var clipper = _featureToGeoJson(layerFeature);
+                var clipper = _openLayerFeatureToGeoJson(layerFeature);
                 feature = turf.erase(feature, clipper);
             });
-            return feature;
+            return _geoJsonToOpenLayerFeature(feature, properties);
         } catch (e) {
             $log.error(e);
         }
     }
     function _intersect(olFeature, olFeatures) {
-        var feature = _featureToGeoJson(olFeature);
+        $log.info("intersecting feature", olFeatures);
+        var feature = _openLayerFeatureToGeoJson(olFeature), properties = olFeature.getProperties();
         try {
             olFeatures.forEach(function(layerFeature) {
-                var clipper = _featureToGeoJson(layerFeature);
+                var clipper = _openLayerFeatureToGeoJson(layerFeature);
                 feature = turf.intersect(feature, clipper);
             });
-            return feature;
+            return _geoJsonToOpenLayerFeature(feature, properties);
         } catch (e) {
             $log.error(e);
         }
     }
     function _merge(olFeatures) {
         $log.info("merging features ...", olFeatures);
-        var toMerge;
-        toMerge = _featuresToGeoJson(olFeatures);
+        var properties, toMerge;
+        toMerge = _openLayerFeaturesToGeoJson(olFeatures);
+        properties = {
+            name: "merged " + new Date().getTime()
+        };
         try {
-            return turf.merge(toMerge);
+            return _geoJsonToOpenLayerFeature(turf.merge(toMerge), properties);
         } catch (e) {
             $log.error(e);
         }
@@ -713,38 +661,6 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformations", func
         intersect: _intersect,
         merge: _merge
     };
-});
-
-"use strict";
-
-angular.module("farmbuild.webmapping").factory("webmappingValidator", function(validations, farmdata, $log) {
-    var webmappingValidator = {
-        geojsonhint: geojsonhint
-    }, _isDefined = validations.isDefined, _isArray = validations.isArray, _isPositiveNumber = validations.isPositiveNumber, _isEmpty = validations.isEmpty;
-    if (!_isDefined(geojsonhint)) {
-        throw Error("geojsonhint must be available!");
-    }
-    function isGeoJsons(geoJsons) {
-        var errors = geojsonhint.hint(typeof geoJsons === "string" ? geoJsons : angular.toJson(geoJsons)), isGeoJson = errors.length === 0;
-        if (!isGeoJson) {
-            $log.error("isGeoJsons errors: ", errors);
-        }
-        return isGeoJson;
-    }
-    webmappingValidator.isGeoJsons = isGeoJsons;
-    function _validate(farmData) {
-        $log.info("validating farmData...", farmData);
-        if (!farmdata.validate(farmData)) {
-            return false;
-        }
-        if (!_isDefined(farmData) || !_isDefined(farmData.geometry) || !_isDefined(farmData.geometry.crs) || !_isDefined(farmData.paddocks)) {
-            $log.error("farmData must have geometry, geometry.crs, paddocks");
-            return false;
-        }
-        return true;
-    }
-    webmappingValidator.validate = _validate;
-    return webmappingValidator;
 });
 
 "use strict";

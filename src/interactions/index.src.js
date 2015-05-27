@@ -13,8 +13,14 @@ angular.module('farmbuild.webmapping')
 		// Remove all interactions of map
 		function _destroy(map) {
 			$log.info('destroying all interactions ...');
-			map.getInteractions().clear();
-			map.addInteraction(new ol.interaction.DragPan({kinetic: null}));
+			if(!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)){
+				return;
+			}
+			map.removeInteraction(_select.interaction);
+			map.removeInteraction(_modify.interaction);
+			map.removeInteraction(_draw.interaction);
+			map.removeInteraction(_snap.interaction);
+
 			_select = undefined;
 			_modify = undefined;
 			_draw = undefined;
@@ -54,19 +60,16 @@ angular.module('farmbuild.webmapping')
 
 		};
 
-		function _addGeoJsonFeature(layer, feature, name) {
+		function _addFeature(layer, feature) {
 			if (!_isDefined(feature)) {
 				return;
 			}
 			$log.info('adding feature ...', feature);
-			layer.getSource().addFeature(new ol.Feature({
-				geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates),
-				name: name
-			}));
+			layer.getSource().addFeature(feature);
 			_clearSelections();
 		};
 
-		function _remove(features, deselect) {
+		function _removeFeatures(features, deselect) {
 			if (!_isDefined(deselect)) {
 				deselect = true;
 			}
@@ -104,10 +107,8 @@ angular.module('farmbuild.webmapping')
 				farmFeatures = farmSource.getFeatures(),
 				name = featureToClip.getProperties().name;
 			clipped = transform.erase(featureToClip, paddocksFeatures);
-			clipped = transform.intersect(new ol.Feature({
-				geometry: new ol.geom[clipped.geometry.type](clipped.geometry.coordinates)
-			}), farmFeatures);
-			_addGeoJsonFeature(_activeLayer, clipped, name);
+			clipped = transform.intersect(clipped, farmFeatures);
+			_addFeature(_activeLayer, clipped, name);
 		};
 
 		function _clipDonut(donutFeature) {
@@ -115,7 +116,7 @@ angular.module('farmbuild.webmapping')
 				paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0],
 				name = donutFeature.getProperties().name;
 			clipped = turf.erase(paddockFeature, donutFeature);
-			_addGeoJsonFeature(_activeLayer, clipped, name);
+			_addFeature(_activeLayer, clipped, name);
 			_activeLayer.getSource().removeFeature(paddockFeature);
 		};
 
@@ -123,17 +124,17 @@ angular.module('farmbuild.webmapping')
 			var farmFeatures = farmSource.getFeatures(),
 				clipped = transform.erase(featureToClip, farmFeatures),
 				name = featureToClip.getProperties().name;
-			_addGeoJsonFeature(_activeLayer, clipped);
-			_remove(farmFeatures, false);
+			_addFeature(_activeLayer, clipped);
+			_removeFeatures(farmFeatures, false);
 			clipped = transform.merge(farmSource.getFeatures());
-			_addGeoJsonFeature(_activeLayer, clipped, name);
+			_addFeature(_activeLayer, clipped, name);
 			_clearSelections();
 		};
 
 		function _merge(features) {
 			$log.info('merging features ...', features);
-			_remove(features, false);
-			_addGeoJsonFeature(_activeLayer, transform.merge(features));
+			_removeFeatures(features, false);
+			_addFeature(_activeLayer, transform.merge(features));
 			_clearSelections();
 		};
 
@@ -221,7 +222,7 @@ angular.module('farmbuild.webmapping')
 			enableDonutDrawing: _enableDonutDrawing,
 			clip: _clip,
 			merge: _merge,
-			remove: _remove,
+			remove: _removeFeatures,
 			selectedFeatures: _selectedFeatures,
 			isDrawing: _isDrawing,
 			isEditing: _isEditing,
