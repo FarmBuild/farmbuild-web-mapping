@@ -49,13 +49,20 @@ angular.module('farmbuild.webmapping')
 				return drawingStatus;
 			}
 
+			function _discard() {
+				drawingStatus = false;
+				_disable();
+				_enable();
+			}
+
 			return {
 				init: _init,
 				enable: _enable,
 				disable: _disable,
 				interaction: drawInteraction,
 				isDrawing: _isDrawing,
-				finish: _finish
+				finish: _finish,
+				discard: _discard
 			}
 		};
 

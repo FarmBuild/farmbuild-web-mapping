@@ -203,8 +203,7 @@ angular.module('farmbuild.webmapping')
 			if (!-_isDefined(_mode)) {
 				return;
 			}
-			_draw.disable();
-			_draw.enable();
+			_draw.discard();
 		};
 
 		function _isEditing() {

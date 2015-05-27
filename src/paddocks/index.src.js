@@ -11,34 +11,18 @@
 
 angular.module('farmbuild.webmapping')
 	.factory('webMappingPaddocks',
-	function ($log, collections) {
+	function ($log) {
 
-		function _add() {
-
-		}
-
-		function _remove() {
-
-		}
-
-		function _edit() {
-
-		}
-
-		function _find() {
-
-		}
-
-		function _validate(){
-
+		function _findByCoordinate(coordinate, vectorLayer) {
+			var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
+			if(paddocks && paddocks.length > 0) {
+				return vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
+			}
+			return undefined;
 		}
 
 		return {
-			add: _add,
-			remove: _remove,
-			edit: _edit,
-			find: _find,
-			validate: _validate
+			findByCoordinate: _findByCoordinate
 		};
 
 	});

@@ -137,13 +137,19 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
         function _isDrawing() {
             return drawingStatus;
         }
+        function _discard() {
+            drawingStatus = false;
+            _disable();
+            _enable();
+        }
         return {
             init: _init,
             enable: _enable,
             disable: _disable,
             interaction: drawInteraction,
             isDrawing: _isDrawing,
-            finish: _finish
+            finish: _finish,
+            discard: _discard
         };
     }
     return {
@@ -316,8 +322,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         if (!-_isDefined(_mode)) {
             return;
         }
-        _draw.disable();
-        _draw.enable();
+        _draw.discard();
     }
     function _isEditing() {
         if (!-_isDefined(_mode)) {
@@ -600,18 +605,16 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log, collections) {
-    function _add() {}
-    function _remove() {}
-    function _edit() {}
-    function _find() {}
-    function _validate() {}
+angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log) {
+    function _findByCoordinate(coordinate, vectorLayer) {
+        var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
+        if (paddocks && paddocks.length > 0) {
+            return vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
+        }
+        return undefined;
+    }
     return {
-        add: _add,
-        remove: _remove,
-        edit: _edit,
-        find: _find,
-        validate: _validate
+        findByCoordinate: _findByCoordinate
     };
 });
 
