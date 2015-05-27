@@ -107,7 +107,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		function mapOnPointerMove(event) {
 			var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
 				featuresAtCoordinate;
-			if (selectedLayer === "paddocks") {
+			if (selectedLayer === "paddocks" || selectedLayer === "paddocksMulti") {
 				selectedLayer = paddocksLayer;
 			}
 			if (selectedLayer === "farm") {
@@ -151,7 +151,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		function selectLayer() {
-			var selectedLayer = this.value;
+			var selectedLayer = this.value, multi = (selectedLayer === 'paddocksMulti');
+
+			if (selectedLayer === "paddocksMulti") {
+				selectedLayer = 'paddocks';
+			}
 
 			if (selectedLayer === 'none' || selectedLayer === '') {
 				actions.destroy(olmap);
@@ -162,7 +166,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 
 			actions.destroy(olmap);
-			actions.init(olmap, farmLayer, paddocksLayer, selectedLayer);
+			actions.init(olmap, farmLayer, paddocksLayer, selectedLayer, multi);
 			olmap.on('pointermove', mapOnPointerMove);
 			olmap.on('dblclick', mapOnDblClick);
 			olmap.on('click', mapOnClick);
@@ -180,11 +184,19 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				event.stopPropagation();
 				return false;
 			}
-
-			if (event.keyCode == 13) {
-				$scope.apply();
+			if (selectedFeatures.getLength() > 1) {
+				mergeSelectedPaddocks();
+			}
+			if (selectedFeatures.getLength() === 1) {
+				clipSelectedPaddock();
 			}
 		}
+
+		function mergeSelectedPaddocks() {
+			$log.info('Merging selected paddocks...');
+			actions.merge(actions.selectedFeatures());
+			$scope.farmChanged = false;
+		};
 
 		function clipSelectedPaddock() {
 			$log.info('Clipping selected paddock...');

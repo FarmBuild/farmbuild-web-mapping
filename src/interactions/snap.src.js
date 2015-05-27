@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-	.factory('snapInteraction',
+	.factory('webMappingSnapInteraction',
 	function (validations,
 	          $log) {
 		var _isDefined = validations.isDefined;
