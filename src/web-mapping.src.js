@@ -29,7 +29,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 
     var _isDefined = validations.isDefined,
       session = webMappingSession,
-			webmapping = {
+			webMapping = {
         session:session,
         farmdata: farmdata,
         validator:webmappingValidator,
@@ -89,26 +89,17 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
         create: farmdata.create
 			};
 
-		function _exportFarmData(toExport) {
-			if (!toExport) {
-				return undefined;
-			}
-			return _toFarmData(toExport);
-		};
-
-		webmapping.exportFarmData = _exportFarmData;
-
 		// Provide a shortcut for modules
-		webmapping.version = '0.1.0';
+		webMapping.version = '0.1.0';
 
 		if (typeof window.farmbuild === 'undefined') {
 			window.farmbuild = {
-				webmapping: webmapping
+				webmapping: webMapping
 			};
 		} else {
-			window.farmbuild.webmapping = webmapping;
+			window.farmbuild.webmapping = webMapping;
 		}
 
-		return webmapping;
+		return webMapping;
 
 	});

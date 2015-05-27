@@ -19,6 +19,7 @@ angular.module('farmbuild.webmapping')
 				drawInteraction.on('drawend', function (e) {
 					$log.info('draw end ...');
 					var feature = e.feature;
+					feature.setProperties({name: 'parham'});
 					clipFn(feature, paddocksSource, farmSource);
 					setTimeout(function () {
 						paddocksSource.removeFeature(feature);
@@ -40,6 +41,10 @@ angular.module('farmbuild.webmapping')
 				drawInteraction.setActive(false);
 			}
 
+			function _finish(){
+				drawInteraction.finishDrawing();
+			}
+
 			function _isDrawing() {
 				return drawingStatus;
 			}
@@ -49,7 +54,8 @@ angular.module('farmbuild.webmapping')
 				enable: _enable,
 				disable: _disable,
 				interaction: drawInteraction,
-				isDrawing: _isDrawing
+				isDrawing: _isDrawing,
+				finish: _finish
 			}
 		};
 

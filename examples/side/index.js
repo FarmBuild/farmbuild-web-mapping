@@ -178,18 +178,33 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			if (!selectedFeatures) {
 				return;
 			}
+
 			if (event.keyCode == 46 || event.keyCode == 8) {
 				$scope.removeSelectedPaddock();
 				event.preventDefault();
 				event.stopPropagation();
 				return false;
 			}
-			if (selectedFeatures.getLength() > 1) {
-				mergeSelectedPaddocks();
+
+			if (event.keyCode == 13) {
+				if (selectedFeatures.getLength() > 1) {
+					mergeSelectedPaddocks();
+				}
+				if (selectedFeatures.getLength() === 1) {
+					clipSelectedPaddock();
+				}
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
 			}
-			if (selectedFeatures.getLength() === 1) {
-				clipSelectedPaddock();
+
+			if (event.keyCode == 27) {
+				actions.discardDrawing();
+				event.preventDefault();
+				event.stopPropagation();
+				return false;
 			}
+
 		}
 
 		function mergeSelectedPaddocks() {
@@ -220,7 +235,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.apply = function () {
 			$log.info('apply changes to farm data ...');
-			clipSelectedPaddock();
+			if(actions.isDrawing()) {
+				actions.finishDrawing();
+			} else {
+				clipSelectedPaddock();
+			}
 			var paddocksGeometry = angular.fromJson(olHelper.exportGeometry(paddocksLayer.getSource()));
 			var farmGeometry = angular.fromJson(olHelper.exportGeometry(farmLayer.getSource()));
 			farmGeometry.features[0].geometry.crs = {

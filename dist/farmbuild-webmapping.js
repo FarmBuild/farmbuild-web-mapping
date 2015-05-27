@@ -2,7 +2,7 @@
 
 angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, webmappingValidator, webmappingConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch) {
     $log.info("Welcome to Web Mapping...");
-    var _isDefined = validations.isDefined, session = webMappingSession, webmapping = {
+    var _isDefined = validations.isDefined, session = webMappingSession, webMapping = {
         session: session,
         farmdata: farmdata,
         validator: webmappingValidator,
@@ -20,22 +20,15 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         "export": session.export,
         create: farmdata.create
     };
-    function _exportFarmData(toExport) {
-        if (!toExport) {
-            return undefined;
-        }
-        return _toFarmData(toExport);
-    }
-    webmapping.exportFarmData = _exportFarmData;
-    webmapping.version = "0.1.0";
+    webMapping.version = "0.1.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
-            webmapping: webmapping
+            webmapping: webMapping
         };
     } else {
-        window.farmbuild.webmapping = webmapping;
+        window.farmbuild.webmapping = webMapping;
     }
-    return webmapping;
+    return webMapping;
 });
 
 "use strict";
@@ -117,6 +110,9 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
             drawInteraction.on("drawend", function(e) {
                 $log.info("draw end ...");
                 var feature = e.feature;
+                feature.setProperties({
+                    name: "parham"
+                });
                 clipFn(feature, paddocksSource, farmSource);
                 setTimeout(function() {
                     paddocksSource.removeFeature(feature);
@@ -135,6 +131,9 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
         function _disable() {
             drawInteraction.setActive(false);
         }
+        function _finish() {
+            drawInteraction.finishDrawing();
+        }
         function _isDrawing() {
             return drawingStatus;
         }
@@ -143,7 +142,8 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
             enable: _enable,
             disable: _disable,
             interaction: drawInteraction,
-            isDrawing: _isDrawing
+            isDrawing: _isDrawing,
+            finish: _finish
         };
     }
     return {
@@ -192,13 +192,14 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _draw.init(_clip, _select);
         _snap.init();
     }
-    function _addGeoJsonFeature(layer, feature) {
+    function _addGeoJsonFeature(layer, feature, name) {
         if (!_isDefined(feature)) {
             return;
         }
         $log.info("adding feature ...", feature);
         layer.getSource().addFeature(new ol.Feature({
-            geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates)
+            geometry: new ol.geom[feature.geometry.type](feature.geometry.coordinates),
+            name: name
         }));
         _clearSelections();
     }
@@ -229,25 +230,25 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
     }
     function _clipPaddocks(featureToClip, paddockSource, farmSource) {
-        var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures();
+        var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name;
         clipped = transform.erase(featureToClip, paddocksFeatures);
         clipped = transform.intersect(new ol.Feature({
             geometry: new ol.geom[clipped.geometry.type](clipped.geometry.coordinates)
         }), farmFeatures);
-        _addGeoJsonFeature(_activeLayer, clipped);
+        _addGeoJsonFeature(_activeLayer, clipped, name);
     }
     function _clipDonut(donutFeature) {
-        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0];
+        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0], name = donutFeature.getProperties().name;
         clipped = turf.erase(paddockFeature, donutFeature);
-        _addGeoJsonFeature(_activeLayer, clipped);
+        _addGeoJsonFeature(_activeLayer, clipped, name);
         _activeLayer.getSource().removeFeature(paddockFeature);
     }
     function _clipFarm(featureToClip, farmSource) {
-        var farmFeatures = farmSource.getFeatures(), clipped = transform.erase(featureToClip, farmFeatures);
+        var farmFeatures = farmSource.getFeatures(), clipped = transform.erase(featureToClip, farmFeatures), name = featureToClip.getProperties().name;
         _addGeoJsonFeature(_activeLayer, clipped);
         _remove(farmFeatures, false);
         clipped = transform.merge(farmSource.getFeatures());
-        _addGeoJsonFeature(_activeLayer, clipped);
+        _addGeoJsonFeature(_activeLayer, clipped, name);
         _clearSelections();
     }
     function _merge(features) {
@@ -305,6 +306,19 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
         return _draw.isDrawing();
     }
+    function _finishDrawing() {
+        if (!-_isDefined(_mode)) {
+            return;
+        }
+        _draw.finish();
+    }
+    function _discardDrawing() {
+        if (!-_isDefined(_mode)) {
+            return;
+        }
+        _draw.disable();
+        _draw.enable();
+    }
     function _isEditing() {
         if (!-_isDefined(_mode)) {
             return;
@@ -322,7 +336,9 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         remove: _remove,
         selectedFeatures: _selectedFeatures,
         isDrawing: _isDrawing,
-        isEditing: _isEditing
+        isEditing: _isEditing,
+        finishDrawing: _finishDrawing,
+        discardDrawing: _discardDrawing
     };
 });
 
