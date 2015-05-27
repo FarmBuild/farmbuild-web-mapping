@@ -13,10 +13,10 @@
  * @module webmapping
  */
 angular.module('farmbuild.webmapping')
-    .factory('googleaddresssearch',
+    .factory('webMappingGoogleAddressSearch',
     function (validations,
               $log,
-              openLayers) {
+              webMappingOpenLayersHelper) {
         var countryRestrict = {'country': 'au'};
 
         function _init(targetElementId, openLayersProjection, olmap) {
@@ -55,7 +55,7 @@ angular.module('farmbuild.webmapping')
         function _center(latLng, openLayersProjection, olmap) {
             var googleMapProjection = 'EPSG:3857',
                 centerPoint = _transform(latLng, openLayersProjection, googleMapProjection);
-            openLayers.center(centerPoint, olmap);
+            webMappingOpenLayersHelper.center(centerPoint, olmap);
         };
 
         return {

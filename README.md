@@ -16,4 +16,4 @@ For more information about API and Testing see the [Wiki](https://github.com/Far
 * <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/examples/index.html" target="_blank">Load or create FarmData - angularJS example</a>
 
 ## Supported projections
-<a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/src/projection/README.md">Read me</a>
+<a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/src/projections/README.md">Read me</a>

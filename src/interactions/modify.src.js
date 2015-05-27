@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-	.factory('modifyInteraction',
+	.factory('webMappingModifyInteraction',
 	function (validations,
 	          $log) {
 		var _isDefined = validations.isDefined;
