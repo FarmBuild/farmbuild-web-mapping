@@ -173,6 +173,9 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
     }
     function _clipPaddocks(featureToClip, paddockSource, farmSource) {
+        if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] === Infinity) {
+            return;
+        }
         var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name || "Paddock " + new Date().getTime();
         clipped = transform.erase(featureToClip, paddocksFeatures);
         clipped = transform.intersect(clipped, farmFeatures);

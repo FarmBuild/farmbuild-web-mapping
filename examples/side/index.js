@@ -238,11 +238,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjectionCode, featureProjectionCode);
 			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjectionCode, featureProjectionCode);
-			farmGeometry.features[0].geometry.crs = {
-				properties: {
-					name: "EPSG:4283"
-				}
-			};
+
 			$scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;

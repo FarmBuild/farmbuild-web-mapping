@@ -103,6 +103,9 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _clipPaddocks(featureToClip, paddockSource, farmSource) {
+			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] === Infinity) {
+				return;
+			}
 			var clipped,
 				paddocksFeatures = paddockSource.getFeatures(),
 				farmFeatures = farmSource.getFeatures(),
