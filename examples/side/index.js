@@ -306,6 +306,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.disableDonutDrawing = function(){
 			olmap.on('pointermove', mapOnPointerMove);
 			$scope.donutDrawing = false;
+			onPaddockChanged();
 		};
 
 	});
