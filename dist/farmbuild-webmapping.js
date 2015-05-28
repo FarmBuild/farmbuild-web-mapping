@@ -187,7 +187,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     function _clipFarm(featureToClip, farmSource) {
         var farmFeatures = farmSource.getFeatures(), clipped = transform.erase(featureToClip, farmFeatures), name = featureToClip.getProperties().name;
         _addFeature(_activeLayer, clipped);
-        _removeFeatures(farmFeatures, false);
         clipped = transform.merge(farmSource.getFeatures());
         _addFeature(_activeLayer, clipped, name);
         _clearSelections();

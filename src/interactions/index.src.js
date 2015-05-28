@@ -125,7 +125,6 @@ angular.module('farmbuild.webmapping')
 				clipped = transform.erase(featureToClip, farmFeatures),
 				name = featureToClip.getProperties().name;
 			_addFeature(_activeLayer, clipped);
-			_removeFeatures(farmFeatures, false);
 			clipped = transform.merge(farmSource.getFeatures());
 			_addFeature(_activeLayer, clipped, name);
 			_clearSelections();
