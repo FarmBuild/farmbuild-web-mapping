@@ -185,10 +185,11 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _activeLayer.getSource().removeFeature(paddockFeature);
     }
     function _clipFarm(featureToClip, farmSource) {
-        var farmFeatures = farmSource.getFeatures(), clipped = transform.erase(featureToClip, farmFeatures), name = featureToClip.getProperties().name;
+        var clipped = transform.erase(featureToClip, farmSource.getFeatures()), name = featureToClip.getProperties().name, merged;
         _addFeature(_activeLayer, clipped);
-        clipped = transform.merge(farmSource.getFeatures());
-        _addFeature(_activeLayer, clipped, name);
+        merged = transform.merge(farmSource.getFeatures());
+        _removeFeatures(farmSource.getFeatures(), false);
+        _addFeature(_activeLayer, merged, name);
         _clearSelections();
     }
     function _merge(features) {
