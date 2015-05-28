@@ -9,7 +9,7 @@
     </form-item> <form-item class="form-group">
         <label for="selectedPaddockName">Paddock's Area in hectares:</label>
         <p type="text" id="selectedPaddockArea" class="form-control"
-               ng-bind="farmData.selectedPaddockArea"
+               ng-bind="farmData.selectedPaddockArea | number : 2"
                 ></p>
     </form-item>
     <button class="btn btn-primary" ng-click="enableDonutDrawing()" ng-show="farmData.name && !donutDrawing">
