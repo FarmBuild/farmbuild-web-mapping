@@ -15,7 +15,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         find: session.find,
         save: function(geoJsons) {
             var farmData = session.find();
-            return session.save(farmdataConverter.toFarmData(farmData, geoJsons));
+            return session.save(farmdataConverter.toFarmData(farmData, geoJsons), geoJsons);
         },
         "export": session.export,
         create: farmdata.create
@@ -400,16 +400,26 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
 
 angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function(validations, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
-    function _featuresToGeoJson(olFeatures) {
+    function _featuresToGeoJson(olFeatures, dataProjection, featureProjection) {
         if (olFeatures.getArray) {
-            return angular.fromJson(_geoJSONFormat.writeFeatures(olFeatures.getArray()));
+            return _geoJSONFormat.writeFeaturesObject(olFeatures.getArray(), {
+                dataProjection: dataProjection,
+                featureProjection: featureProjection
+            });
         }
-        return angular.fromJson(_geoJSONFormat.writeFeatures(olFeatures));
+        return _geoJSONFormat.writeFeatureObject(olFeatures, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
     }
-    function _area(olFeatures) {
+    function _olArea(olFeatures, dataProjection, featureProjection) {
         $log.info("calculating area of features ...", olFeatures);
-        var geoJsonFeatures = _featuresToGeoJson(olFeatures);
+        var geoJsonFeatures = _featuresToGeoJson(olFeatures, dataProjection, featureProjection);
         return turf.area(geoJsonFeatures) * 1e-4;
+    }
+    function _area(features) {
+        $log.info("calculating area of features ...", features);
+        return turf.area(features) * 1e-4;
     }
     return {
         area: _area
@@ -600,7 +610,7 @@ angular.module("farmbuild.webmapping").factory("webMappingProjections", function
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingSession", function($log, farmdata, validations) {
+angular.module("farmbuild.webmapping").factory("webMappingSession", function($log, farmdata, validations, webMappingMeasurement) {
     var webMappingSession = {}, _isDefined = validations.isDefined;
     function load(farmData) {
         var loaded = farmdata.load(farmData);
@@ -610,11 +620,12 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         return farmData;
     }
     webMappingSession.load = load;
-    function save(farmData) {
+    function save(farmData, geoJsons) {
         if (!_isDefined(farmData)) {
             $log.error("Unable to save the undefined farmData!");
             return undefined;
         }
+        farmData.area = webMappingMeasurement.area(geoJsons.farm);
         return farmdata.update(farmData);
     }
     webMappingSession.save = save;

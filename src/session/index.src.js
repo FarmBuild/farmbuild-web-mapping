@@ -10,7 +10,7 @@
 
 angular.module('farmbuild.webmapping')
   .factory('webMappingSession',
-  function ($log, farmdata, validations) {
+  function ($log, farmdata, validations, webMappingMeasurement) {
 
     var webMappingSession = {},
       _isDefined = validations.isDefined;
@@ -27,11 +27,12 @@ angular.module('farmbuild.webmapping')
     };
     webMappingSession.load = load;
 
-    function save(farmData) {
+    function save(farmData, geoJsons) {
       if(!_isDefined(farmData)) {
         $log.error('Unable to save the undefined farmData!');
         return undefined;
       }
+      farmData.area = webMappingMeasurement.area(geoJsons.farm);
       return farmdata.update(farmData);
     }
 
