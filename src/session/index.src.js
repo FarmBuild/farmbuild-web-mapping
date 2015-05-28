@@ -33,6 +33,7 @@ angular.module('farmbuild.webmapping')
         return undefined;
       }
       farmData.area = webMappingMeasurement.area(geoJsons.farm);
+      farmData.name = geoJsons.farm.features[0].properties.name;
       return farmdata.update(farmData);
     }
 
@@ -46,8 +47,8 @@ angular.module('farmbuild.webmapping')
       return farmdata.session.find();
     }
 
-    webMappingSession.export = function(document, farmData) {
-      return farmdata.session.export(document, save(farmData));
+    webMappingSession.export = function(document, farmData, geoJsons) {
+      return farmdata.session.export(document, save(farmData, geoJsons));
     }
 
     return webMappingSession;

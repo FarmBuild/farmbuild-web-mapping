@@ -223,7 +223,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.loadFarmData();
 
 		$scope.exportFarmData = function (farmData) {
-			webmapping.export(document, farmData);
+			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjectionCode, featureProjectionCode);
+			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjectionCode, featureProjectionCode);
+
+			webmapping.export(document, farmData, {paddocks: paddocksGeometry, farm: farmGeometry});
 		};
 
 		$scope.clear = function () {
@@ -284,14 +287,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.onFarmNameChanged = function () {
-			olmap.getLayers().item(1).getSource().setProperties({
+			olmap.getLayers().item(1).getSource().getFeatures()[0].setProperties({
 				name: $scope.farmData.name
 			});
 			onFarmChanged();
 		};
 
 		$scope.onPaddockNameChanged = function () {
-			olmap.getLayers().item(1).getSource().setProperties({
+			olmap.getLayers().item(0).getSource().getFeatures()[0].setProperties({
 				name: $scope.farmData.selectedPaddockName
 			});
 			onPaddockChanged();
