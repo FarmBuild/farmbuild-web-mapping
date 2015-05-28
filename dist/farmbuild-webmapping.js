@@ -15,7 +15,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         find: session.find,
         save: function(geoJsons) {
             var farmData = session.find();
-            return session.save(farmData, geoJsons);
+            return session.save(farmdataConverter.toFarmData(farmData, geoJsons));
         },
         "export": session.export,
         create: farmdata.create
@@ -607,7 +607,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         return farmData;
     }
     webMappingSession.load = load;
-    function save(farmData, geoJsons) {
+    function save(farmData) {
         if (!_isDefined(farmData)) {
             $log.error("Unable to save the undefined farmData!");
             return undefined;
