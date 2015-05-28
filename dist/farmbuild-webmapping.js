@@ -15,7 +15,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         find: session.find,
         save: function(geoJsons) {
             var farmData = session.find();
-            return session.save(farmdataConverter.toFarmData(farmData, geoJsons));
+            return session.save(farmData, geoJsons);
         },
         "export": session.export,
         create: farmdata.create
@@ -47,9 +47,6 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
             drawInteraction.on("drawend", function(e) {
                 $log.info("draw end ...");
                 var feature = e.feature;
-                feature.setProperties({
-                    name: "new " + new Date().getTime()
-                });
                 clipFn(feature, paddocksSource, farmSource);
                 setTimeout(function() {
                     paddocksSource.removeFeature(feature);
@@ -138,11 +135,14 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _draw.init(_clip, _select);
         _snap.init();
     }
-    function _addFeature(layer, feature) {
-        if (!_isDefined(feature)) {
+    function _addFeature(layer, feature, name) {
+        if (!_isDefined(feature) || !_isDefined(name)) {
             return;
         }
         $log.info("adding feature ...", feature);
+        feature.setProperties({
+            name: name
+        });
         layer.getSource().addFeature(feature);
         _clearSelections();
     }
@@ -173,23 +173,29 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
     }
     function _clipPaddocks(featureToClip, paddockSource, farmSource) {
-        var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name;
+        var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name || "Paddock " + new Date().getTime();
         clipped = transform.erase(featureToClip, paddocksFeatures);
         clipped = transform.intersect(clipped, farmFeatures);
         _addFeature(_activeLayer, clipped, name);
     }
     function _clipDonut(donutFeature) {
-        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], name = donutFeature.getProperties().name;
+        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], name = donutFeature.getProperties().name || "Paddock " + new Date().getTime();
         clipped = transform.erase(paddockFeature, donutFeature);
         _addFeature(_activeLayer, clipped, name);
         _activeLayer.getSource().removeFeature(paddockFeature);
     }
     function _clipFarm(featureToClip, farmSource) {
-        var clipped = transform.erase(featureToClip, farmSource.getFeatures()), name = featureToClip.getProperties().name, merged;
-        _addFeature(_activeLayer, clipped);
-        merged = transform.merge(farmSource.getFeatures());
+        var clipped = featureToClip, name;
+        if (farmSource.getFeatures()[0]) {
+            name = farmSource.getFeatures()[0].getProperties().name;
+        }
+        if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
+            clipped = transform.erase(featureToClip, farmSource.getFeatures());
+            _addFeature(_activeLayer, clipped, name);
+            clipped = transform.merge(farmSource.getFeatures());
+        }
         _removeFeatures(farmSource.getFeatures(), false);
-        _addFeature(_activeLayer, merged, name);
+        _addFeature(_activeLayer, clipped, name);
         _clearSelections();
     }
     function _merge(features) {
@@ -424,10 +430,18 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         }
         var format = new ol.format["GeoJSON"]();
         try {
-            return format.writeFeaturesObject(source.getFeatures(), {
+            var result = format.writeFeaturesObject(source.getFeatures(), {
                 dataProjection: dataProjection,
                 featureProjection: featureProjection
             });
+            angular.forEach(result.features, function(feature) {
+                feature.geometry.crs = {
+                    properties: {
+                        name: "EPSG:4283"
+                    }
+                };
+            });
+            return result;
         } catch (e) {
             $log.error(e);
         }
@@ -593,7 +607,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         return farmData;
     }
     webMappingSession.load = load;
-    function save(farmData) {
+    function save(farmData, geoJsons) {
         if (!_isDefined(farmData)) {
             $log.error("Unable to save the undefined farmData!");
             return undefined;
@@ -631,6 +645,11 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformations", func
         }
         $log.info("Converting geoJson to openlayer feature ...", feature);
         properties.geometry = new ol.geom[feature.geometry.type](feature.geometry.coordinates);
+        properties.geometry.crs = {
+            properties: {
+                name: "EPSG:4283"
+            }
+        };
         return new ol.Feature(properties);
     }
     function _erase(olFeature, olFeatures) {

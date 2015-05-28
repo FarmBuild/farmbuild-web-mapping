@@ -13,7 +13,7 @@ angular.module('farmbuild.webmapping')
 		// Remove all interactions of map
 		function _destroy(map) {
 			$log.info('destroying all interactions ...');
-			if(!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)){
+			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
 				return;
 			}
 			map.removeInteraction(_select.interaction);
@@ -60,11 +60,12 @@ angular.module('farmbuild.webmapping')
 
 		};
 
-		function _addFeature(layer, feature) {
-			if (!_isDefined(feature)) {
+		function _addFeature(layer, feature, name) {
+			if (!_isDefined(feature) || !_isDefined(name)) {
 				return;
 			}
 			$log.info('adding feature ...', feature);
+			feature.setProperties({name: name});
 			layer.getSource().addFeature(feature);
 			_clearSelections();
 		};
@@ -105,7 +106,7 @@ angular.module('farmbuild.webmapping')
 			var clipped,
 				paddocksFeatures = paddockSource.getFeatures(),
 				farmFeatures = farmSource.getFeatures(),
-				name = featureToClip.getProperties().name;
+				name = featureToClip.getProperties().name || 'Paddock ' +(new Date()).getTime();
 			clipped = transform.erase(featureToClip, paddocksFeatures);
 			clipped = transform.intersect(clipped, farmFeatures);
 			_addFeature(_activeLayer, clipped, name);
@@ -114,19 +115,25 @@ angular.module('farmbuild.webmapping')
 		function _clipDonut(donutFeature) {
 			var clipped,
 				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
-				name = donutFeature.getProperties().name;
+				name = donutFeature.getProperties().name  || 'Paddock ' +(new Date()).getTime();
 			clipped = transform.erase(paddockFeature, donutFeature);
 			_addFeature(_activeLayer, clipped, name);
 			_activeLayer.getSource().removeFeature(paddockFeature);
 		};
 
 		function _clipFarm(featureToClip, farmSource) {
-			var clipped = transform.erase(featureToClip, farmSource.getFeatures()),
-				name = featureToClip.getProperties().name, merged;
-			_addFeature(_activeLayer, clipped);
-			merged = transform.merge(farmSource.getFeatures());
+			var clipped = featureToClip,
+				name;
+			if(farmSource.getFeatures()[0]) {
+				name = farmSource.getFeatures()[0].getProperties().name;
+			}
+			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
+				clipped = transform.erase(featureToClip, farmSource.getFeatures());
+				_addFeature(_activeLayer, clipped, name);
+				clipped = transform.merge(farmSource.getFeatures());
+			}
 			_removeFeatures(farmSource.getFeatures(), false);
-			_addFeature(_activeLayer, merged, name);
+			_addFeature(_activeLayer, clipped, name);
 			_clearSelections();
 		};
 

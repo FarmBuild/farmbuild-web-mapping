@@ -24,6 +24,11 @@ angular.module('farmbuild.webmapping')
 			}
 			$log.info('Converting geoJson to openlayer feature ...', feature);
 			properties.geometry = new ol.geom[feature.geometry.type](feature.geometry.coordinates);
+			properties.geometry.crs = {
+				properties: {
+					name: "EPSG:4283"
+				}
+			}
 			return new ol.Feature(properties);
 		};
 

@@ -27,7 +27,7 @@ angular.module('farmbuild.webmapping')
     };
     webMappingSession.load = load;
 
-    function save(farmData) {
+    function save(farmData, geoJsons) {
       if(!_isDefined(farmData)) {
         $log.error('Unable to save the undefined farmData!');
         return undefined;

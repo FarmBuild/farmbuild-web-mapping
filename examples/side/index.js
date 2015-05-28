@@ -210,7 +210,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		function clipSelectedPaddock() {
 			$log.info('Clipping selected paddock...');
 			var selectedPaddock;
-			if (actions.selectedFeatures() && actions.selectedFeatures().item(0)) {
+			if (actions.selectedFeatures() && actions.selectedFeatures().item(0) && layerSelectionElement.value === 'paddocks') {
 				selectedPaddock = actions.selectedFeatures().item(0);
 				olmap.getLayers().item(0).getSource().removeFeature(selectedPaddock);
 				actions.clip(selectedPaddock, olmap.getLayers().item(0).getSource(), olmap.getLayers().item(1).getSource());

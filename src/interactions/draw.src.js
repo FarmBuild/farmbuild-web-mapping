@@ -19,7 +19,6 @@ angular.module('farmbuild.webmapping')
 				drawInteraction.on('drawend', function (e) {
 					$log.info('draw end ...');
 					var feature = e.feature;
-					feature.setProperties({name: 'new ' +(new Date()).getTime()});
 					clipFn(feature, paddocksSource, farmSource);
 					setTimeout(function () {
 						paddocksSource.removeFeature(feature);

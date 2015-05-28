@@ -20,10 +20,18 @@ angular.module('farmbuild.webmapping')
             }
             var format = new ol.format['GeoJSON']();
             try {
-                return format.writeFeaturesObject(source.getFeatures(), {
+                var result = format.writeFeaturesObject(source.getFeatures(), {
                     dataProjection: dataProjection,
                     featureProjection: featureProjection
                 });
+                angular.forEach(result.features, function(feature){
+                    feature.geometry.crs = {
+                        properties: {
+                            name: "EPSG:4283"
+                        }
+                    }
+                });
+                return result;
             } catch (e) {
                 $log.error(e);
             }
