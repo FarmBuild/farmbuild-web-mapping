@@ -32,10 +32,16 @@ angular.module('farmbuild.webmapping')
 			var feature = _openLayerFeatureToGeoJson(olFeature),
 				properties = olFeature.getProperties();
 			try {
-				olFeatures.forEach(function (layerFeature) {
-					var clipper = _openLayerFeatureToGeoJson(layerFeature);
+				if(olFeatures.forEach){
+					olFeatures.forEach(function (layerFeature) {
+						var clipper = _openLayerFeatureToGeoJson(layerFeature);
+						feature = turf.erase(feature, clipper);
+					});
+				} else {
+					var clipper = _openLayerFeatureToGeoJson(olFeatures);
 					feature = turf.erase(feature, clipper);
-				});
+				}
+
 				return _geoJsonToOpenLayerFeature(feature, properties);
 			} catch (e) {
 				$log.error(e);

@@ -113,9 +113,9 @@ angular.module('farmbuild.webmapping')
 
 		function _clipDonut(donutFeature) {
 			var clipped,
-				paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0],
+				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
 				name = donutFeature.getProperties().name;
-			clipped = turf.erase(paddockFeature, donutFeature);
+			clipped = transform.erase(paddockFeature, donutFeature);
 			_addFeature(_activeLayer, clipped, name);
 			_activeLayer.getSource().removeFeature(paddockFeature);
 		};

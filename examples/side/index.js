@@ -23,7 +23,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.farmChanged = false;
 		$scope.paddockChanged = false;
 		$scope.noResult = $scope.farmLoaded = false;
-		$scope.selectedPaddockName = '';
+		$scope.farmData.selectedPaddockName = '';
+		$scope.donutDrawing = false;
 
 		$scope.loadFarmData = function () {
 			$scope.farmData = webmapping.find();
@@ -139,15 +140,15 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		function mapOnClick(event) {
-			var coordinate = event.coordinate,
+			var coordinate = event.coordinate, selectedLayer = layerSelectionElement.value,
 				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));
-			if (!paddockAtCoordinate) {
-				$scope.selectedPaddockName = '';
+			if ((selectedLayer !== 'paddocks') || !paddockAtCoordinate) {
+				$scope.farmData.selectedPaddockName = '';
 				$scope.$apply();
 				return;
 			}
-			$scope.selectedPaddockName = paddockAtCoordinate.getProperties().name;
-			$log.info('Paddock selected: ' + $scope.selectedPaddockName);
+			$scope.farmData.selectedPaddockName = paddockAtCoordinate.getProperties().name;
+			$log.info('Paddock selected: ' + $scope.farmData.selectedPaddockName);
 			$scope.$apply();
 		}
 
@@ -288,11 +289,23 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			});
 			onFarmChanged();
 		};
+
 		$scope.onPaddockNameChanged = function(){
 			olmap.getLayers().item(1).getSource().setProperties({
-				name: $scope.selectedPaddockName
+				name: $scope.farmData.selectedPaddockName
 			});
 			onPaddockChanged();
+		};
+
+		$scope.enableDonutDrawing = function(){
+			actions.enableDonutDrawing();
+			olmap.un('pointermove', mapOnPointerMove);
+			$scope.donutDrawing = true;
+		};
+
+		$scope.disableDonutDrawing = function(){
+			olmap.on('pointermove', mapOnPointerMove);
+			$scope.donutDrawing = false;
 		};
 
 	});

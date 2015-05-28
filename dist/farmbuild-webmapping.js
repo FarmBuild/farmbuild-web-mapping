@@ -179,8 +179,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _addFeature(_activeLayer, clipped, name);
     }
     function _clipDonut(donutFeature) {
-        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesAtCoordinate(donutFeature.geometry.coordinates[0][1])[0], name = donutFeature.getProperties().name;
-        clipped = turf.erase(paddockFeature, donutFeature);
+        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], name = donutFeature.getProperties().name;
+        clipped = transform.erase(paddockFeature, donutFeature);
         _addFeature(_activeLayer, clipped, name);
         _activeLayer.getSource().removeFeature(paddockFeature);
     }
@@ -637,10 +637,15 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformations", func
         $log.info("erasing feature", olFeature);
         var feature = _openLayerFeatureToGeoJson(olFeature), properties = olFeature.getProperties();
         try {
-            olFeatures.forEach(function(layerFeature) {
-                var clipper = _openLayerFeatureToGeoJson(layerFeature);
+            if (olFeatures.forEach) {
+                olFeatures.forEach(function(layerFeature) {
+                    var clipper = _openLayerFeatureToGeoJson(layerFeature);
+                    feature = turf.erase(feature, clipper);
+                });
+            } else {
+                var clipper = _openLayerFeatureToGeoJson(olFeatures);
                 feature = turf.erase(feature, clipper);
-            });
+            }
             return _geoJsonToOpenLayerFeature(feature, properties);
         } catch (e) {
             $log.error(e);
