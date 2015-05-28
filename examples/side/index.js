@@ -126,12 +126,16 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		function onPaddockChanged(e) {
 			$scope.paddockChanged = true;
-			$scope.$apply();
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
 		}
 
 		function onFarmChanged(e) {
 			$scope.farmChanged = true;
-			$scope.$apply();
+			if(!$scope.$$phase) {
+				$scope.$apply();
+			}
 		}
 
 		function mapOnClick(event) {
@@ -204,8 +208,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		function clipSelectedPaddock() {
 			$log.info('Clipping selected paddock...');
-			var selectedPaddock = actions.selectedFeatures().item(0);
-			if (selectedPaddock) {
+			var selectedPaddock;
+			if (actions.selectedFeatures() && actions.selectedFeatures().item(0)) {
+				selectedPaddock = actions.selectedFeatures().item(0);
 				olmap.getLayers().item(0).getSource().removeFeature(selectedPaddock);
 				actions.clip(selectedPaddock, olmap.getLayers().item(0).getSource(), olmap.getLayers().item(1).getSource());
 			}
@@ -275,6 +280,19 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
+		};
+
+		$scope.onFarmNameChanged = function(){
+			olmap.getLayers().item(1).getSource().setProperties({
+				name: $scope.farmData.name
+			});
+			onFarmChanged();
+		};
+		$scope.onPaddockNameChanged = function(){
+			olmap.getLayers().item(1).getSource().setProperties({
+				name: $scope.selectedPaddockName
+			});
+			onPaddockChanged();
 		};
 
 	});

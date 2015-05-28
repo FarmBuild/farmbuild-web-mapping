@@ -3,6 +3,7 @@
         <label>Farm name *:</label>
         <input type="text" id="farmName" name="farmName" class="form-control"
                ng-model="farmData.name"
+               ng-change="onFarmNameChanged()"
                required>
     </form-item>
     <form-item class="form-group">

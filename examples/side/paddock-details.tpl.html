@@ -3,6 +3,7 @@
         <label for="selectedPaddockName">Paddock's Name:</label>
         <input type="text" id="selectedPaddockName" class="form-control"
                ng-model="selectedPaddockName"
+               ng-change="onPaddockNameChanged()"
                required
                 />
     </form-item>
