@@ -151,6 +151,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			$scope.farmData.selectedPaddockName = paddockAtCoordinate.getProperties().name;
+			$scope.farmData.selectedPaddockArea = paddockAtCoordinate.getGeometry().getArea() * 0.0001;
 			$log.info('Paddock selected: ' + $scope.farmData.selectedPaddockName);
 			$scope.$apply();
 		}
@@ -251,6 +252,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.removeSelectedPaddock = function () {
+			var selectedLayer = layerSelectionElement.value;
 			$log.info('removing selected paddock(s)...');
 			var selectedPaddocks = actions.selectedFeatures();
 			actions.remove(selectedPaddocks);

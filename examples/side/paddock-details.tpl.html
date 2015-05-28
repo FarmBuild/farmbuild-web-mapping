@@ -6,6 +6,11 @@
                ng-change="onPaddockNameChanged()"
                required
                 />
+    </form-item> <form-item class="form-group">
+        <label for="selectedPaddockName">Paddock's Area in hectares:</label>
+        <p type="text" id="selectedPaddockArea" class="form-control"
+               ng-bind="farmData.selectedPaddockArea"
+                ></p>
     </form-item>
     <button class="btn btn-primary" ng-click="enableDonutDrawing()" ng-show="farmData.name && !donutDrawing">
         Enable donut drawing
