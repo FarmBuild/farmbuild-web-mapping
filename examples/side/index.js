@@ -253,6 +253,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			var selectedPaddocks = actions.selectedFeatures();
 			actions.remove(selectedPaddocks);
 			$scope.paddockChanged = false;
+			$scope.farmData.selectedPaddockName = '';
 			onFarmChanged();
 		};
 
