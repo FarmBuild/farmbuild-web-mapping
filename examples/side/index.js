@@ -46,11 +46,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			$scope.farmLoaded = true;
 
-			//webmapping.ga.track('AgSmart');
 
 			layerSelectionElement.addEventListener('change', selectLayer);
 
 			gmapElement.addEventListener('keydown', keyboardActions);
+
+			webmapping.ga.trackWebMapping('AgSmart');
 
 		};
 

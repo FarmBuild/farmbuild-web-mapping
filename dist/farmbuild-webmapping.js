@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch, webMappingGoogleAnalytics) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webMapping = {
         session: session,
@@ -11,6 +11,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         paddocks: webMappingPaddocks,
         olHelper: webMappingOpenLayersHelper,
         googleAddressSearch: webMappingGoogleAddressSearch,
+        ga: webMappingGoogleAnalytics,
         load: session.load,
         find: session.find,
         save: function(geoJsons) {
@@ -29,6 +30,17 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         window.farmbuild.webmapping = webMapping;
     }
     return webMapping;
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webMappingGoogleAnalytics", function($log, validations, googleAnalytics) {
+    var webMappingGoogleAnalytics = {}, api = "farmbuild-webmapping", _isDefined = validations.isDefined;
+    webMappingGoogleAnalytics.trackWebMapping = function(clientName) {
+        $log.info("googleAnalyticsWebMapping.trackCalculate clientName: %s", clientName);
+        googleAnalytics.track(api, clientName);
+    };
+    return webMappingGoogleAnalytics;
 });
 
 "use strict";
