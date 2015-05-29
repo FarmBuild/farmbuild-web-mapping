@@ -5,7 +5,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 	})
 
 	.controller('MapCtrl',
-	function ($scope, $log, $location, webmapping) {
+	function ($scope, $log, $location, webmapping, webMappingMeasurement, webMappingParcels) {
 
 		var dataProjectionCode = 'EPSG:4283',
 			featureProjectionCode = 'EPSG:3857',
@@ -141,6 +141,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		function mapOnClick(event) {
+			//webMappingMeasurement.measure(olmap, 'area');
+			//webMappingParcels.load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', olmap.getView().calculateExtent(olmap.getSize()),'EPSG:3857', 'EPSG:3857');
 			var coordinate = event.coordinate, selectedLayer = layerSelectionElement.value,
 				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));
 			if ($scope.paddockChanged || $scope.farmChanged) {

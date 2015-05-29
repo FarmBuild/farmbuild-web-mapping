@@ -25,7 +25,8 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	          webMappingPaddocks,
 	          webMappingOpenLayersHelper,
 	          webMappingGoogleAddressSearch,
-	          webMappingGoogleAnalytics) {
+	          webMappingGoogleAnalytics,
+	          webMappingParcels) {
     $log.info('Welcome to Web Mapping...');
 
     var _isDefined = validations.isDefined,
@@ -40,6 +41,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				olHelper: webMappingOpenLayersHelper,
 				googleAddressSearch: webMappingGoogleAddressSearch,
 				ga: webMappingGoogleAnalytics,
+				parcels: webMappingParcels,
 		/**
          * Loads the specified farmData into session
          * @method load

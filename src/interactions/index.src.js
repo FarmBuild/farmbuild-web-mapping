@@ -4,11 +4,11 @@ angular.module('farmbuild.webmapping')
 	.factory('webMappingInteractions',
 	function (validations,
 	          $log,
-	          webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingTransformations) {
+	          webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingTransformation) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
-			transform = webMappingTransformations;
+			transform = webMappingTransformation;
 
 		// Remove all interactions of map
 		function _destroy(map) {

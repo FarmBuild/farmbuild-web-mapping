@@ -1,7 +1,7 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-	.factory('webMappingTransformations',
+	.factory('webMappingTransformation',
 	function (validations,
 	          $log) {
 		var _isDefined = validations.isDefined,
@@ -84,7 +84,8 @@ angular.module('farmbuild.webmapping')
 		return {
 			erase: _erase,
 			intersect: _intersect,
-			merge: _merge
+			merge: _merge,
+			geoJsonToOpenLayerFeature: _geoJsonToOpenLayerFeature
 		}
 
 	});

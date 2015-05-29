@@ -13,17 +13,19 @@ module.exports = function(config){
       'src/web-mapping.src.js',
       'src/session/index.src.js',
       'src/interactions/*.src.js',
-      'src/transformations/*.src.js',
+      'src/transformation/*.src.js',
       'src/measurement/*.src.js',
       'src/paddocks/*.src.js',
       'src/openlayers/*.src.js',
+      'src/ga/*.src.js',
       'src/google/**/*.src.js',
       'src/projections/index.src.js',
       'src/index.src.js',
 //      'src/blank.spec.js',//use this as a basis of creating your module test
-      'src/index-load-save.spec.js',
-      'src/index-load-edit-save.spec.js',
+//      'src/index-load-save.spec.js',
+//      'src/index-load-edit-save.spec.js',
 //      'src/**/*.spec.js',
+      'src/transformation/*.spec.js',
       {pattern: 'examples/data/*.json'}
     ],
 

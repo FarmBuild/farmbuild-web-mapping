@@ -20,7 +20,7 @@ angular.module('farmbuild.webmapping')
             _isDefined = validations.isDefined;
 
         webMappingGoogleAnalytics.trackWebMapping = function(clientName) {
-            $log.info('googleAnalyticsWebMapping.trackCalculate clientName: %s', clientName);
+            $log.info('googleAnalyticsWebMapping.trackWebMapping clientName: %s', clientName);
             googleAnalytics.track(api, clientName)
         }
 
