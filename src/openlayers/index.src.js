@@ -4,7 +4,8 @@ angular.module('farmbuild.webmapping')
     .factory('webMappingOpenLayersHelper',
     function (validations,
               $log) {
-        var _isDefined = validations.isDefined;
+        var _isDefined = validations.isDefined,
+            _geoJSONFormat = new ol.format['GeoJSON']();
 
         function _transform(latLng, sourceProjection, destinationProjection) {
             if(!_isDefined(latLng) || !_isDefined(sourceProjection) || !_isDefined(destinationProjection)){
@@ -160,6 +161,39 @@ angular.module('farmbuild.webmapping')
             map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
         };
 
+
+        function _openLayerFeatureToGeoJson(olFeature) {
+            if (!_isDefined(olFeature)) {
+                return;
+            }
+            $log.info('Converting openlayer feature to geoJson ...', olFeature);
+            return _geoJSONFormat.writeFeatureObject(olFeature);
+        };
+
+        function _openLayerFeaturesToGeoJson(olFeatures) {
+            if (!_isDefined(olFeatures)) {
+                return;
+            }
+            $log.info('Converting openlayer feature to geoJson ...', olFeatures);
+            return _geoJSONFormat.writeFeaturesObject(olFeatures);
+        };
+
+        function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
+            if (!_isDefined(feature)) {
+                return;
+            }
+            $log.info('Converting geoJson feature to openlayer feature ...', feature);
+            return _geoJSONFormat.readFeature(feature, dataProjection, featureProjection);
+        };
+
+        function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
+            if (!_isDefined(features)) {
+                return;
+            }
+            $log.info('Converting geoJson feature to openlayer features ...', features);
+            return _geoJSONFormat.readFeatures(features, dataProjection, featureProjection);
+        };
+
         return {
             exportGeometry: _exportGeometry,
             clear: _clear,
@@ -167,7 +201,11 @@ angular.module('farmbuild.webmapping')
             integrateGMap: _integrateGMap,
             paddocksLayer: _paddocksLayer,
             farmLayer: _farmLayer,
-            reload: _reload
+            reload: _reload,
+            featureToGeoJson: _openLayerFeatureToGeoJson,
+            featuresToGeoJson: _openLayerFeaturesToGeoJson,
+            geoJsonToFeature: _geoJsonToOpenLayerFeature,
+            geoJsonToFeatures: _geoJsonToOpenLayerFeatures
         }
 
     });

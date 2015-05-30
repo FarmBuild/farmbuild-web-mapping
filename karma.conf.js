@@ -4,12 +4,12 @@ module.exports = function(config){
     basePath : '',
 
     files : [
-      'lib/ol/ol.js',
+      'lib/ol/ol-debug.js',
       'bower_components/farmbuild-core/dist/farmbuild-core.js',
+      'bower_components/turf/turf.js',
       'bower_components/angular-mocks/angular-mocks.js',
       'bower_components/farmbuild-farmdata/dist/farmbuild-farmdata.js',
       'bower_components/proj4/dist/proj4.js',
-      'node_modules/geojsonhint/geojsonhint.js',
       'src/web-mapping.src.js',
       'src/session/index.src.js',
       'src/interactions/*.src.js',
@@ -17,6 +17,7 @@ module.exports = function(config){
       'src/measurement/*.src.js',
       'src/paddocks/*.src.js',
       'src/openlayers/*.src.js',
+      'src/parcels/*.src.js',
       'src/ga/*.src.js',
       'src/google/**/*.src.js',
       'src/projections/index.src.js',

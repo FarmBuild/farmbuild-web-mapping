@@ -110,8 +110,8 @@ angular.module('farmbuild.webmapping')
 				paddocksFeatures = paddockSource.getFeatures(),
 				farmFeatures = farmSource.getFeatures(),
 				name = featureToClip.getProperties().name || 'Paddock ' +(new Date()).getTime();
-			clipped = transform.erase(featureToClip, paddocksFeatures);
-			clipped = transform.intersect(clipped, farmFeatures);
+			clipped = transform.eraseAll(featureToClip, paddocksFeatures);
+			clipped = transform.intersect(clipped, farmFeatures[0]);
 			_addFeature(_activeLayer, clipped, name);
 		};
 
@@ -131,7 +131,7 @@ angular.module('farmbuild.webmapping')
 				name = farmSource.getFeatures()[0].getProperties().name;
 			}
 			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
-				clipped = transform.erase(featureToClip, farmSource.getFeatures());
+				clipped = transform.erase(featureToClip, farmSource.getFeatures()[0]);
 				_addFeature(_activeLayer, clipped, name);
 				clipped = transform.merge(farmSource.getFeatures());
 			}
