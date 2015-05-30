@@ -27,6 +27,7 @@ module.exports = function(config){
 //      'src/index-load-edit-save.spec.js',
 //      'src/**/*.spec.js',
       'src/transformation/*.spec.js',
+      'src/projections/*.spec.js',
       {pattern: 'examples/data/*.json'}
     ],
 
