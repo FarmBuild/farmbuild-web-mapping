@@ -791,7 +791,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
             $log.error("Unable to save the undefined farmData!");
             return undefined;
         }
-        farmData.area = webMappingMeasurement.area(geoJsons.farm);
+        farmData.area = webMappingMeasurement.areas(geoJsons.farm);
         farmData.name = geoJsons.farm.features[0].properties.name;
         return farmdata.update(farmData);
     }
