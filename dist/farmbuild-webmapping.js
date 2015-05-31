@@ -318,17 +318,17 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         destroy: _destroy,
         enableDrawing: _enableDrawing,
         enableEditing: _enableEditing,
-        measureLength: _measureLength,
-        measureArea: _measureArea,
         enableDonutDrawing: _enableDonutDrawing,
-        clip: _clip,
-        merge: _merge,
-        remove: _removeFeatures,
-        selectedFeatures: _selectedFeatures,
         isDrawing: _isDrawing,
         isEditing: _isEditing,
         finishDrawing: _finishDrawing,
-        discardDrawing: _discardDrawing
+        discardDrawing: _discardDrawing,
+        measureLength: _measureLength,
+        measureArea: _measureArea,
+        clip: _clip,
+        merge: _merge,
+        remove: _removeFeatures,
+        selectedFeatures: _selectedFeatures
     };
 });
 

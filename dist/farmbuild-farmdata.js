@@ -1367,7 +1367,11 @@ angular.module("farmbuild.farmdata").factory("farmdataConverter", function(farmd
         var farmFeature = geoJsons.farm.features[0], paddocks = geoJsons.paddocks;
         farmData.geometry = resetCrs(farmFeature.geometry);
         paddocks.features.forEach(function(paddockFeature, i) {
+            if (!farmData.paddocks[i]) {
+                farmData.paddocks[i] = {};
+            }
             farmData.paddocks[i].geometry = paddockFeature.geometry;
+            farmData.paddocks[i].name = paddockFeature.properties.name;
             delete farmData.paddocks[i].geometry.crs;
         });
         return farmData;

@@ -5,11 +5,11 @@ angular.module('farmbuild.webmapping')
 	function (validations,
 	          $log,
 	          webMappingSelectInteraction,
-			  webMappingModifyInteraction,
-			  webMappingDrawInteraction,
-			  webMappingSnapInteraction,
-			  webMappingMeasureInteraction,
-			  webMappingTransformation) {
+	          webMappingModifyInteraction,
+	          webMappingDrawInteraction,
+	          webMappingSnapInteraction,
+	          webMappingMeasureInteraction,
+	          webMappingTransformation) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
@@ -114,7 +114,7 @@ angular.module('farmbuild.webmapping')
 			var clipped,
 				paddocksFeatures = paddockSource.getFeatures(),
 				farmFeatures = farmSource.getFeatures(),
-				name = featureToClip.getProperties().name || 'Paddock ' +(new Date()).getTime();
+				name = featureToClip.getProperties().name || 'Paddock ' + (new Date()).getTime();
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
 			_addFeature(_activeLayer, clipped, name);
@@ -123,7 +123,7 @@ angular.module('farmbuild.webmapping')
 		function _clipDonut(donutFeature) {
 			var clipped,
 				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
-				name = donutFeature.getProperties().name  || 'Paddock ' +(new Date()).getTime();
+				name = donutFeature.getProperties().name || 'Paddock ' + (new Date()).getTime();
 			clipped = _transform.erase(paddockFeature, donutFeature);
 			_addFeature(_activeLayer, clipped, name);
 			_activeLayer.getSource().removeFeature(paddockFeature);
@@ -132,7 +132,7 @@ angular.module('farmbuild.webmapping')
 		function _clipFarm(featureToClip, farmSource) {
 			var clipped = featureToClip,
 				name;
-			if(farmSource.getFeatures()[0]) {
+			if (farmSource.getFeatures()[0]) {
 				name = farmSource.getFeatures()[0].getProperties().name;
 			}
 			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
@@ -196,24 +196,24 @@ angular.module('farmbuild.webmapping')
 			_mode = 'donut-draw';
 		};
 
-        function _measure(map, type){
-            if (!_isDefined(map) || !_isDefined(type)) {
-                return;
-            }
-            _select.disable();
-            _modify.disable();
-            _draw.disable();
-            _snap.enable();
-            return webMappingMeasureInteraction.create(map, type);
-        }
+		function _measure(map, type) {
+			if (!_isDefined(map) || !_isDefined(type)) {
+				return;
+			}
+			_select.disable();
+			_modify.disable();
+			_draw.disable();
+			_snap.enable();
+			return webMappingMeasureInteraction.create(map, type);
+		}
 
 		function _measureLength(map) {
 			if (!_isDefined(map) || _mode === 'length') {
 				return;
 			}
 			$log.info('length measurement enabled');
-            _mode = 'length';
-            return _measure(map, 'LineString');
+			_mode = 'length';
+			return _measure(map, 'LineString');
 		};
 
 		function _measureArea(map) {
@@ -221,8 +221,8 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('area measurement enabled');
-            _mode = 'area';
-            return _measure(map, 'Polygon');
+			_mode = 'area';
+			return _measure(map, 'Polygon');
 		};
 
 		function _clearSelections() {
@@ -262,16 +262,16 @@ angular.module('farmbuild.webmapping')
 			destroy: _destroy,
 			enableDrawing: _enableDrawing,
 			enableEditing: _enableEditing,
-            measureLength: _measureLength,
-			measureArea: _measureArea,
 			enableDonutDrawing: _enableDonutDrawing,
-			clip: _clip,
-			merge: _merge,
-			remove: _removeFeatures,
-			selectedFeatures: _selectedFeatures,
 			isDrawing: _isDrawing,
 			isEditing: _isEditing,
 			finishDrawing: _finishDrawing,
-			discardDrawing: _discardDrawing
+			discardDrawing: _discardDrawing,
+			measureLength: _measureLength,
+			measureArea: _measureArea,
+			clip: _clip,
+			merge: _merge,
+			remove: _removeFeatures,
+			selectedFeatures: _selectedFeatures
 		}
 	});
