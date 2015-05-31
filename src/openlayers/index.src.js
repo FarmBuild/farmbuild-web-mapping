@@ -28,7 +28,7 @@ angular.module('farmbuild.webmapping')
                 angular.forEach(result.features, function(feature){
                     feature.geometry.crs = {
                         properties: {
-                            name: "EPSG:4283"
+                            name: dataProjection
                         }
                     }
                 });

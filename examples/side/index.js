@@ -140,7 +140,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         }
 
         function mapOnClick(event) {
-            //webMappingMeasurement.measure(olmap, 'area');
+            //var measure = actions.measureLength(olmap);
+            //console.log(measure.getValue());
             //webMappingParcels.load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', olmap.getView().calculateExtent(olmap.getSize()),'EPSG:3857', 'EPSG:3857');
             var coordinate = event.coordinate, selectedLayer = layerSelectionElement.value,
                 paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));

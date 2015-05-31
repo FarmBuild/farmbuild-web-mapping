@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch, webMappingGoogleAnalytics, webMappingParcels) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingMeasurement, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch, webMappingGoogleAnalytics, webMappingParcels) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webMapping = {
         session: session,
@@ -106,11 +106,11 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingTransformation) {
-    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, transform = webMappingTransformation;
+angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingMeasureInteraction, webMappingTransformation) {
+    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
-        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
+        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw) || !_isDefined(_measure)) {
             return;
         }
         map.removeInteraction(_select.interaction);
@@ -190,13 +190,13 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             return;
         }
         var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name || "Paddock " + new Date().getTime();
-        clipped = transform.eraseAll(featureToClip, paddocksFeatures);
-        clipped = transform.intersect(clipped, farmFeatures[0]);
+        clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
+        clipped = _transform.intersect(clipped, farmFeatures[0]);
         _addFeature(_activeLayer, clipped, name);
     }
     function _clipDonut(donutFeature) {
         var clipped, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], name = donutFeature.getProperties().name || "Paddock " + new Date().getTime();
-        clipped = transform.erase(paddockFeature, donutFeature);
+        clipped = _transform.erase(paddockFeature, donutFeature);
         _addFeature(_activeLayer, clipped, name);
         _activeLayer.getSource().removeFeature(paddockFeature);
     }
@@ -206,9 +206,9 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             name = farmSource.getFeatures()[0].getProperties().name;
         }
         if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
-            clipped = transform.erase(featureToClip, farmSource.getFeatures()[0]);
+            clipped = _transform.erase(featureToClip, farmSource.getFeatures()[0]);
             _addFeature(_activeLayer, clipped, name);
-            clipped = transform.merge(farmSource.getFeatures());
+            clipped = _transform.merge(farmSource.getFeatures());
         }
         _removeFeatures(farmSource.getFeatures(), false);
         _addFeature(_activeLayer, clipped, name);
@@ -217,7 +217,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     function _merge(features) {
         $log.info("merging features ...", features);
         _removeFeatures(features, false);
-        _addFeature(_activeLayer, transform.merge(features));
+        _addFeature(_activeLayer, _transform.merge(features));
         _clearSelections();
     }
     function _selectedFeatures() {
@@ -228,7 +228,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         return _select.interaction.getFeatures();
     }
     function _enableEditing() {
-        if (!-_isDefined(_mode) || _mode === "edit") {
+        if (!_isDefined(_mode) || _mode === "edit") {
             return;
         }
         $log.info("editing enabled");
@@ -239,7 +239,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _mode = "edit";
     }
     function _enableDrawing() {
-        if (!-_isDefined(_mode) || _mode === "draw") {
+        if (!_isDefined(_mode) || _mode === "draw") {
             return;
         }
         $log.info("drawing enabled");
@@ -250,7 +250,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _mode = "draw";
     }
     function _enableDonutDrawing() {
-        if (!-_isDefined(_mode) || _mode === "donut-draw") {
+        if (!_isDefined(_mode) || _mode === "donut-draw") {
             return;
         }
         $log.info("donut drawing enabled");
@@ -260,29 +260,55 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _snap.enable();
         _mode = "donut-draw";
     }
+    function _measure(map, type) {
+        if (!_isDefined(map) || !_isDefined(type)) {
+            return;
+        }
+        _select.disable();
+        _modify.disable();
+        _draw.disable();
+        _snap.enable();
+        return webMappingMeasureInteraction.create(map, type);
+    }
+    function _measureLength(map) {
+        if (!_isDefined(map) || _mode === "length") {
+            return;
+        }
+        $log.info("length measurement enabled");
+        _mode = "length";
+        return _measure(map, "LineString");
+    }
+    function _measureArea(map) {
+        if (!_isDefined(_mode) || _mode === "area") {
+            return;
+        }
+        $log.info("area measurement enabled");
+        _mode = "area";
+        return _measure(map, "Polygon");
+    }
     function _clearSelections() {
         _select.interaction.getFeatures().clear();
     }
     function _isDrawing() {
-        if (!-_isDefined(_mode)) {
+        if (!_isDefined(_mode)) {
             return;
         }
         return _draw.isDrawing();
     }
     function _finishDrawing() {
-        if (!-_isDefined(_mode)) {
+        if (!_isDefined(_mode)) {
             return;
         }
         _draw.finish();
     }
     function _discardDrawing() {
-        if (!-_isDefined(_mode)) {
+        if (!_isDefined(_mode)) {
             return;
         }
         _draw.discard();
     }
     function _isEditing() {
-        if (!-_isDefined(_mode)) {
+        if (!_isDefined(_mode)) {
             return;
         }
         return _select.interaction.getFeatures().getLength() > 0;
@@ -292,6 +318,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         destroy: _destroy,
         enableDrawing: _enableDrawing,
         enableEditing: _enableEditing,
+        measureLength: _measureLength,
+        measureArea: _measureArea,
         enableDonutDrawing: _enableDonutDrawing,
         clip: _clip,
         merge: _merge,
@@ -301,6 +329,67 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         isEditing: _isEditing,
         finishDrawing: _finishDrawing,
         discardDrawing: _discardDrawing
+    };
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webMappingMeasureInteraction", function(validations, webMappingMeasurement, $log) {
+    var _isDefined = validations.isDefined, _measurement = webMappingMeasurement, _value, _type;
+    function _create(map, type) {
+        _type = type;
+        var sketch, source = new ol.source.Vector(), drawInteraction = new ol.interaction.Draw({
+            source: source,
+            type: type,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: "rgba(255, 255, 255, 0.2)"
+                }),
+                stroke: new ol.style.Stroke({
+                    color: "rgba(0, 0, 0, 0.5)",
+                    lineDash: [ 10, 10 ],
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 5,
+                    stroke: new ol.style.Stroke({
+                        color: "rgba(0, 0, 0, 0.7)"
+                    }),
+                    fill: new ol.style.Fill({
+                        color: "rgba(255, 255, 255, 0.2)"
+                    })
+                })
+            })
+        });
+        drawInteraction.on("drawstart", function(evt) {
+            sketch = evt.feature;
+        }, this);
+        drawInteraction.on("drawend", function(evt) {
+            sketch = null;
+        }, this);
+        function onPointerMove(evt) {
+            if (evt.dragging || !sketch) {
+                return;
+            }
+            if (_type === "Polygon") {
+                _value = _measurement.area(sketch);
+            } else {
+                _value = _measurement.length(sketch);
+            }
+        }
+        function _getValue() {
+            return _value;
+        }
+        map.addInteraction(drawInteraction);
+        drawInteraction.setActive(true);
+        map.on("pointermove", onPointerMove);
+        return {
+            getValue: _getValue,
+            interaction: drawInteraction
+        };
+    }
+    return {
+        create: _create
     };
 });
 
@@ -412,170 +501,23 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function(validations, $log) {
-    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
-    function _featuresToGeoJson(olFeatures, dataProjection, featureProjection) {
-        if (olFeatures.getArray) {
-            return _geoJSONFormat.writeFeaturesObject(olFeatures.getArray(), {
-                dataProjection: dataProjection,
-                featureProjection: featureProjection
-            });
-        }
-        return _geoJSONFormat.writeFeatureObject(olFeatures, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
-        });
-    }
-    function _olArea(olFeatures, dataProjection, featureProjection) {
-        $log.info("calculating area of features ...", olFeatures);
-        var geoJsonFeatures = _featuresToGeoJson(olFeatures, dataProjection, featureProjection);
-        return turf.area(geoJsonFeatures) * 1e-4;
-    }
-    function _area(features) {
+    var _isDefined = validations.isDefined;
+    function _areas(features) {
         $log.info("calculating area of features ...", features);
         return turf.area(features) * 1e-4;
     }
-    function _measure(map, type) {
-        var sketch;
-        var helpTooltipElement;
-        var helpTooltip;
-        var measureTooltipElement;
-        var measureTooltip;
-        var continuePolygonMsg = "Click to continue drawing the polygon";
-        var continueLineMsg = "Click to continue drawing the line";
-        var pointerMoveHandler = function(evt) {
-            if (evt.dragging) {
-                return;
-            }
-            var helpMsg = "Click to start drawing";
-            var tooltipCoord = evt.coordinate;
-            var formatLength = function(line) {
-                var length;
-                length = Math.round(line.getLength() * 100) / 100;
-                var output;
-                if (length > 100) {
-                    output = Math.round(length / 1e3 * 100) / 100 + " " + "km";
-                } else {
-                    output = Math.round(length * 100) / 100 + " " + "m";
-                }
-                console.log(output);
-            };
-            var formatArea = function(polygon) {
-                var area;
-                area = polygon.getArea();
-                var output;
-                if (area > 1e4) {
-                    output = Math.round(area / 1e6 * 100) / 100 + " " + "km<sup>2</sup>";
-                } else {
-                    output = Math.round(area * 100) / 100 + " " + "m<sup>2</sup>";
-                }
-                console.log(output);
-            };
-            if (sketch) {
-                var output;
-                var geom = sketch.getGeometry();
-                if (geom instanceof ol.geom.Polygon) {
-                    output = formatArea(geom);
-                    helpMsg = continuePolygonMsg;
-                    tooltipCoord = geom.getInteriorPoint().getCoordinates();
-                } else if (geom instanceof ol.geom.LineString) {
-                    output = formatLength(geom);
-                    helpMsg = continueLineMsg;
-                    tooltipCoord = geom.getLastCoordinate();
-                }
-                measureTooltipElement.innerHTML = output;
-                measureTooltip.setPosition(tooltipCoord);
-            }
-            helpTooltipElement.innerHTML = helpMsg;
-            helpTooltip.setPosition(evt.coordinate);
-        };
-        var source = new ol.source.Vector();
-        var vector = new ol.layer.Vector({
-            source: source,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: "rgba(255, 255, 255, 0.2)"
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "#ffcc33",
-                    width: 2
-                }),
-                image: new ol.style.Circle({
-                    radius: 7,
-                    fill: new ol.style.Fill({
-                        color: "#ffcc33"
-                    })
-                })
-            })
-        });
-        var draw;
-        var type = type == "area" ? "Polygon" : "LineString";
-        draw = new ol.interaction.Draw({
-            source: source,
-            type: type,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: "rgba(255, 255, 255, 0.2)"
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "rgba(0, 0, 0, 0.5)",
-                    lineDash: [ 10, 10 ],
-                    width: 2
-                }),
-                image: new ol.style.Circle({
-                    radius: 5,
-                    stroke: new ol.style.Stroke({
-                        color: "rgba(0, 0, 0, 0.7)"
-                    }),
-                    fill: new ol.style.Fill({
-                        color: "rgba(255, 255, 255, 0.2)"
-                    })
-                })
-            })
-        });
-        map.addInteraction(draw);
-        draw.on("drawstart", function(evt) {
-            sketch = evt.feature;
-        }, this);
-        draw.on("drawend", function(evt) {
-            measureTooltipElement.className = "tooltip tooltip-static";
-            measureTooltip.setOffset([ 0, -7 ]);
-            sketch = null;
-            measureTooltipElement = null;
-            createMeasureTooltip();
-        }, this);
-        map.on("pointermove", pointerMoveHandler);
-        function createHelpTooltip() {
-            if (helpTooltipElement) {
-                helpTooltipElement.parentNode.removeChild(helpTooltipElement);
-            }
-            helpTooltipElement = document.createElement("div");
-            helpTooltipElement.className = "tooltip";
-            helpTooltip = new ol.Overlay({
-                element: helpTooltipElement,
-                offset: [ 15, 0 ],
-                positioning: "center-left"
-            });
-            map.addOverlay(helpTooltip);
-        }
-        function createMeasureTooltip() {
-            if (measureTooltipElement) {
-                measureTooltipElement.parentNode.removeChild(measureTooltipElement);
-            }
-            measureTooltipElement = document.createElement("div");
-            measureTooltipElement.className = "tooltip tooltip-measure";
-            measureTooltip = new ol.Overlay({
-                element: measureTooltipElement,
-                offset: [ 0, -15 ],
-                positioning: "bottom-center"
-            });
-            map.addOverlay(measureTooltip);
-        }
-        createMeasureTooltip();
-        createHelpTooltip();
+    function _area(feature) {
+        $log.info("calculating area of polygon ...", feature);
+        return feature.getGeometry().getArea() * 1e-4;
+    }
+    function _length(feature) {
+        $log.info("calculating length of line ...", feature);
+        return feature.getGeometry().getLength() * 1e-4;
     }
     return {
         area: _area,
-        measure: _measure
+        areas: _areas,
+        length: _length
     };
 });
 
@@ -603,7 +545,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             angular.forEach(result.features, function(feature) {
                 feature.geometry.crs = {
                     properties: {
-                        name: "EPSG:4283"
+                        name: dataProjection
                     }
                 };
             });

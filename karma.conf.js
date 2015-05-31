@@ -22,12 +22,13 @@ module.exports = function(config){
       'src/google/**/*.src.js',
       'src/projections/index.src.js',
       'src/index.src.js',
+      'src/transformation/*.spec.js',
+      'src/projections/*.spec.js',
+      //'src/session/*.spec.js',
 //      'src/blank.spec.js',//use this as a basis of creating your module test
 //      'src/index-load-save.spec.js',
 //      'src/index-load-edit-save.spec.js',
 //      'src/**/*.spec.js',
-      'src/transformation/*.spec.js',
-      'src/projections/*.spec.js',
       {pattern: 'examples/data/*.json'}
     ],
 
