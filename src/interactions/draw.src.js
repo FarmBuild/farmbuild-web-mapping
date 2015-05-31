@@ -3,7 +3,7 @@
 angular.module('farmbuild.webmapping')
 	.factory('webMappingDrawInteraction',
 	function (validations,
-	          $log) {
+	          $log, $rootScope) {
 		var _isDefined = validations.isDefined;
 
 		function _create(map, farmSource, paddocksSource) {
@@ -24,6 +24,7 @@ angular.module('farmbuild.webmapping')
 						paddocksSource.removeFeature(feature);
 					}, 100);
 					drawingStatus = false;
+					$rootScope.$broadcast('mapdrawend');
 				});
 				drawInteraction.on('drawstart', function (event) {
 					$log.info('draw start ...');

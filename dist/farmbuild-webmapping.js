@@ -46,7 +46,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGoogleAnalytics", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", function(validations, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", function(validations, $log, $rootScope) {
     var _isDefined = validations.isDefined;
     function _create(map, farmSource, paddocksSource) {
         var drawInteraction = new ol.interaction.Draw({
@@ -65,6 +65,7 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
                     paddocksSource.removeFeature(feature);
                 }, 100);
                 drawingStatus = false;
+                $rootScope.$broadcast("mapdrawend");
             });
             drawInteraction.on("drawstart", function(event) {
                 $log.info("draw start ...");

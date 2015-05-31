@@ -5,7 +5,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
     })
 
     .controller('MapCtrl',
-    function ($scope, $log, $location, webmapping) {
+    function ($scope, $log, $location, $rootScope, webmapping) {
 
         var dataProjectionCode,
             featureProjectionCode = 'EPSG:3857',
@@ -316,5 +316,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             $scope.donutDrawing = false;
             onPaddockChanged();
         };
+
+        $rootScope.$on('mapdrawend', $scope.apply);
 
     });
