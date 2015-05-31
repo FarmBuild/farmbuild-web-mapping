@@ -1374,6 +1374,9 @@ angular.module("farmbuild.farmdata").factory("farmdataConverter", function(farmd
             farmData.paddocks[i].name = paddockFeature.properties.name;
             delete farmData.paddocks[i].geometry.crs;
         });
+        if (paddocks.features.length === 0) {
+            farmData.paddocks = [];
+        }
         return farmData;
     }
     farmdataConverter.toFarmData = toFarmData;
