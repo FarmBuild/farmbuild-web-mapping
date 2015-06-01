@@ -115,6 +115,7 @@ angular.module('farmbuild.webmapping')
 
 		function _clipPaddocks(featureToClip, paddockSource, farmSource) {
 			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] === Infinity) {
+				$log.error('please draw farm boundaries before adding paddock');
 				return;
 			}
 			var clipped,
@@ -132,6 +133,7 @@ angular.module('farmbuild.webmapping')
 				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
 				clipped = _transform.erase(paddockFeature, donutFeature);
 			if (!_isDefined(paddockFeature)) {
+				$log.error('donut must be inside a paddock');
 				return;
 			}
 			name = paddockFeature.getProperties().name;
