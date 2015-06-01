@@ -316,6 +316,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             onPaddockChanged();
         };
 
-        $rootScope.$on('mapdrawend', $scope.apply);
+        $rootScope.$on('mapdrawend', function(){
+            $scope.farmChanged = true;
+        });
 
     });

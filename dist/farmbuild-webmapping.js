@@ -107,8 +107,8 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingMeasureInteraction, webMappingOpenLayersHelper, webMappingTransformation, farmdata) {
-    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation, _olHelper = webMappingOpenLayersHelper;
+angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingMeasureInteraction, webMappingTransformation) {
+    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
         if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw) || !_isDefined(_measure)) {

@@ -9,14 +9,11 @@ angular.module('farmbuild.webmapping')
 	          webMappingDrawInteraction,
 	          webMappingSnapInteraction,
 	          webMappingMeasureInteraction,
-	          webMappingOpenLayersHelper,
-	          webMappingTransformation,
-	          farmdata) {
+	          webMappingTransformation) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
-			_transform = webMappingTransformation,
-			_olHelper = webMappingOpenLayersHelper;
+			_transform = webMappingTransformation;
 
 		// Remove all interactions of map
 		function _destroy(map) {
