@@ -9,11 +9,14 @@ angular.module('farmbuild.webmapping')
 	          webMappingDrawInteraction,
 	          webMappingSnapInteraction,
 	          webMappingMeasureInteraction,
-	          webMappingTransformation) {
+	          webMappingOpenLayersHelper,
+	          webMappingTransformation,
+	          farmdata) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
-			_transform = webMappingTransformation;
+			_transform = webMappingTransformation,
+			_olHelper = webMappingOpenLayersHelper;
 
 		// Remove all interactions of map
 		function _destroy(map) {
@@ -65,12 +68,15 @@ angular.module('farmbuild.webmapping')
 
 		};
 
-		function _addFeature(layer, feature, name) {
-			if (!_isDefined(feature) || !_isDefined(name)) {
+		function _addFeature(layer, feature, name, id) {
+			if (!_isDefined(feature)) {
 				return;
 			}
+			if (!_isDefined(name)) {
+				name = 'Paddock ' + (new Date()).getTime();
+			}
+			feature.setProperties({name: name, _id: id});
 			$log.info('adding feature ...', feature);
-			feature.setProperties({name: name});
 			layer.getSource().addFeature(feature);
 			_clearSelections();
 		};
@@ -114,19 +120,26 @@ angular.module('farmbuild.webmapping')
 			var clipped,
 				paddocksFeatures = paddockSource.getFeatures(),
 				farmFeatures = farmSource.getFeatures(),
-				name = featureToClip.getProperties().name || 'Paddock ' + (new Date()).getTime();
+				name = featureToClip.getProperties().name,
+				id = featureToClip.getProperties()._id;
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
-			_addFeature(_activeLayer, clipped, name);
+			_addFeature(_activeLayer, clipped, name, id);
 		};
 
 		function _clipDonut(donutFeature) {
-			var clipped,
+			var name, id,
 				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
-				name = donutFeature.getProperties().name || 'Paddock ' + (new Date()).getTime();
-			clipped = _transform.erase(paddockFeature, donutFeature);
-			_addFeature(_activeLayer, clipped, name);
-			_activeLayer.getSource().removeFeature(paddockFeature);
+				clipped = _transform.erase(paddockFeature, donutFeature);
+			if (!_isDefined(paddockFeature)) {
+				return;
+			}
+			name = paddockFeature.getProperties().name;
+			id = paddockFeature.getProperties()._id;
+			if (_isDefined(clipped)) {
+				_addFeature(_activeLayer, clipped, name, id);
+				_activeLayer.getSource().removeFeature(paddockFeature);
+			}
 		};
 
 		function _clipFarm(featureToClip, farmSource) {

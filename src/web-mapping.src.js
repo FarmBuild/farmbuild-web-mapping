@@ -70,7 +70,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
                  */
                 save: function (geoJsons) {
                     var farmData = session.find();
-                    return session.save(farmdataConverter.toFarmData(farmData, geoJsons), geoJsons);
+                    return session.save(farmData, geoJsons);
                 },
                 /**
                  * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json

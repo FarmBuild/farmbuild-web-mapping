@@ -17,7 +17,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         find: session.find,
         save: function(geoJsons) {
             var farmData = session.find();
-            return session.save(farmdataConverter.toFarmData(farmData, geoJsons), geoJsons);
+            return session.save(farmData, geoJsons);
         },
         "export": session.export,
         create: farmdata.create
@@ -107,8 +107,8 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingMeasureInteraction, webMappingTransformation) {
-    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation;
+angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingMeasureInteraction, webMappingOpenLayersHelper, webMappingTransformation, farmdata) {
+    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation, _olHelper = webMappingOpenLayersHelper;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
         if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw) || !_isDefined(_measure)) {
@@ -149,14 +149,18 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _draw.init(_clip, _select);
         _snap.init();
     }
-    function _addFeature(layer, feature, name) {
-        if (!_isDefined(feature) || !_isDefined(name)) {
+    function _addFeature(layer, feature, name, id) {
+        if (!_isDefined(feature)) {
             return;
         }
-        $log.info("adding feature ...", feature);
+        if (!_isDefined(name)) {
+            name = "Paddock " + new Date().getTime();
+        }
         feature.setProperties({
-            name: name
+            name: name,
+            _id: id
         });
+        $log.info("adding feature ...", feature);
         layer.getSource().addFeature(feature);
         _clearSelections();
     }
@@ -190,16 +194,22 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] === Infinity) {
             return;
         }
-        var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name || "Paddock " + new Date().getTime();
+        var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name, id = featureToClip.getProperties()._id;
         clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
         clipped = _transform.intersect(clipped, farmFeatures[0]);
-        _addFeature(_activeLayer, clipped, name);
+        _addFeature(_activeLayer, clipped, name, id);
     }
     function _clipDonut(donutFeature) {
-        var clipped, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], name = donutFeature.getProperties().name || "Paddock " + new Date().getTime();
-        clipped = _transform.erase(paddockFeature, donutFeature);
-        _addFeature(_activeLayer, clipped, name);
-        _activeLayer.getSource().removeFeature(paddockFeature);
+        var name, id, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], clipped = _transform.erase(paddockFeature, donutFeature);
+        if (!_isDefined(paddockFeature)) {
+            return;
+        }
+        name = paddockFeature.getProperties().name;
+        id = paddockFeature.getProperties()._id;
+        if (_isDefined(clipped)) {
+            _addFeature(_activeLayer, clipped, name, id);
+            _activeLayer.getSource().removeFeature(paddockFeature);
+        }
     }
     function _clipFarm(featureToClip, farmSource) {
         var clipped = featureToClip, name;
@@ -794,7 +804,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
         }
         farmData.area = webMappingMeasurement.areas(geoJsons.farm);
         farmData.name = geoJsons.farm.features[0].properties.name;
-        return farmdata.update(farmData);
+        return farmdata.merge(farmData, geoJsons);
     }
     webMappingSession.save = save;
     webMappingSession.clear = farmdata.session.clear;

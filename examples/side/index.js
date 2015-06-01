@@ -145,7 +145,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             //webMappingParcels.load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', olmap.getView().calculateExtent(olmap.getSize()),'EPSG:3857', 'EPSG:3857');
             var coordinate = event.coordinate, selectedLayer = layerSelectionElement.value,
                 paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));
-            if ($scope.paddockChanged || $scope.farmChanged) {
+            if ($scope.paddockChanged) {
                 $scope.cancel();
             }
             if ((selectedLayer !== 'paddocks') || !paddockAtCoordinate) {
@@ -255,7 +255,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         };
 
         $scope.removeSelectedPaddock = function () {
-            var selectedLayer = layerSelectionElement.value;
             $log.info('removing selected paddock(s)...');
             var selectedPaddocks = actions.selectedFeatures();
             actions.remove(selectedPaddocks);
@@ -299,7 +298,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         };
 
         $scope.onPaddockNameChanged = function () {
-            olmap.getLayers().item(0).getSource().getFeatures()[0].setProperties({
+            actions.selectedFeatures().item(0).setProperties({
                 name: $scope.farmData.selectedPaddockName
             });
             onPaddockChanged();

@@ -34,7 +34,7 @@ angular.module('farmbuild.webmapping')
       }
       farmData.area = webMappingMeasurement.areas(geoJsons.farm);
       farmData.name = geoJsons.farm.features[0].properties.name;
-      return farmdata.update(farmData);
+      return farmdata.merge(farmData, geoJsons);
     }
 
     webMappingSession.save = save;
