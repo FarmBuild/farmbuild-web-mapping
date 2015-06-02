@@ -517,7 +517,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
             source: new ol.source.Vector(),
             style: new ol.style.Style({
                 stroke: new ol.style.Stroke({
-                    color: "rgba(204,204,204,0.5)",
+                    color: "rgba(238,238,238,1)",
                     width: 2
                 })
             })
@@ -665,6 +665,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             targetElement.parentNode.removeChild(targetElement);
             view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], dataProjection, googleProjection));
             view.setZoom(defaults.zoomNew);
+            addControls(map);
             return;
         }
         gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);

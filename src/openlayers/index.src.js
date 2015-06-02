@@ -95,6 +95,7 @@ angular.module('farmbuild.webmapping')
 				view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]],
 					dataProjection, googleProjection));
 				view.setZoom(defaults.zoomNew);
+				addControls(map);
 				return;
 			}
 

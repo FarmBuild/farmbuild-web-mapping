@@ -57,6 +57,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			webmapping.ga.trackWebMapping('AgSmart');
 
 			olmap.getView().on('change:resolution', loadParcels);
+			olmap.getView().on('change:center', loadParcels);
 		};
 
 		function loadParcels() {
