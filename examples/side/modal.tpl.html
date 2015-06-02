@@ -1,0 +1,13 @@
+    <div class="modal-dialog absolute" >
+  <div class="modal-content">
+    <div class="modal-header">
+      <h3 class="modal-title">Measurement completed</h3>
+    </div>
+    <div class="modal-body">
+      <h4>Measured value is: {{measuredValue | number : 2}} {{measuredUnit}}</h4>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-primary" ng-click="$parent.measuredValue=0">Ok</button>
+    </div>
+  </div>
+</div>

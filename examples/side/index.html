@@ -12,22 +12,8 @@
 <body>
 
 <div ng-controller="MapCtrl">
-<modal ng-show="measuredValue > 0">
-    <div class="modal-dialog absolute" >
-  <div class="modal-content">
-    <div class="modal-header">
-      <h3 class="modal-title">Measurement completed</h3>
-    </div>
-    <div class="modal-body">
-      <h4>Measured value is: {{measuredValue | number : 2}} {{measuredUnit}}</h4>
-    </div>
-    <div class="modal-footer">
-      <button class="btn btn-primary" ng-click="measuredValue=0">Ok</button>
-    </div>
-  </div>
-</div>
-</modal>
 
+<modal ng-show="measuredValue > 0" ng-include="'modal.tpl.html'"></modal>
     <modal ng-if="noResult"
            ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
     <div class="col-md-3 col-lg-3">
