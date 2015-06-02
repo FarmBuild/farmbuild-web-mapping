@@ -58,11 +58,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap.getView().on('change:resolution', loadParcels);
 		};
 
-		function loadParcels(){
-			if(layerSelectionElement.value !== '' || layerSelectionElement.value !== 'none') {
-				farmbuild.webmapping.parcels.load('https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/ows',
-					olmap.getView().calculateExtent(olmap.getSize()), featureProjectionCode, featureProjectionCode);
+		function loadParcels() {
+			if (layerSelectionElement.value !== '' || layerSelectionElement.value !== 'none') {
+				return;
 			}
+			farmbuild.webmapping.parcels.load('https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/ows',
+				olmap.getView().calculateExtent(olmap.getSize()), featureProjectionCode, featureProjectionCode);
 		}
 
 		function createGoogleMap() {
