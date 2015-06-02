@@ -55,7 +55,15 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			webmapping.ga.trackWebMapping('AgSmart');
 
+			olmap.getView().on('change:resolution', loadParcels);
 		};
+
+		function loadParcels(){
+			if(layerSelectionElement.value !== '' || layerSelectionElement.value !== 'none') {
+				farmbuild.webmapping.parcels.load('https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/ows',
+					olmap.getView().calculateExtent(olmap.getSize()), featureProjectionCode, featureProjectionCode);
+			}
+		}
 
 		function createGoogleMap() {
 			return new google.maps.Map(gmapElement, {
@@ -177,6 +185,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap.on('click', mapOnClick);
 			olmap.getLayers().item(0).getSource().on('changefeature', onPaddockChanged);
 			olmap.getLayers().item(1).getSource().on('changefeature', onFarmChanged);
+			loadParcels();
 		}
 
 		function keyboardActions(event) {

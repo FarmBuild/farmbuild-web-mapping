@@ -117,7 +117,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         map.removeInteraction(_select.interaction);
         map.removeInteraction(_modify.interaction);
         map.removeInteraction(_draw.interaction);
-        map.removeInteraction(_snap.interaction);
+        _snap.destroy(map);
         _select = undefined;
         _modify = undefined;
         _draw = undefined;
@@ -288,6 +288,13 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _snap.enable();
         return webMappingMeasureInteraction.create(map, type);
     }
+    function _snapParcels(parcels) {
+        if (!_isDefined(parcels) || !_isDefined(_snap)) {
+            $log.error("Snap interaction is undefined, select a layer to start!");
+            return;
+        }
+        _snap.addFeatures(parcels);
+    }
     function _measureLength(map) {
         if (!_isDefined(map) || _mode === "length") {
             return;
@@ -346,7 +353,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         clip: _clip,
         merge: _merge,
         remove: _removeFeatures,
-        selectedFeatures: _selectedFeatures
+        selectedFeatures: _selectedFeatures,
+        snapParcels: _snapParcels
     };
 });
 
@@ -491,7 +499,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
     function _create(map, farmSource, paddocksSource) {
         var snapInteraction = new ol.interaction.Snap({
             source: paddocksSource
-        });
+        }), snapVisibleLayer;
         snapInteraction.addFeature(farmSource.getFeatures()[0]);
         function _enable() {
             snapInteraction.setActive(true);
@@ -499,16 +507,38 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
         function _disable() {
             snapInteraction.setActive(false);
         }
+        snapVisibleLayer = new ol.layer.Vector({
+            source: new ol.source.Vector(),
+            style: new ol.style.Style({
+                stroke: new ol.style.Stroke({
+                    color: "rgba(204,204,204,0.5)",
+                    width: 2
+                })
+            })
+        });
+        map.addLayer(snapVisibleLayer);
+        function _addFeatures(parcels) {
+            parcels.forEach(function(parcel) {
+                snapInteraction.addFeature(parcel);
+            });
+            snapVisibleLayer.getSource().addFeatures(parcels);
+        }
         function _init() {
             $log.info("snap interaction init ...");
             map.addInteraction(snapInteraction);
             snapInteraction.setActive(false);
         }
+        function _destroy(map) {
+            map.removeLayer(snapVisibleLayer);
+            map.removeInteraction(snapInteraction);
+        }
         return {
             init: _init,
             enable: _enable,
             disable: _disable,
-            interaction: snapInteraction
+            addFeatures: _addFeatures,
+            interaction: snapInteraction,
+            destroy: _destroy
         };
     }
     return {
@@ -703,14 +733,20 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             return;
         }
         $log.info("Converting geoJson feature to openlayer feature ...", feature);
-        return _geoJSONFormat.readFeature(feature, dataProjection, featureProjection);
+        return _geoJSONFormat.readFeature(feature, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
     }
     function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
         if (!_isDefined(features)) {
             return;
         }
         $log.info("Converting geoJson feature to openlayer features ...", features);
-        return _geoJSONFormat.readFeatures(features, dataProjection, featureProjection);
+        return _geoJSONFormat.readFeatures(features, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
     }
     return {
         exportGeometry: _exportGeometry,
@@ -748,12 +784,10 @@ angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($l
     };
 });
 
-var loadFeatures = function(data) {
-    console.log(data);
-};
+"use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingParcels", function($log, $http, validations) {
-    var _isDefined = validations.isDefined;
+angular.module("farmbuild.webmapping").factory("webMappingParcels", function($log, $http, validations, webMappingInteractions, webMappingOpenLayersHelper) {
+    var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
     function _load(serviceUrl, extent, dataProjection, resultProjection) {
         var config = {
             params: {
@@ -761,9 +795,8 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
                 version: "1.0.0",
                 request: "GetFeature",
                 typeName: "farmbuild:parcels",
-                maxFeatures: 50,
                 outputFormat: "text/javascript",
-                format_options: "callback:loadFeatures",
+                format_options: "callback:JSON_CALLBACK",
                 srsname: resultProjection,
                 bbox: extent.join(",") + "," + dataProjection
             }
@@ -778,6 +811,11 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
             params: config.params
         }).success(function(data, status) {
             $log.info("loaded parcels successfully.", status, data);
+            var olFeatures = olHelper.geoJsonToFeatures({
+                type: "FeatureCollection",
+                features: data.features
+            });
+            webMappingInteractions.snapParcels(olFeatures);
         }).error(function(data, status) {
             $log.error("loading parcels failed!!", status, data);
         });

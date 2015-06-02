@@ -1,6 +1,4 @@
-var loadFeatures = function(data){
-	console.log(data)
-}
+'use strict';
 
 /**
  * @since 0.0.1
@@ -13,20 +11,19 @@ var loadFeatures = function(data){
 
 angular.module('farmbuild.webmapping')
 	.factory('webMappingParcels',
-	function ($log, $http, validations) {
-		var _isDefined = validations.isDefined;
+	function ($log, $http, validations, webMappingInteractions, webMappingOpenLayersHelper) {
+		var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
 
 		function _load(serviceUrl, extent, dataProjection, resultProjection) {
-			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3875', 'EPSG:3875');
+			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3857', 'EPSG:3857');
 			var config = {
 				params: {
 					service: 'WFS',
 					version: '1.0.0',
 					request: 'GetFeature',
 					typeName: 'farmbuild:parcels',
-					maxFeatures: 50,
 					outputFormat: 'text/javascript',
-					format_options: 'callback:loadFeatures',
+					format_options: 'callback:JSON_CALLBACK',
 					srsname: resultProjection,
 					bbox: extent.join(',') + ',' + dataProjection
 				}
@@ -39,6 +36,11 @@ angular.module('farmbuild.webmapping')
 			return $http({method: 'JSONP', url: serviceUrl, params: config.params}).
 				success(function(data, status) {
 					$log.info('loaded parcels successfully.', status, data);
+					var olFeatures = olHelper.geoJsonToFeatures({
+						"type": "FeatureCollection",
+						"features": data.features
+					});
+					webMappingInteractions.snapParcels(olFeatures);
 				})
 				.error(function(data, status) {
 					$log.error('loading parcels failed!!', status, data);

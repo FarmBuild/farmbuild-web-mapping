@@ -25,7 +25,7 @@ angular.module('farmbuild.webmapping')
 			map.removeInteraction(_select.interaction);
 			map.removeInteraction(_modify.interaction);
 			map.removeInteraction(_draw.interaction);
-			map.removeInteraction(_snap.interaction);
+			_snap.destroy(map);
 
 			_select = undefined;
 			_modify = undefined;
@@ -223,7 +223,15 @@ angular.module('farmbuild.webmapping')
 			_draw.disable();
 			_snap.enable();
 			return webMappingMeasureInteraction.create(map, type);
-		}
+		};
+
+		function _snapParcels(parcels) {
+			if (!_isDefined(parcels) || !_isDefined(_snap)) {
+				$log.error('Snap interaction is undefined, select a layer to start!');
+				return;
+			}
+			_snap.addFeatures(parcels);
+		};
 
 		function _measureLength(map) {
 			if (!_isDefined(map) || _mode === 'length') {
@@ -290,6 +298,7 @@ angular.module('farmbuild.webmapping')
 			clip: _clip,
 			merge: _merge,
 			remove: _removeFeatures,
-			selectedFeatures: _selectedFeatures
+			selectedFeatures: _selectedFeatures,
+			snapParcels: _snapParcels
 		}
 	});

@@ -191,7 +191,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('Converting geoJson feature to openlayer feature ...', feature);
-			return _geoJSONFormat.readFeature(feature, dataProjection, featureProjection);
+			return _geoJSONFormat.readFeature(feature, {dataProjection: dataProjection, featureProjection:featureProjection});
 		};
 
 		function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
@@ -199,7 +199,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('Converting geoJson feature to openlayer features ...', features);
-			return _geoJSONFormat.readFeatures(features, dataProjection, featureProjection);
+			return _geoJSONFormat.readFeatures(features, {dataProjection: dataProjection, featureProjection:featureProjection});
 		};
 
 		return {
