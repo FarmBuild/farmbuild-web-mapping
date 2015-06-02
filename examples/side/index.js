@@ -59,7 +59,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		function loadParcels() {
-			if (layerSelectionElement.value !== '' || layerSelectionElement.value !== 'none') {
+			if (layerSelectionElement.value === '' || layerSelectionElement.value === 'none') {
 				return;
 			}
 			farmbuild.webmapping.parcels.load('https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/ows',
