@@ -3,6 +3,7 @@
 angular.module('farmbuild.webmapping')
 	.factory('webMappingOpenLayersHelper',
 	function (validations,
+	          webMappingMeasureInteraction,
 	          $log) {
 		var _isDefined = validations.isDefined,
 			_geoJSONFormat = new ol.format['GeoJSON']();
@@ -52,6 +53,8 @@ angular.module('farmbuild.webmapping')
 				extent: map.getLayers().item(1).getSource().getExtent()
 			}));
 			map.addControl(new ol.control.ScaleLine())
+			map.addControl(new webMappingMeasureInteraction.create(map, 'Polygon'));
+			map.addControl(new webMappingMeasureInteraction.create(map, 'LineString'));
 		}
 
 		function _integrateGMap(gmap, map, dataProjection) {
@@ -168,7 +171,6 @@ angular.module('farmbuild.webmapping')
 			map.addLayer(_paddocksLayer(geoJson.paddocks, dataProjectionCode, featureProjectionCode));
 			map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
 		};
-
 
 		function _openLayerFeatureToGeoJson(olFeature) {
 			if (!_isDefined(olFeature)) {

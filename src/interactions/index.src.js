@@ -8,8 +8,8 @@ angular.module('farmbuild.webmapping')
 	          webMappingModifyInteraction,
 	          webMappingDrawInteraction,
 	          webMappingSnapInteraction,
-	          webMappingMeasureInteraction,
-	          webMappingTransformation) {
+	          webMappingTransformation,
+	          $rootScope) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
@@ -19,7 +19,7 @@ angular.module('farmbuild.webmapping')
 		// Remove all interactions of map
 		function _destroy(map) {
 			$log.info('destroying all interactions ...');
-			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw) || !_isDefined(_measure)) {
+			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
 				return;
 			}
 			map.removeInteraction(_select.interaction);
@@ -214,41 +214,12 @@ angular.module('farmbuild.webmapping')
 			_mode = 'donut-draw';
 		};
 
-		function _measure(map, type) {
-			if (!_isDefined(map) || !_isDefined(type)) {
-				return;
-			}
-			_select.disable();
-			_modify.disable();
-			_draw.disable();
-			_snap.enable();
-			return webMappingMeasureInteraction.create(map, type);
-		};
-
 		function _snapParcels(parcels) {
 			if (!_isDefined(parcels) || !_isDefined(_snap)) {
 				$log.error('Snap interaction is undefined, select a layer to start!');
 				return;
 			}
 			_snap.addFeatures(parcels);
-		};
-
-		function _measureLength(map) {
-			if (!_isDefined(map) || _mode === 'length') {
-				return;
-			}
-			$log.info('length measurement enabled');
-			_mode = 'length';
-			return _measure(map, 'LineString');
-		};
-
-		function _measureArea(map) {
-			if (!_isDefined(_mode) || _mode === 'area') {
-				return;
-			}
-			$log.info('area measurement enabled');
-			_mode = 'area';
-			return _measure(map, 'Polygon');
 		};
 
 		function _clearSelections() {
@@ -283,6 +254,24 @@ angular.module('farmbuild.webmapping')
 			return _select.interaction.getFeatures().getLength() > 0;
 		};
 
+		$rootScope.$on('web-mapping-measure-start', function (event, data) {
+			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_draw)) {
+				return;
+			}
+			_select.disable();
+			_modify.disable();
+			_draw.disable();
+		});
+
+		$rootScope.$on('web-mapping-measure-end', function (event, data) {
+			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_draw)) {
+				return;
+			}
+			_select.enable();
+			_modify.enable();
+			_draw.disable();
+		});
+
 		return {
 			init: _init,
 			destroy: _destroy,
@@ -293,8 +282,6 @@ angular.module('farmbuild.webmapping')
 			isEditing: _isEditing,
 			finishDrawing: _finishDrawing,
 			discardDrawing: _discardDrawing,
-			measureLength: _measureLength,
-			measureArea: _measureArea,
 			clip: _clip,
 			merge: _merge,
 			remove: _removeFeatures,

@@ -107,11 +107,11 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingMeasureInteraction, webMappingTransformation) {
+angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingTransformation, $rootScope) {
     var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation, _farmName;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
-        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw) || !_isDefined(_measure)) {
+        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
             return;
         }
         map.removeInteraction(_select.interaction);
@@ -278,38 +278,12 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _snap.enable();
         _mode = "donut-draw";
     }
-    function _measure(map, type) {
-        if (!_isDefined(map) || !_isDefined(type)) {
-            return;
-        }
-        _select.disable();
-        _modify.disable();
-        _draw.disable();
-        _snap.enable();
-        return webMappingMeasureInteraction.create(map, type);
-    }
     function _snapParcels(parcels) {
         if (!_isDefined(parcels) || !_isDefined(_snap)) {
             $log.error("Snap interaction is undefined, select a layer to start!");
             return;
         }
         _snap.addFeatures(parcels);
-    }
-    function _measureLength(map) {
-        if (!_isDefined(map) || _mode === "length") {
-            return;
-        }
-        $log.info("length measurement enabled");
-        _mode = "length";
-        return _measure(map, "LineString");
-    }
-    function _measureArea(map) {
-        if (!_isDefined(_mode) || _mode === "area") {
-            return;
-        }
-        $log.info("area measurement enabled");
-        _mode = "area";
-        return _measure(map, "Polygon");
     }
     function _clearSelections() {
         _select.interaction.getFeatures().clear();
@@ -338,6 +312,22 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
         return _select.interaction.getFeatures().getLength() > 0;
     }
+    $rootScope.$on("web-mapping-measure-start", function(event, data) {
+        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_draw)) {
+            return;
+        }
+        _select.disable();
+        _modify.disable();
+        _draw.disable();
+    });
+    $rootScope.$on("web-mapping-measure-end", function(event, data) {
+        if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_draw)) {
+            return;
+        }
+        _select.enable();
+        _modify.enable();
+        _draw.disable();
+    });
     return {
         init: _init,
         destroy: _destroy,
@@ -348,8 +338,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         isEditing: _isEditing,
         finishDrawing: _finishDrawing,
         discardDrawing: _discardDrawing,
-        measureLength: _measureLength,
-        measureArea: _measureArea,
         clip: _clip,
         merge: _merge,
         remove: _removeFeatures,
@@ -360,11 +348,10 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingMeasureInteraction", function(validations, webMappingMeasurement, $log) {
-    var _isDefined = validations.isDefined, _measurement = webMappingMeasurement, _value, _type;
+angular.module("farmbuild.webmapping").factory("webMappingMeasureInteraction", function(validations, webMappingMeasurement, $rootScope, $log) {
+    var _isDefined = validations.isDefined, _measurement = webMappingMeasurement;
     function _create(map, type) {
-        _type = type;
-        var sketch, source = new ol.source.Vector(), drawInteraction = new ol.interaction.Draw({
+        var source = new ol.source.Vector(), baseCssClass = "measure ol-unselectable ol-control ", drawInteraction = new ol.interaction.Draw({
             source: source,
             type: type,
             style: new ol.style.Style({
@@ -387,32 +374,49 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasureInteraction", f
                 })
             })
         });
-        drawInteraction.on("drawstart", function(evt) {
-            sketch = evt.feature;
-        }, this);
+        var letter, cssClass, options = {};
+        if (type == "Polygon") {
+            letter = "A";
+            cssClass = "area";
+        } else {
+            letter = "L";
+            cssClass = "length";
+        }
         drawInteraction.on("drawend", function(evt) {
-            sketch = null;
-        }, this);
-        function onPointerMove(evt) {
-            if (evt.dragging || !sketch) {
-                return;
-            }
-            if (_type === "Polygon") {
-                _value = _measurement.area(sketch);
+            if (type == "Polygon") {
+                $rootScope.$broadcast("web-mapping-measure-end", {
+                    value: _measurement.area(evt.feature)
+                });
             } else {
-                _value = _measurement.length(sketch);
+                $rootScope.$broadcast("web-mapping-measure-end", {
+                    value: _measurement.length(evt.feature)
+                });
             }
-        }
-        function _getValue() {
-            return _value;
-        }
+            drawInteraction.setActive(false);
+            document.getElementsByClassName(baseCssClass + cssClass)[0].className = baseCssClass + cssClass;
+        }, this);
         map.addInteraction(drawInteraction);
-        drawInteraction.setActive(true);
-        map.on("pointermove", onPointerMove);
-        return {
-            getValue: _getValue,
-            interaction: drawInteraction
-        };
+        drawInteraction.setActive(false);
+        function _measureControl(type) {
+            var button = document.createElement("button");
+            button.innerHTML = letter;
+            var handleMeasure = function(e) {
+                drawInteraction.setActive(!drawInteraction.getActive());
+                element.className = baseCssClass + cssClass + " active";
+                $rootScope.$broadcast("web-mapping-measure-start");
+            };
+            button.addEventListener("click", handleMeasure, false);
+            button.addEventListener("touchstart", handleMeasure, false);
+            var element = document.createElement("div");
+            element.className = baseCssClass + cssClass;
+            element.appendChild(button);
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        }
+        ol.inherits(_measureControl, ol.control.Control);
+        return new _measureControl(type);
     }
     return {
         create: _create
@@ -571,7 +575,7 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureInteraction, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
     function _transform(latLng, sourceProjection, destinationProjection) {
         if (!_isDefined(latLng) || !_isDefined(sourceProjection) || !_isDefined(destinationProjection)) {
@@ -615,6 +619,8 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             extent: map.getLayers().item(1).getSource().getExtent()
         }));
         map.addControl(new ol.control.ScaleLine());
+        map.addControl(new webMappingMeasureInteraction.create(map, "Polygon"));
+        map.addControl(new webMappingMeasureInteraction.create(map, "LineString"));
     }
     function _integrateGMap(gmap, map, dataProjection) {
         if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {

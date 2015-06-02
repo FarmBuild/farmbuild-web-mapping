@@ -1,94 +1,106 @@
 'use strict';
 
 angular.module('farmbuild.webmapping')
-    .factory('webMappingMeasureInteraction',
-    function (validations,
-              webMappingMeasurement,
-              $log) {
-        var _isDefined = validations.isDefined,
-            _measurement = webMappingMeasurement,
-            _value, _type;
+	.factory('webMappingMeasureInteraction',
+	function (validations,
+	          webMappingMeasurement,
+	          $rootScope,
+	          $log) {
+		var _isDefined = validations.isDefined,
+			_measurement = webMappingMeasurement;
 
-        function _create(map, type) {
-            _type = type;
-            /**
-             * Currently drawn feature.
-             * @type {ol.Feature}
-             */
-            var sketch,
+		function _create(map, type) {
+			var source = new ol.source.Vector(),
+				baseCssClass = 'measure ol-unselectable ol-control ',
 
-                source = new ol.source.Vector(),
+				drawInteraction = new ol.interaction.Draw({
+					source: source,
+					type: /** @type {ol.geom.GeometryType} */ (type),
+					style: new ol.style.Style({
+						fill: new ol.style.Fill({
+							color: 'rgba(255, 255, 255, 0.2)'
+						}),
+						stroke: new ol.style.Stroke({
+							color: 'rgba(0, 0, 0, 0.5)',
+							lineDash: [10, 10],
+							width: 2
+						}),
+						image: new ol.style.Circle({
+							radius: 5,
+							stroke: new ol.style.Stroke({
+								color: 'rgba(0, 0, 0, 0.7)'
+							}),
+							fill: new ol.style.Fill({
+								color: 'rgba(255, 255, 255, 0.2)'
+							})
+						})
+					})
+				});
 
-                drawInteraction = new ol.interaction.Draw({
-                    source: source,
-                    type: /** @type {ol.geom.GeometryType} */ (type),
-                    style: new ol.style.Style({
-                        fill: new ol.style.Fill({
-                            color: 'rgba(255, 255, 255, 0.2)'
-                        }),
-                        stroke: new ol.style.Stroke({
-                            color: 'rgba(0, 0, 0, 0.5)',
-                            lineDash: [10, 10],
-                            width: 2
-                        }),
-                        image: new ol.style.Circle({
-                            radius: 5,
-                            stroke: new ol.style.Stroke({
-                                color: 'rgba(0, 0, 0, 0.7)'
-                            }),
-                            fill: new ol.style.Fill({
-                                color: 'rgba(255, 255, 255, 0.2)'
-                            })
-                        })
-                    })
-                });
+			var letter, cssClass, options = {};
+			if (type == 'Polygon') {
+				letter = "A";
+				cssClass = 'area';
+			} else {
+				letter = "L";
+				cssClass = 'length'
+			}
 
-            drawInteraction.on('drawstart',
-                function (evt) {
-                    // set sketch
-                    sketch = evt.feature;
-                }, this);
+			drawInteraction.on('drawend',
+				function (evt) {
+					// unset sketch
+					if (type == 'Polygon') {
+						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.area(evt.feature)});
+					} else {
+						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.length(evt.feature)});
 
-            drawInteraction.on('drawend',
-                function (evt) {
-                    // unset sketch
-                    sketch = null;
-                }, this);
-
-
-            /**
-             * Handle pointer move.
-             * @param {ol.MapBrowserEvent} evt
-             */
-            function onPointerMove(evt) {
-                if (evt.dragging || !sketch) {
-                    return;
-                }
-                if(_type === 'Polygon') {
-                    _value =  _measurement.area(sketch);
-                } else {
-                    _value =  _measurement.length(sketch);
-                }
-            };
-
-            function _getValue() {
-                return _value;
-            };
+					}
+					drawInteraction.setActive(false);
+					document.getElementsByClassName(baseCssClass + cssClass)[0].className = (baseCssClass + cssClass);
+				}, this);
 
 
-            map.addInteraction(drawInteraction);
-            drawInteraction.setActive(true);
-            map.on('pointermove', onPointerMove);
+			map.addInteraction(drawInteraction);
+			drawInteraction.setActive(false);
 
-            return {
-                getValue: _getValue,
-                interaction: drawInteraction
-            }
+			/**
+			 * @constructor
+			 * @extends {ol.control.Control}
+			 * @param {Object=} opt_options Control options.
+			 */
+			function _measureControl(type) {
 
-        };
+				var button = document.createElement('button');
+				button.innerHTML = letter;
 
-        return {
-            create: _create
-        }
+				var handleMeasure = function (e) {
+					drawInteraction.setActive(!drawInteraction.getActive());
+					element.className = baseCssClass + cssClass + ' active';
+					$rootScope.$broadcast('web-mapping-measure-start')
+				};
 
-    });
+				button.addEventListener('click', handleMeasure, false);
+				button.addEventListener('touchstart', handleMeasure, false);
+
+				var element = document.createElement('div');
+				element.className = baseCssClass + cssClass;
+				element.appendChild(button);
+
+				ol.control.Control.call(this, {
+					element: element,
+					target: options.target
+				});
+			}
+
+			ol.inherits(_measureControl, ol.control.Control);
+
+			return (new _measureControl(type));
+
+		};
+
+
+		return {
+			create: _create
+		}
+
+	});
