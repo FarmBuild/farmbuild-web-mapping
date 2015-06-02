@@ -13,7 +13,8 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
-			_transform = webMappingTransformation;
+			_transform = webMappingTransformation,
+			_farmName;
 
 		// Remove all interactions of map
 		function _destroy(map) {
@@ -47,6 +48,7 @@ angular.module('farmbuild.webmapping')
 
 			} else if (activeLayerName === 'farm') {
 				_activeLayer = farmLayer;
+				_farmName = _activeLayer.getSource().getFeatures()[0].getProperties().name;
 			} else {
 				return;
 			}
@@ -70,7 +72,11 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			if (!_isDefined(name)) {
-				name = 'Paddock ' + (new Date()).getTime();
+				if (_activeLayerName === 'farm') {
+					name = _farmName;
+				} else {
+					name = 'Paddock ' + (new Date()).getTime();
+				}
 			}
 			feature.setProperties({name: name, _id: id});
 			$log.info('adding feature ...', feature);
@@ -147,7 +153,7 @@ angular.module('farmbuild.webmapping')
 			if (farmSource.getFeatures()[0]) {
 				name = farmSource.getFeatures()[0].getProperties().name;
 			}
-			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
+			if (farmSource.getFeatures()[0] && farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
 				clipped = _transform.erase(featureToClip, farmSource.getFeatures()[0]);
 				_addFeature(_activeLayer, clipped, name);
 				clipped = _transform.merge(farmSource.getFeatures());

@@ -25,6 +25,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         $scope.noResult = $scope.farmLoaded = false;
         $scope.farmData.selectedPaddockName = '';
         $scope.donutDrawing = false;
+        $scope.farmSelected = false;
 
         $scope.loadFarmData = function () {
             $scope.farmData = webmapping.find();
@@ -85,21 +86,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
                     dragPan: false,
                     rotate: false,
                     mouseWheelZoom: true
-                }).extend([new ol.interaction.DragPan({kinetic: null})]),
-                controls: ol.control.defaults({
-                    attributionOptions: /** @type {olx.control.AttributionOptions} */ ({
-                        collapsible: false
-                    })
-                }).extend([
-                    new ol.control.ZoomToExtent({
-                        extent: farmLayer.getSource().getExtent()
-                    }),
-                    new ol.control.ScaleLine()
-                ])
+                }).extend([new ol.interaction.DragPan({kinetic: null})])
             })
         }
 
         function mapOnPointerMove(event) {
+            if (event.dragging) {
+                return;
+            }
             var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
                 featureAtCoordinate;
             if (selectedLayer === "paddocks") {
@@ -161,6 +155,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
         function selectLayer() {
             var selectedLayer = this.value;
+            $scope.farmSelected = false;
 
             if (selectedLayer === 'none' || selectedLayer === '') {
                 actions.destroy(olmap);
@@ -168,6 +163,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
                 olmap.un('dblclick', mapOnDblClick);
                 olmap.un('click', mapOnClick);
                 return;
+            }
+
+            if(selectedLayer === 'farm'){
+                $scope.farmSelected = true;
+                $scope.$apply();
             }
 
             actions.destroy(olmap);
@@ -249,6 +249,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjectionCode, featureProjectionCode);
             var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjectionCode, featureProjectionCode);
 
+            if(farmGeometry.features.length === 0){
+                $log.error('Draw farm boundary first!');
+                return;
+            }
+
             $scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
             $scope.farmChanged = false;
             $scope.paddockChanged = false;
@@ -260,6 +265,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             actions.remove(selectedPaddocks);
             $scope.paddockChanged = false;
             $scope.farmData.selectedPaddockName = '';
+            onFarmChanged();
+        };
+
+        $scope.removeFarm= function () {
+            $log.info('removing selected farm...');
+            var farmFeature = olmap.getLayers().item(1).getSource().getFeatures();
+            actions.remove(farmFeature);
+            $scope.farmSelected = false;
             onFarmChanged();
         };
 
@@ -288,6 +301,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
             $scope.farmChanged = false;
             $scope.paddockChanged = false;
+            if(selectedLayer === 'farm'){
+                $scope.farmSelected = true;
+            }
         };
 
         $scope.onFarmNameChanged = function () {

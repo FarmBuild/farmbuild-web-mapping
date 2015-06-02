@@ -18,15 +18,20 @@
                 ng-bind="farmData.dateLastUpdated | date: 'medium'"></span>
     </form-item>
 
-
     <wrapper ng-show="farmChanged">
-        <button class="btn btn-primary" ng-click="apply()" ng-disabled="!farmChanged">
+        <button class="btn btn-primary" ng-click="apply()">
             Apply
         </button>
-        <button class="btn btn-default" ng-click="cancel()" ng-disabled="!farmChanged">
+        <button class="btn btn-default" ng-click="cancel()">
             Cancel
         </button>
     </wrapper>
+    <wrapper ng-show="farmSelected">
+        <button class="btn btn-danger" ng-click="removeFarm()">
+            Remove
+        </button>
+    </wrapper>
+    <hr/>
 
     <wrapper ng-show="!farmChanged && !paddockChanged">
 
