@@ -5,7 +5,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 	})
 
 	.controller('MapCtrl',
-	function ($scope, $log, $location, $rootScope, webmapping) {
+	function ($scope, $log, $location, $rootScope, webmapping, webMappingMeasurement) {
 
 		var dataProjectionCode,
 			featureProjectionCode = 'EPSG:3857',
@@ -18,6 +18,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			actions = webmapping.actions,
 			olHelper = webmapping.olHelper,
 			googleAddressSearch = webmapping.googleAddressSearch;
+			$scope.measuredValue = 0;
 
 		$scope.farmData = {};
 		$scope.farmChanged = false;
@@ -154,7 +155,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			$scope.farmData.selectedPaddockName = paddockAtCoordinate.getProperties().name;
-			$scope.farmData.selectedPaddockArea = paddockAtCoordinate.getGeometry().getArea() * 0.0001;
+			$scope.farmData.selectedPaddockArea = webMappingMeasurement.area(paddockAtCoordinate);
 			$log.info('Paddock selected: ' + $scope.farmData.selectedPaddockName);
 			$scope.$apply();
 		}
@@ -350,7 +351,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		});
 
 		$rootScope.$on('web-mapping-measure-end', function (event, data) {
-			alert('value is :' + data.value);
+			$scope.measuredValue = data.value;
+			$scope.measuredUnit = data.unit;
+			$scope.$apply();
 		});
 
 	});

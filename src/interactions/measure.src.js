@@ -50,9 +50,9 @@ angular.module('farmbuild.webmapping')
 				function (evt) {
 					// unset sketch
 					if (type == 'Polygon') {
-						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.area(evt.feature)});
+						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.area(evt.feature), unit: 'hectares'});
 					} else {
-						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.length(evt.feature)});
+						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.length(evt.feature), unit: 'metres'});
 
 					}
 					drawInteraction.setActive(false);

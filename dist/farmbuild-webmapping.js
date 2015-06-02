@@ -385,11 +385,13 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasureInteraction", f
         drawInteraction.on("drawend", function(evt) {
             if (type == "Polygon") {
                 $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.area(evt.feature)
+                    value: _measurement.area(evt.feature),
+                    unit: "hectares"
                 });
             } else {
                 $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.length(evt.feature)
+                    value: _measurement.length(evt.feature),
+                    unit: "metres"
                 });
             }
             drawInteraction.setActive(false);
@@ -553,18 +555,30 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function(validations, $log) {
-    var _isDefined = validations.isDefined;
+    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
+    function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
+        if (!_isDefined(olFeature)) {
+            return;
+        }
+        $log.info("Converting openlayer feature to geoJson ...", olFeature);
+        return _geoJSONFormat.writeFeatureObject(olFeature, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
+    }
     function _areas(features) {
         $log.info("calculating area of features ...", features);
         return turf.area(features) * 1e-4;
     }
     function _area(feature) {
         $log.info("calculating area of polygon ...", feature);
-        return feature.getGeometry().getArea() * 1e-4;
+        var feature = _openLayerFeatureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
+        return turf.area(feature) * 1e-4;
     }
     function _length(feature) {
         $log.info("calculating length of line ...", feature);
-        return feature.getGeometry().getLength() * 1e-4;
+        var feature = _openLayerFeatureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
+        return turf.lineDistance(feature, "kilometers") * 1e3;
     }
     return {
         area: _area,
@@ -720,19 +734,25 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         map.addLayer(_paddocksLayer(geoJson.paddocks, dataProjectionCode, featureProjectionCode));
         map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
     }
-    function _openLayerFeatureToGeoJson(olFeature) {
+    function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
         if (!_isDefined(olFeature)) {
             return;
         }
         $log.info("Converting openlayer feature to geoJson ...", olFeature);
-        return _geoJSONFormat.writeFeatureObject(olFeature);
+        return _geoJSONFormat.writeFeatureObject(olFeature, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
     }
-    function _openLayerFeaturesToGeoJson(olFeatures) {
+    function _openLayerFeaturesToGeoJson(olFeatures, dataProjection, featureProjection) {
         if (!_isDefined(olFeatures)) {
             return;
         }
         $log.info("Converting openlayer feature to geoJson ...", olFeatures);
-        return _geoJSONFormat.writeFeaturesObject(olFeatures);
+        return _geoJSONFormat.writeFeaturesObject(olFeatures, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
     }
     function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
         if (!_isDefined(feature)) {

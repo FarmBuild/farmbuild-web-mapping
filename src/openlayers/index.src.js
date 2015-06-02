@@ -172,20 +172,26 @@ angular.module('farmbuild.webmapping')
 			map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
 		};
 
-		function _openLayerFeatureToGeoJson(olFeature) {
+		function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
 			if (!_isDefined(olFeature)) {
 				return;
 			}
 			$log.info('Converting openlayer feature to geoJson ...', olFeature);
-			return _geoJSONFormat.writeFeatureObject(olFeature);
+			return _geoJSONFormat.writeFeatureObject(olFeature, {
+					dataProjection: dataProjection,
+					featureProjection: featureProjection
+				});
 		};
 
-		function _openLayerFeaturesToGeoJson(olFeatures) {
+		function _openLayerFeaturesToGeoJson(olFeatures, dataProjection, featureProjection) {
 			if (!_isDefined(olFeatures)) {
 				return;
 			}
 			$log.info('Converting openlayer feature to geoJson ...', olFeatures);
-			return _geoJSONFormat.writeFeaturesObject(olFeatures);
+			return _geoJSONFormat.writeFeaturesObject(olFeatures, {
+					dataProjection: dataProjection,
+					featureProjection: featureProjection
+				});
 		};
 
 		function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
