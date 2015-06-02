@@ -26,8 +26,8 @@ angular.module('farmbuild.webmapping')
 				source: (new ol.source.Vector()),
 				style: new ol.style.Style({
 					stroke: new ol.style.Stroke({
-						color: 'rgba(238,238,238,1)',
-						width: 2
+						color: 'rgba(238,238,238,.7)',
+						width: 1
 					})
 				})
 			});
