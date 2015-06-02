@@ -199,7 +199,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				if (selectedLayer === 'farm') {
 					$scope.removeFarm();
 				}
-				if (selectedLayer === 'paddock') {
+				if (selectedLayer === 'paddocks') {
 					$scope.removeSelectedPaddock();
 				}
 				event.preventDefault();
