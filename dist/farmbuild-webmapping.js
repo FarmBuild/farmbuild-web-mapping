@@ -65,7 +65,7 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
                     paddocksSource.removeFeature(feature);
                 }, 100);
                 drawingStatus = false;
-                $rootScope.$broadcast("mapdrawend");
+                $rootScope.$broadcast("web-mapping-draw-end");
             });
             drawInteraction.on("drawstart", function(event) {
                 $log.info("draw start ...");
@@ -148,6 +148,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _modify.init();
         _draw.init(_clip, _select);
         _snap.init();
+        _select.enable();
     }
     function _addFeature(layer, feature, name, id) {
         if (!_isDefined(feature)) {
@@ -198,6 +199,10 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name, id = featureToClip.getProperties()._id;
         clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
         clipped = _transform.intersect(clipped, farmFeatures[0]);
+        if (!_isDefined(clipped)) {
+            $log.error("paddock condition is invalid, new paddock must be outside current paddocks and inside the farm boundary");
+            return;
+        }
         _addFeature(_activeLayer, clipped, name, id);
     }
     function _clipDonut(donutFeature) {
@@ -256,7 +261,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             return;
         }
         $log.info("drawing enabled");
-        _select.disable();
         _modify.disable();
         _draw.enable();
         _snap.enable();
@@ -267,7 +271,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             return;
         }
         $log.info("donut drawing enabled");
-        _select.disable();
         _modify.disable();
         _draw.enable();
         _snap.enable();
@@ -277,7 +280,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         if (!_isDefined(map) || !_isDefined(type)) {
             return;
         }
-        _select.disable();
         _modify.disable();
         _draw.disable();
         _snap.enable();
@@ -439,7 +441,7 @@ angular.module("farmbuild.webmapping").factory("webMappingModifyInteraction", fu
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingSelectInteraction", function(validations, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingSelectInteraction", function(validations, $rootScope, $log) {
     var _isDefined = validations.isDefined;
     function _create(map, layer, multi) {
         if (!_isDefined(multi)) {
@@ -459,7 +461,15 @@ angular.module("farmbuild.webmapping").factory("webMappingSelectInteraction", fu
         function _init() {
             $log.info("select interaction init ...");
             map.addInteraction(selectInteraction);
-            selectInteraction.setActive(false);
+            selectInteraction.getFeatures().on("change:length", function(e) {
+                if (e.target.getArray().length === 0) {
+                    $rootScope.$broadcast("web-mapping-deselect");
+                } else {
+                    $rootScope.$broadcast("web-mapping-select", {
+                        feature: e.target.item(0)
+                    });
+                }
+            });
         }
         function _enable() {
             selectInteraction.setActive(true);
@@ -833,7 +843,9 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformation", funct
         clippers.forEach(function(clipper) {
             var clipperGeoJson = olHelper.featureToGeoJson(clipper);
             try {
-                clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
+                if (_isDefined(clipeeGeoJson)) {
+                    clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
+                }
             } catch (e) {
                 $log.error(e);
             }
@@ -854,6 +866,9 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformation", funct
         }
     }
     function _intersect(olFeature1, olFeature2) {
+        if (!_isDefined(olFeature1) || !_isDefined(olFeature2)) {
+            return;
+        }
         $log.info("intersecting feature", olFeature1, olFeature2);
         var feature1 = olHelper.featureToGeoJson(olFeature1), feature2 = olHelper.featureToGeoJson(olFeature2), intersection;
         try {

@@ -62,6 +62,8 @@ angular.module('farmbuild.webmapping')
 			_modify.init();
 			_draw.init(_clip, _select);
 			_snap.init();
+			
+			_select.enable();
 
 		};
 
@@ -122,6 +124,10 @@ angular.module('farmbuild.webmapping')
 				id = featureToClip.getProperties()._id;
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
+			if (!_isDefined(clipped)) {
+				$log.error('paddock condition is invalid, new paddock must be outside current paddocks and inside the farm boundary');
+				return;
+			}
 			_addFeature(_activeLayer, clipped, name, id);
 		};
 
@@ -189,7 +195,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('drawing enabled');
-			_select.disable();
+			//_select.disable();
 			_modify.disable();
 			_draw.enable();
 			_snap.enable();
@@ -201,7 +207,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('donut drawing enabled');
-			_select.disable();
+			//_select.disable();
 			_modify.disable();
 			_draw.enable();
 			_snap.enable();
@@ -212,7 +218,7 @@ angular.module('farmbuild.webmapping')
 			if (!_isDefined(map) || !_isDefined(type)) {
 				return;
 			}
-			_select.disable();
+			//_select.disable();
 			_modify.disable();
 			_draw.disable();
 			_snap.enable();

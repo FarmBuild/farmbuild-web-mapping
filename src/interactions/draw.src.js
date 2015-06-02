@@ -24,7 +24,7 @@ angular.module('farmbuild.webmapping')
 						paddocksSource.removeFeature(feature);
 					}, 100);
 					drawingStatus = false;
-					$rootScope.$broadcast('mapdrawend');
+					$rootScope.$broadcast('web-mapping-draw-end');
 				});
 				drawInteraction.on('drawstart', function (event) {
 					$log.info('draw start ...');
