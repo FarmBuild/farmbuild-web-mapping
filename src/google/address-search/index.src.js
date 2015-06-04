@@ -9,53 +9,66 @@
 'use strict';
 
 /**
- * webmapping
- * @module webmapping
+ * webmapping/googleAddressSearch singleton
+ * @private-module webmapping/googleAddressSearch
  */
 angular.module('farmbuild.webmapping')
     .factory('webMappingGoogleAddressSearch',
     function (validations,
-              $log,
-              webMappingOpenLayersHelper) {
-        var countryRestrict = {'country': 'au'};
+              $log) {
+        var countryRestrict = {'country': 'au'},
+          _isDefined = validations.isDefined;
 
-        function _init(targetElementId, openLayersProjection, olmap) {
+        /**
+         * Initialise google address search with autocomplete
+         * @method init
+         * @param {!string} targetElementId - Auto complete html element in page
+         * @param {function} onPlaceChangedCallback - function to call when a location is selected
+         * @public
+         * @static
+         */
+        function _init(targetElementId, onPlaceChangedCallback) {
+            if(!_isDefined(google) || !_isDefined(google.maps) || !_isDefined(google.maps.places)){
+                $log.error('google.maps.places is not defined, please make sure that you have included google places library in your html page.');
+                return;
+            }
+
+            if(!_isDefined(targetElementId) || !_isDefined(onPlaceChangedCallback)){
+                return;
+            }
+
             // Create the autocomplete object and associate it with the UI input control.
             // Restrict the search to the default country, and to place type "cities".
             var autocomplete = new google.maps.places.Autocomplete(
                 /** @type {HTMLInputElement} */(document.getElementById(targetElementId)),
                 {
-                    //types: ['(cities)'],
                     componentRestrictions: countryRestrict
                 });
 
             google.maps.event.addListener(autocomplete, 'place_changed', function () {
-                _onPlaceChanged(autocomplete, openLayersProjection, olmap)
+                _onPlaceChanged(autocomplete, onPlaceChangedCallback)
             });
         };
 
 
-        // When the user selects a city, get the place details for the city and
-        // zoom the map in on the city.
-        function _onPlaceChanged(autocomplete, openLayersProjection, olmap) {
+        /**
+         * When the user selects a location, get it and send it to callback function
+         * @method init
+         * @param {!object} autocomplete - Auto complete object
+         * @param {function} onPlaceChangedCallback - function to call when a location is selected
+         * @private
+         * @static
+         */
+        function _onPlaceChanged(autocomplete, onPlaceChangedCallback) {
             var place = autocomplete.getPlace(), latLng;
             if (!place.geometry) {
                 return;
             }
 
             latLng = place.geometry.location;
-            _center(latLng, openLayersProjection, olmap);
-        };
-
-        function _transform(latLng, sourceProjection, destinationProjection) {
-            return ol.proj.transform([latLng.lng(), latLng.lat()], sourceProjection, destinationProjection);
-        };
-
-
-        function _center(latLng, openLayersProjection, olmap) {
-            var googleMapProjection = 'EPSG:3857',
-                centerPoint = _transform(latLng, openLayersProjection, googleMapProjection);
-            webMappingOpenLayersHelper.center(centerPoint, olmap);
+            if(_isDefined(onPlaceChangedCallback) && typeof onPlaceChangedCallback === 'function') {
+                onPlaceChangedCallback(latLng);
+            }
         };
 
         return {

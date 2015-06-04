@@ -10,9 +10,9 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         actions: webMappingInteractions,
         paddocks: webMappingPaddocks,
         olHelper: webMappingOpenLayersHelper,
-        googleAddressSearch: webMappingGoogleAddressSearch,
         ga: webMappingGoogleAnalytics,
         parcels: webMappingParcels,
+        measurement: webMappingMeasurement,
         load: session.load,
         find: session.find,
         save: function(geoJsons) {
@@ -31,17 +31,6 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         window.farmbuild.webmapping = webMapping;
     }
     return webMapping;
-});
-
-"use strict";
-
-angular.module("farmbuild.webmapping").factory("webMappingGoogleAnalytics", function($log, validations, googleAnalytics) {
-    var webMappingGoogleAnalytics = {}, api = "farmbuild-webmapping", _isDefined = validations.isDefined;
-    webMappingGoogleAnalytics.trackWebMapping = function(clientName) {
-        $log.info("googleAnalyticsWebMapping.trackWebMapping clientName: %s", clientName);
-        googleAnalytics.track(api, clientName);
-    };
-    return webMappingGoogleAnalytics;
 });
 
 "use strict";
@@ -589,14 +578,20 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureInteraction, $log) {
-    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
-    function _transform(latLng, sourceProjection, destinationProjection) {
-        if (!_isDefined(latLng) || !_isDefined(sourceProjection) || !_isDefined(destinationProjection)) {
+angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureInteraction, webMappingGoogleAddressSearch, $log) {
+    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _googleProjection = "EPSG:3857", _openLayersDefaultProjection = "EPSG:4326";
+    function _transformToGoogleLatLng(latLng, destinationProjection) {
+        if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
             return;
         }
-        var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
+        var transformed = ol.proj.transform(latLng, _googleProjection, destinationProjection);
         return new google.maps.LatLng(transformed[1], transformed[0]);
+    }
+    function _transformFromGoogleLatLng(latLng) {
+        if (!_isDefined(latLng)) {
+            return;
+        }
+        return ol.proj.transform([ latLng.lng(), latLng.lat() ], _openLayersDefaultProjection, _googleProjection);
     }
     function _exportGeometry(source, dataProjection, featureProjection) {
         if (!_isDefined(source)) {
@@ -641,16 +636,16 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             return;
         }
         $log.info("integrating google map ...");
-        var view = map.getView(), targetElement = map.getTargetElement(), googleProjection = "EPSG:3857";
+        var view = map.getView(), targetElement = map.getTargetElement();
         view.on("change:center", function() {
-            var center = ol.proj.transform(view.getCenter(), googleProjection, dataProjection);
+            var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
             gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
         });
         view.on("change:resolution", function() {
             gmap.setZoom(view.getZoom());
         });
         window.onresize = function() {
-            var center = _transform(view.getCenter(), googleProjection, dataProjection);
+            var center = _transformToGoogleLatLng(view.getCenter(), dataProjection);
             google.maps.event.trigger(gmap, "resize");
             gmap.setCenter(center);
         };
@@ -663,7 +658,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         if (extent[0] === Infinity) {
             gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
             targetElement.parentNode.removeChild(targetElement);
-            view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], dataProjection, googleProjection));
+            view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], dataProjection, _googleProjection));
             view.setZoom(defaults.zoomNew);
             addControls(map);
             return;
@@ -775,6 +770,17 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             featureProjection: featureProjection
         });
     }
+    function _integrateAddressSearch(targetElementId, olmap) {
+        if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
+            return;
+        }
+        $log.info("init google address search ...", targetElementId);
+        function onPlaceChanged(latLng) {
+            var latLng = _transformFromGoogleLatLng(latLng);
+            _center(latLng, olmap);
+        }
+        webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
+    }
     return {
         exportGeometry: _exportGeometry,
         clear: _clear,
@@ -786,7 +792,10 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         featureToGeoJson: _openLayerFeatureToGeoJson,
         featuresToGeoJson: _openLayerFeaturesToGeoJson,
         geoJsonToFeature: _geoJsonToOpenLayerFeature,
-        geoJsonToFeatures: _geoJsonToOpenLayerFeatures
+        geoJsonToFeatures: _geoJsonToOpenLayerFeatures,
+        transformFromGoogleLatLng: _transformFromGoogleLatLng,
+        transformToGoogleLatLng: _transformToGoogleLatLng,
+        integrateAddressSearch: _integrateAddressSearch
     };
 });
 
@@ -963,35 +972,54 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformation", funct
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingGoogleAddressSearch", function(validations, $log, webMappingOpenLayersHelper) {
+angular.module("farmbuild.webmapping").factory("webMappingGoogleAddressSearch", function(validations, $log) {
     var countryRestrict = {
         country: "au"
-    };
-    function _init(targetElementId, openLayersProjection, olmap) {
+    }, _isDefined = validations.isDefined;
+    function _init(targetElementId, onPlaceChangedCallback) {
+        if (!_isDefined(google) || !_isDefined(google.maps) || !_isDefined(google.maps.places)) {
+            $log.error("google.maps.places is not defined, please make sure that you have included google places library in your html page.");
+            return;
+        }
+        if (!_isDefined(targetElementId) || !_isDefined(onPlaceChangedCallback)) {
+            return;
+        }
         var autocomplete = new google.maps.places.Autocomplete(document.getElementById(targetElementId), {
             componentRestrictions: countryRestrict
         });
         google.maps.event.addListener(autocomplete, "place_changed", function() {
-            _onPlaceChanged(autocomplete, openLayersProjection, olmap);
+            _onPlaceChanged(autocomplete, onPlaceChangedCallback);
         });
     }
-    function _onPlaceChanged(autocomplete, openLayersProjection, olmap) {
+    function _onPlaceChanged(autocomplete, onPlaceChangedCallback) {
         var place = autocomplete.getPlace(), latLng;
         if (!place.geometry) {
             return;
         }
         latLng = place.geometry.location;
-        _center(latLng, openLayersProjection, olmap);
-    }
-    function _transform(latLng, sourceProjection, destinationProjection) {
-        return ol.proj.transform([ latLng.lng(), latLng.lat() ], sourceProjection, destinationProjection);
-    }
-    function _center(latLng, openLayersProjection, olmap) {
-        var googleMapProjection = "EPSG:3857", centerPoint = _transform(latLng, openLayersProjection, googleMapProjection);
-        webMappingOpenLayersHelper.center(centerPoint, olmap);
+        if (_isDefined(onPlaceChangedCallback) && typeof onPlaceChangedCallback === "function") {
+            onPlaceChangedCallback(latLng);
+        }
     }
     return {
         init: _init
+    };
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webMappingGoogleAnalytics", function($log, validations, googleAnalytics) {
+    var api = "farmbuild-webmapping", _isDefined = validations.isDefined;
+    function _trackWebMapping(clientName) {
+        if (!_isDefined(clientName)) {
+            $log.error("client name is not specified");
+            return;
+        }
+        $log.info("googleAnalyticsWebMapping.trackWebMapping clientName: %s", clientName);
+        googleAnalytics.track(api, clientName);
+    }
+    return {
+        trackWebMapping: _trackWebMapping
     };
 });
 

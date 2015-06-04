@@ -5,20 +5,22 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 	})
 
 	.controller('MapCtrl',
-	function ($scope, $log, $location, $rootScope, webmapping, webMappingMeasurement) {
+	function ($scope, $log, $location, $rootScope, webmapping) {
 
-		var dataProjectionCode,
-			featureProjectionCode = 'EPSG:3857',
-			openLayersProjectionCode = 'EPSG:4326',
+		var dataProjection,
+
+			/**  This example is using Web Mercator: EPSG:3857 to display data on google map */
+			featureProjection = 'EPSG:3857',
+
 			maxZoom = 21,
 			layerSelectionElement = document.getElementById('layers'),
 			gmapElement = document.getElementById('gmap'),
 			gmap,
 			olmap,
 			actions = webmapping.actions,
-			olHelper = webmapping.olHelper,
-			googleAddressSearch = webmapping.googleAddressSearch;
-			$scope.measuredValue = 0;
+			measurement = webmapping.measurement,
+			olHelper = webmapping.olHelper;
+		$scope.measuredValue = 0;
 
 		$scope.farmData = {};
 		$scope.farmChanged = false;
@@ -29,35 +31,46 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.farmSelected = false;
 
 		$scope.loadFarmData = function () {
+			var geoJsons;
+
 			$scope.farmData = webmapping.find();
 
-			var geoJsons = webmapping.toGeoJsons($scope.farmData);
+			/** Convert geometry data of farmData to valid geoJson */
+			geoJsons = webmapping.toGeoJsons($scope.farmData);
 
 			if (!angular.isDefined(geoJsons)) {
 				$scope.noResult = true;
 				return;
 			}
 
-			dataProjectionCode = $scope.farmData.geometry.crs;
+			dataProjection = $scope.farmData.geometry.crs;
 
+			/** Create openlayers map object, customise the map object as you like. */
 			olmap = createOpenLayerMap(geoJsons);
 
+			/**  Create google map object, customise the map object as you like. */
 			gmap = createGoogleMap();
 
-			olHelper.integrateGMap(gmap, olmap, dataProjectionCode);
+			/** Openlayers 3 does not support google maps as a tile layer,
+			 so we need to keep openlayers map view and google maps in sync,
+			 this helper function does the job for you. */
+			olHelper.integrateGMap(gmap, olmap, dataProjection);
 
-			googleAddressSearch.init('locationautocomplete', openLayersProjectionCode, olmap);
-
-			$scope.farmLoaded = true;
+			/** Enable address google search for your map */
+			olHelper.integrateAddressSearch('locationAutoComplete', olmap);
 
 			layerSelectionElement.addEventListener('change', selectLayer);
 
 			gmapElement.addEventListener('keydown', keyboardActions);
 
+			/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
 			webmapping.ga.trackWebMapping('AgSmart');
 
+			/** it is up to you when to load parcels, this example is using map view's change event to load parcels data. Parcels data is used for snapping */
 			olmap.getView().on('change:resolution', loadParcels);
 			olmap.getView().on('change:center', loadParcels);
+
+			$scope.farmLoaded = true;
 		};
 
 		function loadParcels() {
@@ -65,9 +78,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			farmbuild.webmapping.parcels.load('https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/ows',
-				olmap.getView().calculateExtent(olmap.getSize()), featureProjectionCode, featureProjectionCode);
+				olmap.getView().calculateExtent(olmap.getSize()), featureProjection, featureProjection);
 		}
 
+		/**  Create google map object, customise the map object as you like. */
 		function createGoogleMap() {
 			return new google.maps.Map(gmapElement, {
 				disableDefaultUI: true,
@@ -80,9 +94,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			})
 		}
 
+		/** Create openlayers map object, customise the map object as you like. */
 		function createOpenLayerMap(geoJsons) {
-			var farmLayer = olHelper.farmLayer(geoJsons.farm, dataProjectionCode, featureProjectionCode),
-				paddocksLayer = olHelper.paddocksLayer(geoJsons.paddocks, dataProjectionCode, featureProjectionCode);
+
+			/** it is recommended to use these helper functions to create you farm and paddocks layers */
+			var farmLayer = olHelper.farmLayer(geoJsons.farm, dataProjection, featureProjection),
+				paddocksLayer = olHelper.paddocksLayer(geoJsons.paddocks, dataProjection, featureProjection);
 
 			return new ol.Map({
 				layers: [paddocksLayer, farmLayer],
@@ -156,7 +173,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			$scope.farmData.selectedPaddockName = paddockAtCoordinate.getProperties().name;
-			$scope.farmData.selectedPaddockArea = webMappingMeasurement.area(paddockAtCoordinate);
+			$scope.farmData.selectedPaddockArea = measurement.area(paddockAtCoordinate);
 			$log.info('Paddock selected: ' + $scope.farmData.selectedPaddockName);
 			$scope.$apply();
 		}
@@ -242,8 +259,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.loadFarmData();
 
 		$scope.exportFarmData = function (farmData) {
-			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjectionCode, featureProjectionCode);
-			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjectionCode, featureProjectionCode);
+			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjection, featureProjection);
+			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjection, featureProjection);
 
 			webmapping.export(document, farmData, {paddocks: paddocksGeometry, farm: farmGeometry});
 		};
@@ -261,8 +278,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			} else {
 				clipSelectedPaddock();
 			}
-			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjectionCode, featureProjectionCode);
-			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjectionCode, featureProjectionCode);
+			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjection, featureProjection);
+			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjection, featureProjection);
 
 			if (farmGeometry.features.length === 0) {
 				$log.error('Draw farm boundary first!');
@@ -305,7 +322,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap.un('dblclick', mapOnDblClick);
 			olmap.un('click', mapOnClick);
 
-			olHelper.reload(olmap, geoJsons, dataProjectionCode, featureProjectionCode);
+			olHelper.reload(olmap, geoJsons, dataProjection, featureProjection);
 
 			actions.init(olmap, olmap.getLayers().item(1), olmap.getLayers().item(0), selectedLayer);
 			olmap.on('pointermove', mapOnPointerMove);

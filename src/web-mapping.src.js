@@ -40,9 +40,9 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
                 actions: webMappingInteractions,
                 paddocks: webMappingPaddocks,
                 olHelper: webMappingOpenLayersHelper,
-                googleAddressSearch: webMappingGoogleAddressSearch,
                 ga: webMappingGoogleAnalytics,
                 parcels: webMappingParcels,
+                measurement: webMappingMeasurement,
                 /**
                  * Loads the specified farmData into session
                  * @method load

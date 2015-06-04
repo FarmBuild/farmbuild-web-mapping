@@ -4,16 +4,26 @@ angular.module('farmbuild.webmapping')
 	.factory('webMappingOpenLayersHelper',
 	function (validations,
 	          webMappingMeasureInteraction,
+	          webMappingGoogleAddressSearch,
 	          $log) {
 		var _isDefined = validations.isDefined,
-			_geoJSONFormat = new ol.format['GeoJSON']();
+			_geoJSONFormat = new ol.format['GeoJSON'](),
+			_googleProjection = 'EPSG:3857',
+			_openLayersDefaultProjection = 'EPSG:4326';
 
-		function _transform(latLng, sourceProjection, destinationProjection) {
-			if (!_isDefined(latLng) || !_isDefined(sourceProjection) || !_isDefined(destinationProjection)) {
+		function _transformToGoogleLatLng(latLng, destinationProjection) {
+			if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
 				return;
 			}
-			var transformed = ol.proj.transform(latLng, sourceProjection, destinationProjection);
+			var transformed = ol.proj.transform(latLng, _googleProjection, destinationProjection);
 			return new google.maps.LatLng(transformed[1], transformed[0])
+		};
+
+		function _transformFromGoogleLatLng(latLng) {
+			if (!_isDefined(latLng)) {
+				return;
+			}
+			return ol.proj.transform([latLng.lng(), latLng.lat()], _openLayersDefaultProjection, _googleProjection);
 		};
 
 		function _exportGeometry(source, dataProjection, featureProjection) {
@@ -63,10 +73,9 @@ angular.module('farmbuild.webmapping')
 			}
 			$log.info('integrating google map ...');
 			var view = map.getView(),
-				targetElement = map.getTargetElement(),
-				googleProjection = 'EPSG:3857';
+				targetElement = map.getTargetElement();
 			view.on('change:center', function () {
-				var center = ol.proj.transform(view.getCenter(), googleProjection, dataProjection);
+				var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
 				gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
 			});
 
@@ -76,7 +85,7 @@ angular.module('farmbuild.webmapping')
 
 			// Google Map and vector layers go out of sync when window is resized.
 			window.onresize = function () {
-				var center = _transform(view.getCenter(), googleProjection, dataProjection);
+				var center = _transformToGoogleLatLng(view.getCenter(), dataProjection);
 				google.maps.event.trigger(gmap, "resize");
 				gmap.setCenter(center);
 			};
@@ -93,7 +102,7 @@ angular.module('farmbuild.webmapping')
 				gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
 				targetElement.parentNode.removeChild(targetElement);
 				view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]],
-					dataProjection, googleProjection));
+					dataProjection, _googleProjection));
 				view.setZoom(defaults.zoomNew);
 				addControls(map);
 				return;
@@ -179,9 +188,9 @@ angular.module('farmbuild.webmapping')
 			}
 			$log.info('Converting openlayer feature to geoJson ...', olFeature);
 			return _geoJSONFormat.writeFeatureObject(olFeature, {
-					dataProjection: dataProjection,
-					featureProjection: featureProjection
-				});
+				dataProjection: dataProjection,
+				featureProjection: featureProjection
+			});
 		};
 
 		function _openLayerFeaturesToGeoJson(olFeatures, dataProjection, featureProjection) {
@@ -190,9 +199,9 @@ angular.module('farmbuild.webmapping')
 			}
 			$log.info('Converting openlayer feature to geoJson ...', olFeatures);
 			return _geoJSONFormat.writeFeaturesObject(olFeatures, {
-					dataProjection: dataProjection,
-					featureProjection: featureProjection
-				});
+				dataProjection: dataProjection,
+				featureProjection: featureProjection
+			});
 		};
 
 		function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
@@ -200,7 +209,10 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('Converting geoJson feature to openlayer feature ...', feature);
-			return _geoJSONFormat.readFeature(feature, {dataProjection: dataProjection, featureProjection:featureProjection});
+			return _geoJSONFormat.readFeature(feature, {
+				dataProjection: dataProjection,
+				featureProjection: featureProjection
+			});
 		};
 
 		function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
@@ -208,7 +220,22 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('Converting geoJson feature to openlayer features ...', features);
-			return _geoJSONFormat.readFeatures(features, {dataProjection: dataProjection, featureProjection:featureProjection});
+			return _geoJSONFormat.readFeatures(features, {
+				dataProjection: dataProjection,
+				featureProjection: featureProjection
+			});
+		};
+
+		function _integrateAddressSearch(targetElementId, olmap) {
+			if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
+				return;
+			}
+			$log.info('init google address search ...', targetElementId);
+			function onPlaceChanged(latLng) {
+				var latLng = _transformFromGoogleLatLng(latLng);
+				_center(latLng, olmap);
+			}
+			webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
 		};
 
 		return {
@@ -222,7 +249,10 @@ angular.module('farmbuild.webmapping')
 			featureToGeoJson: _openLayerFeatureToGeoJson,
 			featuresToGeoJson: _openLayerFeaturesToGeoJson,
 			geoJsonToFeature: _geoJsonToOpenLayerFeature,
-			geoJsonToFeatures: _geoJsonToOpenLayerFeatures
+			geoJsonToFeatures: _geoJsonToOpenLayerFeatures,
+			transformFromGoogleLatLng: _transformFromGoogleLatLng,
+			transformToGoogleLatLng: _transformToGoogleLatLng,
+			integrateAddressSearch: _integrateAddressSearch
 		}
 
 	});

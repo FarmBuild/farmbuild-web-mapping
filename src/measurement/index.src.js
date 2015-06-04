@@ -25,13 +25,13 @@ angular.module('farmbuild.webmapping')
 
 		function _area(feature) {
 			$log.info('calculating area of polygon ...', feature);
-			var feature = _openLayerFeatureToGeoJson(feature, 'EPSG:4283', 'EPSG:3857')
+			var feature = _openLayerFeatureToGeoJson(feature, 'EPSG:4283', 'EPSG:3857');
 			return turf.area(feature) * 0.0001;
 		};
 
 		function _length(feature) {
 			$log.info('calculating length of line ...', feature);
-			var feature = _openLayerFeatureToGeoJson(feature, 'EPSG:4283', 'EPSG:3857')
+			var feature = _openLayerFeatureToGeoJson(feature, 'EPSG:4283', 'EPSG:3857');
 			return turf.lineDistance(feature, 'kilometers') * 1000;
 		};
 
