@@ -226,7 +226,7 @@ angular.module('farmbuild.webmapping')
 			});
 		};
 
-		function _integrateAddressSearch(targetElementId, olmap) {
+		function _initAddressSearch(targetElementId, olmap) {
 			if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
 				return;
 			}
@@ -235,6 +235,7 @@ angular.module('farmbuild.webmapping')
 				var latLng = _transformFromGoogleLatLng(latLng);
 				_center(latLng, olmap);
 			}
+
 			webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
 		};
 
@@ -252,7 +253,7 @@ angular.module('farmbuild.webmapping')
 			geoJsonToFeatures: _geoJsonToOpenLayerFeatures,
 			transformFromGoogleLatLng: _transformFromGoogleLatLng,
 			transformToGoogleLatLng: _transformToGoogleLatLng,
-			integrateAddressSearch: _integrateAddressSearch
+			initAddressSearch: _initAddressSearch
 		}
 
 	});

@@ -13,6 +13,7 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
+			_farmLayer, _paddocksLayer, _map,
 			_transform = webMappingTransformation,
 			_farmName;
 
@@ -42,6 +43,10 @@ angular.module('farmbuild.webmapping')
 			if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(paddocksLayer) || !_isDefined(farmLayer)) {
 				return;
 			}
+
+			_farmLayer = farmLayer;
+			_paddocksLayer = paddocksLayer;
+			_map = map;
 
 			if (activeLayerName === 'paddocks') {
 				_activeLayer = paddocksLayer;
@@ -121,6 +126,7 @@ angular.module('farmbuild.webmapping')
 				$log.error('please draw farm boundaries before adding paddock');
 				return;
 			}
+			paddockSource.removeFeature(featureToClip);
 			var clipped,
 				paddocksFeatures = paddockSource.getFeatures(),
 				farmFeatures = farmSource.getFeatures(),
@@ -272,6 +278,47 @@ angular.module('farmbuild.webmapping')
 			_draw.disable();
 		});
 
+		function _enableKeyboardShortcuts(elementId) {
+			var element = document.getElementById(elementId) || _map.getTargetElement();
+
+			function onKeyDown(event){
+				var selectedFeatures = _selectedFeatures();
+				if (!_isDefined(selectedFeatures)) {
+					return;
+				}
+
+				if (event.keyCode == 46 || event.keyCode == 8) {
+					_removeFeatures(selectedFeatures);
+					event.preventDefault();
+					event.stopPropagation();
+					return false;
+				}
+
+				if (event.keyCode == 13) {
+
+					if (_isDrawing()) {
+						_finishDrawing();
+					} else {
+						_clip(_selectedFeatures().item(0), _paddocksLayer.getSource(), _farmLayer.getSource());
+					}
+
+					event.preventDefault();
+					event.stopPropagation();
+					return false;
+				}
+
+				if (event.keyCode == 27) {
+					_discardDrawing();
+					event.preventDefault();
+					event.stopPropagation();
+					return false;
+				}
+			}
+
+			element.addEventListener('keydown', onKeyDown);
+
+		};
+
 		return {
 			init: _init,
 			destroy: _destroy,
@@ -286,6 +333,7 @@ angular.module('farmbuild.webmapping')
 			merge: _merge,
 			remove: _removeFeatures,
 			selectedFeatures: _selectedFeatures,
-			snapParcels: _snapParcels
+			snapParcels: _snapParcels,
+			enableKeyboardShortcuts: _enableKeyboardShortcuts
 		}
 	});

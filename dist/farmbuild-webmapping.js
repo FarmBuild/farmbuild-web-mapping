@@ -97,7 +97,7 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingTransformation, $rootScope) {
-    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _transform = webMappingTransformation, _farmName;
+    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _farmLayer, _paddocksLayer, _map, _transform = webMappingTransformation, _farmName;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
         if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
@@ -120,6 +120,9 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(paddocksLayer) || !_isDefined(farmLayer)) {
             return;
         }
+        _farmLayer = farmLayer;
+        _paddocksLayer = paddocksLayer;
+        _map = map;
         if (activeLayerName === "paddocks") {
             _activeLayer = paddocksLayer;
         } else if (activeLayerName === "farm") {
@@ -189,6 +192,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             $log.error("please draw farm boundaries before adding paddock");
             return;
         }
+        paddockSource.removeFeature(featureToClip);
         var clipped, paddocksFeatures = paddockSource.getFeatures(), farmFeatures = farmSource.getFeatures(), name = featureToClip.getProperties().name, id = featureToClip.getProperties()._id;
         clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
         clipped = _transform.intersect(clipped, farmFeatures[0]);
@@ -317,6 +321,38 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _modify.enable();
         _draw.disable();
     });
+    function _enableKeyboardShortcuts(elementId) {
+        var element = document.getElementById(elementId) || _map.getTargetElement();
+        function onKeyDown(event) {
+            var selectedFeatures = _selectedFeatures();
+            if (!_isDefined(selectedFeatures)) {
+                return;
+            }
+            if (event.keyCode == 46 || event.keyCode == 8) {
+                _removeFeatures(selectedFeatures);
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+            if (event.keyCode == 13) {
+                if (_isDrawing()) {
+                    _finishDrawing();
+                } else {
+                    _clip(_selectedFeatures().item(0), _paddocksLayer.getSource(), _farmLayer.getSource());
+                }
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+            if (event.keyCode == 27) {
+                _discardDrawing();
+                event.preventDefault();
+                event.stopPropagation();
+                return false;
+            }
+        }
+        element.addEventListener("keydown", onKeyDown);
+    }
     return {
         init: _init,
         destroy: _destroy,
@@ -331,7 +367,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         merge: _merge,
         remove: _removeFeatures,
         selectedFeatures: _selectedFeatures,
-        snapParcels: _snapParcels
+        snapParcels: _snapParcels,
+        enableKeyboardShortcuts: _enableKeyboardShortcuts
     };
 });
 
@@ -770,7 +807,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             featureProjection: featureProjection
         });
     }
-    function _integrateAddressSearch(targetElementId, olmap) {
+    function _initAddressSearch(targetElementId, olmap) {
         if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
             return;
         }
@@ -795,7 +832,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         geoJsonToFeatures: _geoJsonToOpenLayerFeatures,
         transformFromGoogleLatLng: _transformFromGoogleLatLng,
         transformToGoogleLatLng: _transformToGoogleLatLng,
-        integrateAddressSearch: _integrateAddressSearch
+        initAddressSearch: _initAddressSearch
     };
 });
 
@@ -824,7 +861,7 @@ angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($l
 
 angular.module("farmbuild.webmapping").factory("webMappingParcels", function($log, $http, validations, webMappingInteractions, webMappingOpenLayersHelper) {
     var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
-    function _load(serviceUrl, extent, dataProjection, resultProjection) {
+    function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
         var config = {
             params: {
                 service: "WFS",
@@ -833,11 +870,12 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
                 typeName: "farmbuild:parcels",
                 outputFormat: "text/javascript",
                 format_options: "callback:JSON_CALLBACK",
-                srsname: resultProjection,
-                bbox: extent.join(",") + "," + dataProjection
+                srsname: responseProjection,
+                bbox: extent.join(",") + "," + extentDataProjection
             }
         };
-        if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(dataProjection) || !_isDefined(resultProjection)) {
+        if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(extentDataProjection) || !_isDefined(responseProjection)) {
+            $log.error("There is a problem with input parameters, please refer to api for more information");
             return;
         }
         $log.info("Loading parcels information for the extent: ", extent);

@@ -14,7 +14,7 @@ angular.module('farmbuild.webmapping')
 	function ($log, $http, validations, webMappingInteractions, webMappingOpenLayersHelper) {
 		var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
 
-		function _load(serviceUrl, extent, dataProjection, resultProjection) {
+		function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
 			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3857', 'EPSG:3857');
 			var config = {
 				params: {
@@ -24,12 +24,13 @@ angular.module('farmbuild.webmapping')
 					typeName: 'farmbuild:parcels',
 					outputFormat: 'text/javascript',
 					format_options: 'callback:JSON_CALLBACK',
-					srsname: resultProjection,
-					bbox: extent.join(',') + ',' + dataProjection
+					srsname: responseProjection,
+					bbox: extent.join(',') + ',' + extentDataProjection
 				}
 			};
 
-			if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(dataProjection) || !_isDefined(resultProjection)) {
+			if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(extentDataProjection) || !_isDefined(responseProjection)) {
+				$log.error('There is a problem with input parameters, please refer to api for more information');
 				return;
 			}
 			$log.info('Loading parcels information for the extent: ', extent);

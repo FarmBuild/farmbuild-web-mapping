@@ -19,6 +19,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap,
 			actions = webmapping.actions,
 			measurement = webmapping.measurement,
+			parcels = webmapping.parcels,
 			olHelper = webmapping.olHelper;
 		$scope.measuredValue = 0;
 
@@ -57,11 +58,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olHelper.integrateGMap(gmap, olmap, dataProjection);
 
 			/** Enable address google search for your map */
-			olHelper.integrateAddressSearch('locationAutoComplete', olmap);
+			olHelper.initAddressSearch('locationAutoComplete', olmap);
 
 			layerSelectionElement.addEventListener('change', selectLayer);
 
-			gmapElement.addEventListener('keydown', keyboardActions);
+			actions.enableKeyboardShortcuts('gmap');
 
 			/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
 			webmapping.ga.trackWebMapping('AgSmart');
@@ -74,11 +75,20 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		function loadParcels() {
+			var parcelsServiceUrl = 'https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
+				parcelsExtent, extentProjection, responseProjection;
+
+			/**
+			 * in this example we use the same projection for extent data and response,
+			 * but they can be different based on your application setting.
+			 */
+			extentProjection = responseProjection = featureProjection;
+
 			if (layerSelectionElement.value === '' || layerSelectionElement.value === 'none') {
 				return;
 			}
-			farmbuild.webmapping.parcels.load('https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/ows',
-				olmap.getView().calculateExtent(olmap.getSize()), featureProjection, featureProjection);
+			parcelsExtent = olmap.getView().calculateExtent(olmap.getSize());
+			parcels.load(parcelsServiceUrl, parcelsExtent, extentProjection, responseProjection);
 		}
 
 		/**  Create google map object, customise the map object as you like. */
@@ -97,7 +107,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		/** Create openlayers map object, customise the map object as you like. */
 		function createOpenLayerMap(geoJsons) {
 
-			/** it is recommended to use these helper functions to create you farm and paddocks layers */
+			/** it is recommended to use these helper functions to create your farm and paddocks layers */
 			var farmLayer = olHelper.farmLayer(geoJsons.farm, dataProjection, featureProjection),
 				paddocksLayer = olHelper.paddocksLayer(geoJsons.paddocks, dataProjection, featureProjection);
 
@@ -114,14 +124,17 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 					dragPan: false,
 					rotate: false,
 					mouseWheelZoom: true
-				}).extend([new ol.interaction.DragPan({kinetic: null})])
+				}).extend([new ol.interaction.DragPan()])
 			})
 		}
 
 		function mapOnPointerMove(event) {
+
+			/** don't do anything if user is dragging */
 			if (event.dragging) {
 				return;
 			}
+
 			var selectedLayer = layerSelectionElement.value, coordinate = event.coordinate,
 				featureAtCoordinate;
 			if (selectedLayer === "paddocks") {
@@ -205,53 +218,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			loadParcels();
 		}
 
-		function keyboardActions(event) {
-			var selectedFeatures = actions.selectedFeatures();
-			if (!selectedFeatures) {
-				return;
-			}
-
-			if (event.keyCode == 46 || event.keyCode == 8) {
-				var selectedLayer = layerSelectionElement.value;
-				if (selectedLayer === 'farm') {
-					$scope.removeFarm();
-				}
-				if (selectedLayer === 'paddocks') {
-					$scope.removeSelectedPaddock();
-				}
-				event.preventDefault();
-				event.stopPropagation();
-				return false;
-			}
-
-			if (event.keyCode == 13) {
-
-				if (actions.isDrawing()) {
-					actions.finishDrawing();
-				} else {
-					clipSelectedPaddock();
-				}
-
-				event.preventDefault();
-				event.stopPropagation();
-				return false;
-			}
-
-			if (event.keyCode == 27) {
-				actions.discardDrawing();
-				event.preventDefault();
-				event.stopPropagation();
-				return false;
-			}
-
-		};
-
 		function clipSelectedPaddock() {
 			$log.info('Clipping selected paddock...');
 			var selectedPaddock;
 			if (actions.selectedFeatures() && actions.selectedFeatures().item(0) && layerSelectionElement.value === 'paddocks') {
 				selectedPaddock = actions.selectedFeatures().item(0);
-				olmap.getLayers().item(0).getSource().removeFeature(selectedPaddock);
 				actions.clip(selectedPaddock, olmap.getLayers().item(0).getSource(), olmap.getLayers().item(1).getSource());
 			}
 		};
