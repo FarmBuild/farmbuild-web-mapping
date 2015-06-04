@@ -161,7 +161,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         layer.getSource().addFeature(feature);
         _clearSelections();
     }
-    function _removeFeatures(features, deselect) {
+    function _remove(features, deselect) {
         if (!_isDefined(deselect)) {
             deselect = true;
         }
@@ -221,13 +221,13 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             _addFeature(_activeLayer, clipped, name);
             clipped = _transform.merge(farmSource.getFeatures());
         }
-        _removeFeatures(farmSource.getFeatures(), false);
+        _remove(farmSource.getFeatures(), false);
         _addFeature(_activeLayer, clipped, name);
         _clearSelections();
     }
     function _merge(features) {
         $log.info("merging features ...", features);
-        _removeFeatures(features, false);
+        _remove(features, false);
         _addFeature(_activeLayer, _transform.merge(features));
         _clearSelections();
     }
@@ -329,7 +329,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
                 return;
             }
             if (event.keyCode == 46 || event.keyCode == 8) {
-                _removeFeatures(selectedFeatures);
+                _remove(selectedFeatures);
                 event.preventDefault();
                 event.stopPropagation();
                 return false;
@@ -356,19 +356,29 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     return {
         init: _init,
         destroy: _destroy,
-        enableDrawing: _enableDrawing,
-        enableEditing: _enableEditing,
-        enableDonutDrawing: _enableDonutDrawing,
-        isDrawing: _isDrawing,
-        isEditing: _isEditing,
-        finishDrawing: _finishDrawing,
-        discardDrawing: _discardDrawing,
-        clip: _clip,
-        merge: _merge,
-        remove: _removeFeatures,
-        selectedFeatures: _selectedFeatures,
-        snapParcels: _snapParcels,
-        enableKeyboardShortcuts: _enableKeyboardShortcuts
+        editing: {
+            enable: _enableEditing,
+            active: _isEditing
+        },
+        drawing: {
+            discard: _discardDrawing,
+            finish: _finishDrawing,
+            enable: _enableDrawing,
+            active: _isDrawing
+        },
+        donut: {
+            enable: _enableDonutDrawing
+        },
+        features: {
+            selected: _selectedFeatures,
+            clip: _clip,
+            merge: _merge,
+            remove: _remove,
+            parcelSnapping: _snapParcels
+        },
+        keyboardShortcuts: {
+            enable: _enableKeyboardShortcuts
+        }
     };
 });
 
@@ -889,7 +899,7 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
                 type: "FeatureCollection",
                 features: data.features
             });
-            webMappingInteractions.snapParcels(olFeatures);
+            webMappingInteractions.features.parcelSnapping(olFeatures);
         }).error(function(data, status) {
             $log.error("loading parcels failed!!", status, data);
         });

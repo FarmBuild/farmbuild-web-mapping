@@ -41,7 +41,7 @@ angular.module('farmbuild.webmapping')
 						"type": "FeatureCollection",
 						"features": data.features
 					});
-					webMappingInteractions.snapParcels(olFeatures);
+					webMappingInteractions.features.parcelSnapping(olFeatures);
 				})
 				.error(function(data, status) {
 					$log.error('loading parcels failed!!', status, data);
