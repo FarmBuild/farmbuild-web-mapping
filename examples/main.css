@@ -304,3 +304,23 @@ form textarea {
 .ol-touch .measure {
   top: 95px;
 }
+
+.layer-switcher {
+  top: 4.5em;
+}
+
+.layer-switcher .panel, .layer-switcher .panel ul {
+  margin-bottom: 0px;
+}
+
+.layer-switcher .panel ul {
+  margin-top: 5px;
+}
+
+.layer-switcher .panel label {
+  font-weight: normal;
+}
+
+.layer-switcher .panel input {
+  margin-right: 5px;
+}

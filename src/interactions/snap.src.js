@@ -29,6 +29,7 @@ angular.module('farmbuild.webmapping')
 
 			snapVisibleLayer = new ol.layer.Vector({
 				source: (new ol.source.Vector()),
+				title: 'Parcels',
 				style: new ol.style.Style({
 					stroke: new ol.style.Stroke({
 						color: 'rgba(238,238,238,.7)',

@@ -65,6 +65,9 @@ angular.module('farmbuild.webmapping')
 			map.addControl(new ol.control.ScaleLine())
 			map.addControl(new webMappingMeasureInteraction.create(map, 'Polygon'));
 			map.addControl(new webMappingMeasureInteraction.create(map, 'LineString'));
+			map.addControl(new ol.control.LayerSwitcher({
+				tipLabel: 'Légende' // Optional label for button
+			}));
 		}
 
 		function _integrateGMap(gmap, map, dataProjection) {
@@ -137,6 +140,7 @@ angular.module('farmbuild.webmapping')
 
 			return new ol.layer.Vector({
 				source: paddocksSource,
+				title: 'Paddocks',
 				style: new ol.style.Style({
 					fill: new ol.style.Fill({
 						color: 'rgba(255, 255, 255, 0.3)'
@@ -163,6 +167,7 @@ angular.module('farmbuild.webmapping')
 
 			return new ol.layer.Vector({
 				source: farmSource,
+				title: 'Farm',
 				style: new ol.style.Style({
 					fill: new ol.style.Fill({
 						color: 'rgba(255, 255, 255, 0)'

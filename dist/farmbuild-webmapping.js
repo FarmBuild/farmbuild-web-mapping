@@ -587,6 +587,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
         }
         snapVisibleLayer = new ol.layer.Vector({
             source: new ol.source.Vector(),
+            title: "Parcels",
             style: new ol.style.Style({
                 stroke: new ol.style.Stroke({
                     color: "rgba(238,238,238,.7)",
@@ -725,6 +726,9 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         map.addControl(new ol.control.ScaleLine());
         map.addControl(new webMappingMeasureInteraction.create(map, "Polygon"));
         map.addControl(new webMappingMeasureInteraction.create(map, "LineString"));
+        map.addControl(new ol.control.LayerSwitcher({
+            tipLabel: "Légende"
+        }));
     }
     function _integrateGMap(gmap, map, dataProjection) {
         if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
@@ -784,6 +788,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         });
         return new ol.layer.Vector({
             source: paddocksSource,
+            title: "Paddocks",
             style: new ol.style.Style({
                 fill: new ol.style.Fill({
                     color: "rgba(255, 255, 255, 0.3)"
@@ -808,6 +813,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         });
         return new ol.layer.Vector({
             source: farmSource,
+            title: "Farm",
             style: new ol.style.Style({
                 fill: new ol.style.Fill({
                     color: "rgba(255, 255, 255, 0)"
