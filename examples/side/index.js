@@ -144,10 +144,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				selectedLayer = olmap.getLayers().item(1);
 			}
 			featureAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, selectedLayer);
-			if (featureAtCoordinate && !actions.drawing.active()) {
+			if (featureAtCoordinate && !actions.drawing.isDrawing()) {
 				actions.editing.enable();
 			}
-			if (!featureAtCoordinate && !actions.editing.active()) {
+			if (!featureAtCoordinate && !actions.editing.isEditing()) {
 				actions.drawing.enable();
 			}
 		}
@@ -155,7 +155,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		function mapOnDblClick(event) {
 			var coordinate = event.coordinate,
 				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olmap.getLayers().item(0));
-			if (paddockAtCoordinate && actions.editing.active()) {
+			if (paddockAtCoordinate && actions.editing.isEditing()) {
 				actions.donut.enable();
 			}
 		}
@@ -244,7 +244,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.apply = function () {
 			$log.info('apply changes to farm data ...');
-			if (actions.drawing.active()) {
+			if (actions.drawing.isDrawing()) {
 				actions.drawing.finish();
 			} else {
 				clipSelectedPaddock();

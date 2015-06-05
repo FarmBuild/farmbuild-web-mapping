@@ -26,7 +26,7 @@
     "jsdoc": "^3.3",
     "uglify-js": "2.4.19",
     "jshint": "^2.6",
-    "ncp": "^2.0",
+    "ncp": "https://github.com/bill209/ncp.git",
     "replace": "^0.3",
     "static-livereload": "^0.1"
   },
@@ -51,9 +51,10 @@
     "concat": "uglifyjs src/web-mapping.src.js src/**/*.src.js src/**/**/*.src.js src/index.src.js -o dist/farmbuild-webmapping.js -v -b",
     "uglify": "uglifyjs dist/farmbuild-webmapping.js --source-map dist/farmbuild-webmapping.min.js.map --source-map-url farmbuild-webmapping.min.js.map -o dist/farmbuild-webmapping.min.js -v -c",
     "copy-core": "ncp bower_components/farmbuild-core/dist/ dist/ && ncp bower_components/farmbuild-farmdata/dist/ dist/",
-    "copy-ol": "ncp lib/ dist/",
-    "copy-turf": "ncp bower_components/turf/ dist/turf",
-    "copy-proj4js": "ncp bower_components/proj4/dist/ dist/proj4",
-    "dist": "npm run clean && npm run generate-docs && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-turf && npm run copy-proj4js"
+    "copy-ol": "ncp lib/ol/ dist/ol --filter='^((?!debug).)*$'",
+    "copy-turf": "ncp bower_components/turf/ dist/turf --filter=.min.js",
+    "copy-proj4js": "ncp bower_components/proj4/dist/ dist/proj4 --filter=proj4.js",
+    "copy-ol-layer-switcher": "ncp bower_components/ol3-layerswitcher/src/ dist/ol3-layerswitcher",
+    "dist": "npm run clean && npm run generate-docs && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-turf && npm run copy-proj4js && npm run copy-ol-layer-switcher"
   }
 }

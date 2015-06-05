@@ -8,6 +8,11 @@ angular.module('farmbuild.webmapping')
 
 		function _create(map, farmSource, paddocksSource) {
 
+			if(!_isDefined(map) || !_isDefined(farmSource) || !_isDefined(paddocksSource)){
+				$log.error('There is a problem with input parameters, please refer to api for more information');
+				return;
+			}
+
 			var snapInteraction = new ol.interaction.Snap({
 				source: paddocksSource
 			}), snapVisibleLayer;
@@ -48,8 +53,20 @@ angular.module('farmbuild.webmapping')
 			}
 
 			function _destroy(map) {
+				if(!_isDefined(map)){
+					$log.error('There is a problem with input parameters, map object is not defined');
+					return;
+				}
 				map.removeLayer(snapVisibleLayer);
 				map.removeInteraction(snapInteraction)
+			}
+
+			function _hide() {
+				snapVisibleLayer.setVisible(false);
+			}
+
+			function _show() {
+				snapVisibleLayer.setVisible(true);
 			}
 
 			return {
@@ -58,7 +75,9 @@ angular.module('farmbuild.webmapping')
 				disable: _disable,
 				addFeatures: _addFeatures,
 				interaction: snapInteraction,
-				destroy: _destroy
+				destroy: _destroy,
+				hide: _hide,
+				show: _show
 			};
 
 		};

@@ -260,6 +260,34 @@ angular.module('farmbuild.webmapping')
 			return _select.interaction.getFeatures().getLength() > 0;
 		};
 
+		function _disableSnapping() {
+			if (!_isDefined(_snap)) {
+				return;
+			}
+			return _snap.disable();
+		};
+
+		function _enableSnapping() {
+			if (!_isDefined(_snap)) {
+				return;
+			}
+			return _snap.enable();
+		};
+
+		function _showParcels() {
+			if (!_isDefined(_snap)) {
+				return;
+			}
+			return _snap.show();
+		};
+
+		function _hideParcels() {
+			if (!_isDefined(_snap)) {
+				return;
+			}
+			return _snap.hide();
+		};
+
 		$rootScope.$on('web-mapping-measure-start', function (event, data) {
 			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_draw)) {
 				return;
@@ -324,23 +352,31 @@ angular.module('farmbuild.webmapping')
 			destroy: _destroy,
 			editing: {
 				enable: _enableEditing,
-				active: _isEditing
+				isEditing: _isEditing
 			},
 			drawing: {
 				discard: _discardDrawing,
 				finish: _finishDrawing,
 				enable: _enableDrawing,
-				active: _isDrawing
+				isDrawing: _isDrawing
 			},
 			donut: {
 				enable: _enableDonutDrawing
+			},
+			snapping: {
+				enable: _enableSnapping,
+				disable: _disableSnapping
 			},
 			features: {
 				selected: _selectedFeatures,
 				clip: _clip,
 				merge: _merge,
-				remove: _remove,
-				parcelSnapping: _snapParcels
+				remove: _remove
+			},
+			parcels: {
+				snap: _snapParcels,
+				show: _showParcels,
+				hide: _hideParcels
 			},
 			keyboardShortcuts: {
 				enable: _enableKeyboardShortcuts
