@@ -37,6 +37,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
                 farmdata: farmdata,
                 validator: geoJsonValidator,
                 toGeoJsons: farmdataConverter.toGeoJsons,
+                toKml: farmdataConverter.toKml,
                 actions: webMappingInteractions,
                 paddocks: webMappingPaddocks,
                 olHelper: webMappingOpenLayersHelper,

@@ -7,6 +7,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         farmdata: farmdata,
         validator: geoJsonValidator,
         toGeoJsons: farmdataConverter.toGeoJsons,
+        toKml: farmdataConverter.toKml,
         actions: webMappingInteractions,
         paddocks: webMappingPaddocks,
         olHelper: webMappingOpenLayersHelper,
@@ -361,7 +362,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         $log.info("editing enabled");
         _select.enable();
         _modify.enable();
-        _snap.enable();
         _draw.disable();
         _mode = "edit";
     }
@@ -373,7 +373,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _select.disable();
         _modify.disable();
         _draw.enable();
-        _snap.enable();
         _mode = "draw";
     }
     function _enableDonutDrawing() {
@@ -384,7 +383,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _select.disable();
         _modify.disable();
         _draw.enable();
-        _snap.enable();
         _mode = "donut-draw";
     }
     function _snapParcels(parcels) {
@@ -649,7 +647,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
         function _init() {
             $log.info("snap interaction init ...");
             map.addInteraction(snapInteraction);
-            snapInteraction.setActive(false);
+            snapInteraction.setActive(true);
         }
         function _destroy(map) {
             if (!_isDefined(map)) {

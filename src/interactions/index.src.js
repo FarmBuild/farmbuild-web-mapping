@@ -191,7 +191,6 @@ angular.module('farmbuild.webmapping')
 			$log.info('editing enabled');
 			_select.enable();
 			_modify.enable();
-			_snap.enable();
 			_draw.disable();
 			_mode = 'edit';
 		};
@@ -204,7 +203,6 @@ angular.module('farmbuild.webmapping')
 			_select.disable();
 			_modify.disable();
 			_draw.enable();
-			_snap.enable();
 			_mode = 'draw';
 		};
 
@@ -216,7 +214,6 @@ angular.module('farmbuild.webmapping')
 			_select.disable();
 			_modify.disable();
 			_draw.enable();
-			_snap.enable();
 			_mode = 'donut-draw';
 		};
 

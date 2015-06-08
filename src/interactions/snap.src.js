@@ -50,7 +50,7 @@ angular.module('farmbuild.webmapping')
 			function _init() {
 				$log.info('snap interaction init ...');
 				map.addInteraction(snapInteraction);
-				snapInteraction.setActive(false);
+				snapInteraction.setActive(true);
 			}
 
 			function _destroy(map) {
