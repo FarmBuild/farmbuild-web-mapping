@@ -11,7 +11,7 @@
 angular.module('farmbuild.webmapping')
 	.factory('webMappingDrawInteraction',
 	function (validations,
-	          $log, $rootScope) {
+	          $log, $rootScope, $timeout) {
 		var _isDefined = validations.isDefined;
 
 		function _create(map, farmSource, paddocksSource) {
@@ -28,7 +28,7 @@ angular.module('farmbuild.webmapping')
 					$log.info('draw end ...');
 					var feature = e.feature;
 					clipFn(feature, paddocksSource, farmSource);
-					setTimeout(function () {
+					$timeout(function () {
 						paddocksSource.removeFeature(feature);
 					}, 100);
 					drawingStatus = false;

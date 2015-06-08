@@ -62,23 +62,13 @@ angular.module('farmbuild.webmapping')
 				map.removeInteraction(snapInteraction)
 			}
 
-			function _hide() {
-				snapVisibleLayer.setVisible(false);
-			}
-
-			function _show() {
-				snapVisibleLayer.setVisible(true);
-			}
-
 			return {
 				init: _init,
 				enable: _enable,
 				disable: _disable,
 				addFeatures: _addFeatures,
 				interaction: snapInteraction,
-				destroy: _destroy,
-				hide: _hide,
-				show: _show
+				destroy: _destroy
 			};
 
 		};

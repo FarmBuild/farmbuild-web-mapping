@@ -3,7 +3,8 @@
 angular.module('farmbuild.webmapping')
 	.factory('webMappingOpenLayersHelper',
 	function (validations,
-	          webMappingMeasureInteraction,
+	          webMappingMeasureControl,
+	          webMappingSnapControl,
 	          webMappingGoogleAddressSearch,
 	          $log) {
 		var _isDefined = validations.isDefined,
@@ -63,10 +64,11 @@ angular.module('farmbuild.webmapping')
 				extent: map.getLayers().item(1).getSource().getExtent()
 			}));
 			map.addControl(new ol.control.ScaleLine())
-			map.addControl(new webMappingMeasureInteraction.create(map, 'Polygon'));
-			map.addControl(new webMappingMeasureInteraction.create(map, 'LineString'));
+			map.addControl(new webMappingMeasureControl.create(map, 'Polygon'));
+			map.addControl(new webMappingMeasureControl.create(map, 'LineString'));
+			map.addControl(new webMappingSnapControl.create());
 			map.addControl(new ol.control.LayerSwitcher({
-				tipLabel: 'Légende' // Optional label for button
+				tipLabel: 'Switch on/off farm layers'
 			}));
 		}
 

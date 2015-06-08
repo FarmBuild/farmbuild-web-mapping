@@ -301,8 +301,21 @@ form textarea {
   background-color: #ff6600;
 }
 
-.ol-touch .measure {
-  top: 95px;
+.ol-touch .measure.length {
+  top: 110px;
+}
+
+.snap {
+  top: 140px;
+  left: .5em;
+}
+
+.snap.active button {
+  background-color: #ff6600;
+}
+
+.ol-touch .snap {
+  top: 140px;
 }
 
 .layer-switcher {
