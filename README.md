@@ -13,7 +13,7 @@ For more information about API and Testing see the [Wiki](https://github.com/Far
 <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/0.1.15/index.html" target="_blank">API documentation</a>
 
 
-* <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/measure-tool/examples/index.html" target="_blank">Load or create FarmData - angularJS example</a>
+<a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/examples/index.html" target="_blank">Load or create FarmData - angularJS example</a>
 
 ## Supported projections
 <a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/src/projections/README.md">Read me</a>
