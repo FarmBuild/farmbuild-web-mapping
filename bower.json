@@ -1,6 +1,6 @@
 {
   "name": "farmbuild-web-mapping",
-  "description": "This project is the dairy nutrient calculator module of farm build JavaScript library",
+  "description": "This project is the web mapping module of farm build JavaScript library",
   "version": "0.1.13",
   "homepage": "https://github.com/FarmBuild/farmbuild-web-mapping",
   "license": "MIT",
