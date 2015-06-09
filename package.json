@@ -3,7 +3,7 @@
   "private": true,
   "version": "0.1.15",
   "description": "This project is the web mapping module of farm build JavaScript library",
-  "repository": "https://github.com/FarmBuild/farmbuild-dairy-nutrient-calculator",
+  "repository": "https://github.com/FarmBuild/farmbuild-web-mapping",
   "license": "MIT",
   "dependencies": {
     "mkdirp": "^0.5.1"
