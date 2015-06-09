@@ -18,7 +18,7 @@ module.exports = function(config){
       'src/paddocks/*.src.js',
       'src/openlayers/*.src.js',
       'src/parcels/*.src.js',
-      'src/ga/*.src.js',
+      'src/controls/*.src.js',
       'src/google/**/*.src.js',
       'src/projections/index.src.js',
       'src/index.src.js',
