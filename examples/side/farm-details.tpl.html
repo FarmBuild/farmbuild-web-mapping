@@ -44,6 +44,13 @@
     <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
         Clear session
     </button>
+<hr/>
+    <button class="btn btn-primary" ng-click="toKml()" ng-show="farmData.name">
+        Export Kml
+    </button>
+    <button class="btn btn-primary" ng-click="toGeoJson()" ng-show="farmData.name">
+        Export GeoJson
+    </button>
     <hr>
     <a href="../index.html">Load or create another farmData</a>
 </form-section>

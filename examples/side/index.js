@@ -5,7 +5,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 	})
 
 	.controller('MapCtrl',
-	function ($scope, $log, $location, $rootScope, webmapping) {
+	function ($scope, $log, $location, $rootScope, $filter, webmapping) {
 
 		var dataProjection,
 
@@ -30,6 +30,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.farmData.selectedPaddockName = '';
 		$scope.donutDrawing = false;
 		$scope.farmSelected = false;
+
+		$scope.toGeoJson = function () {
+			farmbuild.webmapping.exportGeoJson(document, $scope.farmData);
+		};
+
+		$scope.toKml = function () {
+			farmbuild.webmapping.exportKml(document, $scope.farmData);
+		};
 
 		$scope.loadFarmData = function () {
 			var geoJsons;
