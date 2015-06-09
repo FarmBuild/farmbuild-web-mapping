@@ -264,8 +264,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$log.error('Draw farm boundary first!');
 				return;
 			}
-
 			$scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
+			olHelper.updateExtent(olmap);
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 		};

@@ -10,7 +10,8 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined,
 			_geoJSONFormat = new ol.format['GeoJSON'](),
 			_googleProjection = 'EPSG:3857',
-			_openLayersDefaultProjection = 'EPSG:4326';
+			_openLayersDefaultProjection = 'EPSG:4326',
+			_extentControl;
 
 		function _transformToGoogleLatLng(latLng, destinationProjection) {
 			if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
@@ -60,10 +61,10 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function addControls(map) {
-			map.addControl(new ol.control.ZoomToExtent({
-				extent: map.getLayers().item(1).getSource().getExtent()
-			}));
-			map.addControl(new ol.control.ScaleLine())
+			if(_isDefined(_extentControl)) {
+				map.addControl(_extentControl);
+			}
+			map.addControl(new ol.control.ScaleLine());
 			map.addControl(new webMappingMeasureControl.create(map, 'Polygon'));
 			map.addControl(new webMappingMeasureControl.create(map, 'LineString'));
 			map.addControl(new webMappingSnapControl.create());
@@ -115,6 +116,9 @@ angular.module('farmbuild.webmapping')
 
 			gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
 			targetElement.parentNode.removeChild(targetElement);
+			_extentControl = new ol.control.ZoomToExtent({
+				extent: map.getLayers().item(1).getSource().getExtent()
+			});
 			addControls(map);
 			view.fitExtent(extent, map.getSize());
 		};
@@ -246,6 +250,16 @@ angular.module('farmbuild.webmapping')
 			webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
 		};
 
+		function _updateExtent(map) {
+			if(_isDefined(_extentControl)) {
+				map.removeControl(_extentControl);
+			}
+			_extentControl = new ol.control.ZoomToExtent({
+				extent: map.getLayers().item(1).getSource().getExtent()
+			});
+			map.addControl(_extentControl);
+		};
+
 		return {
 			exportGeometry: _exportGeometry,
 			clear: _clear,
@@ -260,7 +274,8 @@ angular.module('farmbuild.webmapping')
 			geoJsonToFeatures: _geoJsonToOpenLayerFeatures,
 			transformFromGoogleLatLng: _transformFromGoogleLatLng,
 			transformToGoogleLatLng: _transformToGoogleLatLng,
-			initAddressSearch: _initAddressSearch
+			initAddressSearch: _initAddressSearch,
+			updateExtent: _updateExtent
 		}
 
 	});
