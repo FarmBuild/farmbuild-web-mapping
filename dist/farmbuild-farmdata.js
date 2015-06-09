@@ -1828,7 +1828,7 @@ angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, $
         var farmFeature = geoJsons.farm.features[0], paddocks = geoJsons.paddocks;
         farmData.geometry = farmdataConverter.convertToFarmDataGeometry(farmFeature.geometry);
         var farmDataMerged = farmdataPaddocks.merge(farmData, geoJsons);
-        return farmdataSession.save(farmDataMerged);
+        return farmdataSession.update(farmDataMerged);
     }
     farmdataSession.merge = merge;
     farmdataSession.clear = function() {
