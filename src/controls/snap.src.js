@@ -24,10 +24,12 @@ angular.module('farmbuild.webmapping')
             farmbuild.webmapping.actions.snapping.disable();
             eventToCast = 'web-mapping-snap-disabled';
             element.className = baseCssClass;
+            element.title = 'Enable snapping';
           } else {
             farmbuild.webmapping.actions.snapping.enable();
             eventToCast = 'web-mapping-snap-enabled';
             element.className = baseCssClass + 'active';
+            element.title = 'Disable snapping';
           }
           $rootScope.$broadcast(eventToCast)
         };
@@ -37,6 +39,7 @@ angular.module('farmbuild.webmapping')
 
         var element = document.createElement('div');
         element.className = baseCssClass + ' active';
+        element.title = 'Disable snapping';
         element.appendChild(button);
 
         ol.control.Control.call(this, {

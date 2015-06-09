@@ -14,7 +14,7 @@
 
 <div ng-controller="MapCtrl">
 
-<modal ng-show="measuredValue > 0" ng-include="'modal.tpl.html'"></modal>
+    <modal ng-show="measuredValue > 0" ng-include="'modal.tpl.html'"></modal>
     <modal ng-if="noResult"
            ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
     <div class="col-md-3 col-lg-3">
@@ -23,13 +23,15 @@
     </div>
     <div class="col-md-9 col-lg-9">
         <div id="map" class="map">
-            <input type="text" id="locationAutoComplete" class="address-search addon" >
-            <label>Edit layer</label>
-            <select id="layers" class="farm-layers addon">
-                <option value="none">None</option>
-                <option value="farm">Farm</option>
-                <option value="paddocks">Paddocks</option>
-            </select>
+            <input type="text" id="locationAutoComplete" class="address-search addon">
+            <wrapper>
+                <!--<label for="layers" class="farm-layers-label">Edit layer</label>-->
+                <select id="layers" class="farm-layers addon">
+                    <option value="none">None</option>
+                    <option value="farm">Farm</option>
+                    <option value="paddocks">Paddocks</option>
+                </select>
+            </wrapper>
         </div>
         <div id="olmap" class="fill"></div>
         <div id="gmap" tabindex="0" class="fill"></div>

@@ -84,6 +84,7 @@ angular.module('farmbuild.webmapping')
 
 				var element = document.createElement('div');
 				element.className = baseCssClass + cssClass;
+				element.title = 'Measure ' + cssClass;
 				element.appendChild(button);
 
 				ol.control.Control.call(this, {

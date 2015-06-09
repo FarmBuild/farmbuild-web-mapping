@@ -199,6 +199,14 @@ div.fill {
   width: 150px;
 }
 
+.farm-layers-label {
+  top: 6px;
+  right: 5px;
+  width: 150px;
+  position: absolute;
+  color: #ffffff;
+}
+
 .init-hidden {
   display: none;
 }

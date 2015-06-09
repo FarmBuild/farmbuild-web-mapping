@@ -102,6 +102,7 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", funct
             button.addEventListener("touchstart", handleMeasure, false);
             var element = document.createElement("div");
             element.className = baseCssClass + cssClass;
+            element.title = "Measure " + cssClass;
             element.appendChild(button);
             ol.control.Control.call(this, {
                 element: element,
@@ -131,10 +132,12 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapControl", function
                 farmbuild.webmapping.actions.snapping.disable();
                 eventToCast = "web-mapping-snap-disabled";
                 element.className = baseCssClass;
+                element.title = "Enable snapping";
             } else {
                 farmbuild.webmapping.actions.snapping.enable();
                 eventToCast = "web-mapping-snap-enabled";
                 element.className = baseCssClass + "active";
+                element.title = "Disable snapping";
             }
             $rootScope.$broadcast(eventToCast);
         }
@@ -142,6 +145,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapControl", function
         button.addEventListener("touchstart", toggle, false);
         var element = document.createElement("div");
         element.className = baseCssClass + " active";
+        element.title = "Disable snapping";
         element.appendChild(button);
         ol.control.Control.call(this, {
             element: element,
