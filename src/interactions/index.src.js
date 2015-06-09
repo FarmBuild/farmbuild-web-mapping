@@ -122,16 +122,19 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _clipPaddocks(featureToClip, paddockSource, farmSource) {
+			var name = featureToClip.getProperties().name,
+				paddocksFeatures, farmFeatures, id, clipped;
 			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] === Infinity) {
 				$log.error('please draw farm boundaries before adding paddock');
 				return;
 			}
-			// paddockSource.removeFeature(featureToClip);
-			var clipped,
-				paddocksFeatures = paddockSource.getFeatures(),
-				farmFeatures = farmSource.getFeatures(),
-				name = featureToClip.getProperties().name,
-				id = featureToClip.getProperties()._id;
+			if(_isDefined(name)) {
+				paddockSource.removeFeature(featureToClip);
+			}
+			paddocksFeatures = paddockSource.getFeatures();
+			farmFeatures = farmSource.getFeatures();
+			name = featureToClip.getProperties().name;
+			id = featureToClip.getProperties()._id;
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
 			_addFeature(_activeLayer, clipped, name, id);
@@ -268,7 +271,7 @@ angular.module('farmbuild.webmapping')
 			if (!_isDefined(_snap)) {
 				return;
 			}
-            return _snap.interaction.getActive();
+			return _snap.interaction.getActive();
 		};
 
 		function _enableSnapping() {
