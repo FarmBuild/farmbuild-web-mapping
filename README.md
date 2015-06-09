@@ -18,4 +18,4 @@ For more information about API and Testing see the [Wiki](https://github.com/Far
 ## Supported projections
 <a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/src/projections/README.md">Read me</a>
 
-[![Build Status](https://travis-ci.org/FarmBuild/farmbuild-web-mapping.svg?branch=measure-tool)](https://travis-ci.org/FarmBuild/farmbuild-web-mapping)
+[![Build Status](https://travis-ci.org/FarmBuild/farmbuild-web-mapping.svg)](https://travis-ci.org/FarmBuild/farmbuild-web-mapping)
