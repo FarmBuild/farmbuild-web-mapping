@@ -72,18 +72,18 @@ angular.module('farmbuild.webmapping')
 
 		};
 
-		function _addFeature(layer, feature, name, id) {
+		function _addFeature(layer, feature, properties) {
 			if (!_isDefined(feature)) {
 				return;
 			}
-			if (!_isDefined(name)) {
+			if (!_isDefined(properties.name)) {
 				if (_activeLayerName === 'farm') {
-					name = _farmName;
+					properties.name = _farmName;
 				} else {
-					name = 'Paddock ' + (new Date()).getTime();
+					properties.name = 'Paddock ' + (new Date()).getTime();
 				}
 			}
-			feature.setProperties({name: name, _id: id});
+			feature.setProperties(properties);
 			$log.info('adding feature ...', feature);
 			layer.getSource().addFeature(feature);
 			_clearSelections();
@@ -122,53 +122,51 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _clipPaddocks(featureToClip, paddockSource, farmSource) {
-			var name = featureToClip.getProperties().name,
-				paddocksFeatures, farmFeatures, id, clipped;
+			var properties = featureToClip.getProperties(),
+				paddocksFeatures, farmFeatures, clipped;
 			if (farmSource.getFeatures()[0].getGeometry().getExtent()[0] === Infinity) {
 				$log.error('please draw farm boundaries before adding paddock');
 				return;
 			}
-			if(_isDefined(name)) {
+			if(_isDefined(properties.name)) {
 				paddockSource.removeFeature(featureToClip);
 			}
 			paddocksFeatures = paddockSource.getFeatures();
 			farmFeatures = farmSource.getFeatures();
-			name = featureToClip.getProperties().name;
-			id = featureToClip.getProperties()._id;
+			properties = featureToClip.getProperties();
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
-			_addFeature(_activeLayer, clipped, name, id);
+			_addFeature(_activeLayer, clipped, properties);
 		};
 
 		function _clipDonut(donutFeature) {
-			var name, id,
+			var properties,
 				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
 				clipped = _transform.erase(paddockFeature, donutFeature);
 			if (!_isDefined(paddockFeature)) {
 				$log.error('donut must be inside a paddock');
 				return;
 			}
-			name = paddockFeature.getProperties().name;
-			id = paddockFeature.getProperties()._id;
+			properties = paddockFeature.getProperties();
 			if (_isDefined(clipped)) {
-				_addFeature(_activeLayer, clipped, name, id);
+				_addFeature(_activeLayer, clipped, properties);
 				_activeLayer.getSource().removeFeature(paddockFeature);
 			}
 		};
 
 		function _clipFarm(featureToClip, farmSource) {
 			var clipped = featureToClip,
-				name;
+				properties;
 			if (farmSource.getFeatures()[0]) {
-				name = farmSource.getFeatures()[0].getProperties().name;
+				properties = farmSource.getFeatures()[0].getProperties();
 			}
 			if (farmSource.getFeatures()[0] && farmSource.getFeatures()[0].getGeometry().getExtent()[0] !== Infinity) {
 				clipped = _transform.erase(featureToClip, farmSource.getFeatures()[0]);
-				_addFeature(_activeLayer, clipped, name);
+				_addFeature(_activeLayer, clipped, properties);
 				clipped = _transform.merge(farmSource.getFeatures());
 			}
 			_remove(farmSource.getFeatures(), false);
-			_addFeature(_activeLayer, clipped, name);
+			_addFeature(_activeLayer, clipped, properties);
 			_clearSelections();
 		};
 

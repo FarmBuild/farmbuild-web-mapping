@@ -17,11 +17,11 @@
     <modal ng-show="measuredValue > 0" ng-include="'modal.tpl.html'"></modal>
     <modal ng-if="noResult"
            ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
-    <div class="col-md-3 col-lg-3">
+    <div class="col-md-4 col-lg-3">
         <paddock-details ng-include="'paddock-details.tpl.html'"></paddock-details>
         <farm-details ng-include="'farm-details.tpl.html'"></farm-details>
     </div>
-    <div class="col-md-9 col-lg-9">
+    <div class="col-md-8 col-lg-9">
         <div id="map" class="map">
             <input type="text" id="locationAutoComplete" class="address-search addon">
             <wrapper>

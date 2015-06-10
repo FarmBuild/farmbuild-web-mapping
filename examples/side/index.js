@@ -27,7 +27,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.farmChanged = false;
 		$scope.paddockChanged = false;
 		$scope.noResult = $scope.farmLoaded = false;
-		$scope.farmData.selectedPaddockName = '';
+		$scope.selectedPaddock = {
+			name: '',
+			type: '',
+			comment: ''
+		};
 		$scope.donutDrawing = false;
 		$scope.farmSelected = false;
 
@@ -189,13 +193,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.cancel();
 			}
 			if ((selectedLayer !== 'paddocks') || !paddockAtCoordinate) {
-				$scope.farmData.selectedPaddockName = '';
+				$scope.selectedPaddock = {};
 				$scope.$apply();
 				return;
 			}
-			$scope.farmData.selectedPaddockName = paddockAtCoordinate.getProperties().name;
-			$scope.farmData.selectedPaddockArea = measurement.area(paddockAtCoordinate);
-			$log.info('Paddock selected: ' + $scope.farmData.selectedPaddockName);
+			$scope.selectedPaddock = paddockAtCoordinate.getProperties();
+			$scope.selectedPaddock.area = measurement.area(paddockAtCoordinate);
+			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
 			$scope.$apply();
 		}
 
@@ -240,7 +244,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.exportFarmData = function (farmData) {
 			var paddocksGeometry = olHelper.exportGeometry(olmap.getLayers().item(0).getSource(), dataProjection, featureProjection);
 			var farmGeometry = olHelper.exportGeometry(olmap.getLayers().item(1).getSource(), dataProjection, featureProjection);
-
 			webmapping.export(document, farmData, {paddocks: paddocksGeometry, farm: farmGeometry});
 		};
 
@@ -268,6 +271,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olHelper.updateExtent(olmap);
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
+			$scope.selectedPaddock = {};
 		};
 
 		$scope.removeSelectedPaddock = function () {
@@ -275,7 +279,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			var selectedPaddocks = actions.features.selected();
 			actions.remove(selectedPaddocks);
 			$scope.paddockChanged = false;
-			$scope.farmData.selectedPaddockName = '';
+			$scope.selectedPaddock = {};
 			onFarmChanged();
 		};
 
@@ -324,9 +328,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			onFarmChanged();
 		};
 
-		$scope.onPaddockNameChanged = function () {
+		$scope.onPaddockDetailsChanged = function () {
+			var sp = $scope.selectedPaddock;
 			actions.features.selected().item(0).setProperties({
-				name: $scope.farmData.selectedPaddockName
+				type: sp.type,
+				name: sp.name,
+				comment: sp.comment,
+				area: sp.area
 			});
 			onPaddockChanged();
 		};

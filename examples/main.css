@@ -345,3 +345,7 @@ form textarea {
 .layer-switcher .panel input {
   margin-right: 5px;
 }
+
+.btn {
+  margin-top: 10px;
+}

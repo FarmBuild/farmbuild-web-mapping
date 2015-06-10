@@ -1,33 +1,59 @@
-<form-section ng-show="farmData.selectedPaddockName">
-    <form-item class="form-group">
-        <label for="selectedPaddockName">Paddock's Name:</label>
-        <input type="text" id="selectedPaddockName" class="form-control"
-               ng-model="farmData.selectedPaddockName"
-               ng-change="onPaddockNameChanged()"
-               required
-                />
-    </form-item> <form-item class="form-group">
-        <label for="selectedPaddockName">Paddock's Area in hectares:</label>
-        <p type="text" id="selectedPaddockArea" class="form-control"
-               ng-bind="farmData.selectedPaddockArea | number : 2"
-                ></p>
-    </form-item>
-    <button class="btn btn-primary" ng-click="enableDonutDrawing()" ng-show="farmData.name && !donutDrawing">
-        Enable donut drawing
-    </button>
-    <button class="btn btn-primary" ng-click="disableDonutDrawing()" ng-show="farmData.name && donutDrawing">
-        Disable donut drawing
-    </button>
-    <button class="btn btn-danger" ng-click="removeSelectedPaddock()" ng-show="farmData.name">
-        Remove
-    </button>
-    <wrapper ng-show="paddockChanged">
-        <button class="btn btn-primary" ng-click="apply()">
-            Apply
+<fieldset ng-show="selectedPaddock.name">
+    <legend>Paddock information</legend>
+    <form-section>
+        <form-item class="form-group">
+            <label for="selectedPaddockName">Name:</label>
+            <input type="text" id="selectedPaddockName" class="form-control"
+                   ng-model="selectedPaddock.name"
+                   ng-change="onPaddockDetailsChanged()"
+                   required
+                    />
+        </form-item>
+        <form-item class="form-group">
+            <label for="selectedPaddockArea">Area (hectares):</label>
+
+            <p type="text" id="selectedPaddockArea" class="form-control"
+               ng-bind="selectedPaddock.area | number : 2"
+                    ></p>
+        </form-item>
+        <form-item class="form-group">
+            <label for="selectedPaddockType">Type:</label>
+            <select id="selectedPaddockType" class="form-control" ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.type">
+                <option value="Annual Pasture">Annual Pasture</option>
+                <option value="Bull Paddock">Bull Paddock</option>
+                <option value="Calving paddocks">Calving paddocks</option>
+                <option value="Calf Rearing Area">Calf Rearing Area</option>
+                <option value="Dairy">Dairy</option>
+                <option value="Effluent Paddocks">Effluent Paddocks</option>
+                <option value="Feedpad">FeedPad</option>
+                <option value="Lucerne">Lucerne</option>
+                <option value="Other Crops">Other Crops</option>
+                <option value="Permanent Pasture">Permanent Pasture</option>
+                <option value="Springer Paddock">Springer Paddocks</option>
+                <option value="Sumer Crops">Summer Crops</option>
+            </select>
+        </form-item>
+        <form-item class="form-group">
+            <label for="selectedPaddockComment">Comment:</label>
+            <textarea id="selectedPaddockComment" class="form-control" ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.comment"></textarea>
+        </form-item>
+        <button class="btn btn-primary" ng-click="enableDonutDrawing()" ng-show="farmData.name && !donutDrawing">
+            Enable donut drawing
         </button>
-        <button class="btn btn-default" ng-click="cancel()">
-            Cancel
+        <button class="btn btn-primary" ng-click="disableDonutDrawing()" ng-show="farmData.name && donutDrawing">
+            Disable donut drawing
         </button>
-    </wrapper>
-    <hr/>
-</form-section>
+        <button class="btn btn-danger" ng-click="removeSelectedPaddock()" ng-show="farmData.name">
+            Remove
+        </button>
+        <wrapper ng-show="paddockChanged">
+            <button class="btn btn-primary" ng-click="apply()">
+                Apply
+            </button>
+            <button class="btn btn-default" ng-click="cancel()">
+                Cancel
+            </button>
+        </wrapper>
+        <hr/>
+    </form-section>
+</fieldset>
