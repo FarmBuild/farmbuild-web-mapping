@@ -277,7 +277,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.removeSelectedPaddock = function () {
 			$log.info('removing selected paddock(s)...');
 			var selectedPaddocks = actions.features.selected();
-			actions.remove(selectedPaddocks);
+			actions.features.remove(selectedPaddocks);
 			$scope.paddockChanged = false;
 			$scope.selectedPaddock = {};
 			onFarmChanged();
@@ -286,7 +286,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.removeFarm = function () {
 			$log.info('removing farm...');
 			var farmFeature = olmap.getLayers().item(1).getSource().getFeatures();
-			actions.remove(farmFeature);
+			actions.features.remove(farmFeature);
 			$scope.farmSelected = false;
 			onFarmChanged();
 		};

@@ -54,7 +54,7 @@ describe('farmbuild.webmapping module', function() {
       expect(angular.equals(source.name, saved.name)).toBeTruthy()
 
       expect(angular.equals(source.geometry, saved.geometry)).toBeTruthy()
-      expect(angular.equals(source.paddocks, saved.paddocks)).toBeTruthy()
+      expect(angular.equals(source.paddocks.length, saved.paddocks.length)).toBeTruthy()
 
     }))
   })
