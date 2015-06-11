@@ -313,7 +313,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap.on('click', mapOnClick);
 			olmap.getLayers().item(0).getSource().on('changefeature', onPaddockChanged);
 			olmap.getLayers().item(1).getSource().on('changefeature', onFarmChanged);
-
+			loadParcels();
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 			if (selectedLayer === 'farm') {
@@ -351,7 +351,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			onPaddockChanged();
 		};
 
-		$rootScope.$on('mapdrawend', function () {
+		$rootScope.$on('web-mapping-draw-end', function () {
 			$scope.farmChanged = true;
 		});
 
