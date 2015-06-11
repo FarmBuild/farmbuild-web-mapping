@@ -45,8 +45,22 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			farmbuild.webmapping.exportKml(document, $scope.farmData);
 		};
 
+		$scope.destroyGmap = function(){
+			var gmapEl = document.getElementById('gmap'),
+				gmapParentEl = gmapEl.parentNode;
+			gmap.unbindAll();
+			gmap = null;
+			gmapParentEl.removeChild(gmapEl);
+			gmapEl = document.createElement('div');
+			gmapEl.id= 'gmap';
+			gmapEl.className = 'fill';
+			gmapParentEl.appendChild(gmapEl);
+			gmapElement = gmapEl;
+		}
+
 		$scope.reloadG = function(gmapType){
 			var targetElement = document.getElementById('olmap');
+			$scope.destroyGmap();
 			gmap = createGoogleMap(gmapType);
 
 			/** Openlayers 3 does not support google maps as a tile layer,
@@ -409,12 +423,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		});
 
 		$rootScope.$on('web-mapping-base-layer-change', function (event, data) {
-			console.log(data);
 			if(data.layer.getProperties().title ===  'Google Street'){
 				$scope.reloadG();
+				return;
 			}
 			if(data.layer.getProperties().title ===  'Google Imagery'){
 				$scope.reloadG(google.maps.MapTypeId.SATELLITE);
+				return;
 			}
 		});
 
