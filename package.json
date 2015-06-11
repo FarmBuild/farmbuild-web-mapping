@@ -55,7 +55,6 @@
     "copy-ol": "ncp lib/ol/ dist/ol --filter='^((?!debug).)*$'",
     "copy-turf": "ncp bower_components/turf/ dist/turf --filter=.min.js",
     "copy-proj4js": "ncp bower_components/proj4/dist/ dist/proj4 --filter=proj4.js",
-    "copy-ol-layer-switcher": "ncp bower_components/ol3-layerswitcher/src/ dist/ol3-layerswitcher",
-    "dist": "npm run clean && npm run generate-docs && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-turf && npm run copy-proj4js && npm run copy-ol-layer-switcher"
+    "dist": "npm run clean && npm run generate-docs && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-turf && npm run copy-proj4js"
   }
 }
