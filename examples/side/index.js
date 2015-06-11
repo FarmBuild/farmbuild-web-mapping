@@ -32,7 +32,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.selectedPaddock = {
 			name: '',
 			type: '',
-			comment: ''
+			comment: '',
+			group: ''
 		};
 		$scope.donutDrawing = false;
 		$scope.farmSelected = false;
@@ -395,7 +396,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				type: sp.type,
 				name: sp.name,
 				comment: sp.comment,
-				area: sp.area
+				area: sp.area,
+				group: sp.group
 			});
 			onPaddockChanged();
 		};
@@ -431,6 +433,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.reloadG(google.maps.MapTypeId.SATELLITE);
 				return;
 			}
+			var GMAP = document.getElementById('gmap');
+			GMAP.firstChild.firstChild.style.display = 'none'
 		});
 
 	});
