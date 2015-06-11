@@ -74,7 +74,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap = createOpenLayerMap(geoJsons);
 
 			/**  Create google map object, customise the map object as you like. */
-			gmap = createGoogleMap();
+			gmap = createGoogleMap(google.maps.MapTypeId.SATELLITE);
 
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
