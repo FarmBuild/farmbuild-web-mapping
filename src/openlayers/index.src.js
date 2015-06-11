@@ -102,7 +102,7 @@ angular.module('farmbuild.webmapping')
 			}
 			var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
 
-			$log.info('farm extent: %j', extent)
+			$log.info('farm extent: %j', extent);
 
 			if (extent[0] === Infinity) {
 				gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
@@ -255,7 +255,7 @@ angular.module('farmbuild.webmapping')
 				map.removeControl(_extentControl);
 			}
 			_extentControl = new ol.control.ZoomToExtent({
-				extent: map.getLayers().item(1).getSource().getExtent()
+				extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
 			});
 			map.addControl(_extentControl);
 		};
