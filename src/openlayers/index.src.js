@@ -100,7 +100,7 @@ angular.module('farmbuild.webmapping')
 				centerNew: [-36.22488327137526, 145.5826132801325],
 				zoomNew: 6
 			}
-			var extent = map.getLayers().item(1).getSource().getExtent();
+			var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
 
 			$log.info('farm extent: %j', extent)
 
@@ -117,7 +117,7 @@ angular.module('farmbuild.webmapping')
 			gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
 			targetElement.parentNode.removeChild(targetElement);
 			_extentControl = new ol.control.ZoomToExtent({
-				extent: map.getLayers().item(1).getSource().getExtent()
+				extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
 			});
 			addControls(map);
 			view.fitExtent(extent, map.getSize());
