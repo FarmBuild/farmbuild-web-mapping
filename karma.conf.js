@@ -19,6 +19,7 @@ module.exports = function (config) {
 			'src/openlayers/*.src.js',
 			'src/parcels/*.src.js',
 			'src/controls/*.src.js',
+			'src/controls/**/*.src.js',
 			'src/google/**/*.src.js',
 			'src/projections/index.src.js',
 			'src/index.src.js',
