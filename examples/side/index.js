@@ -1,3 +1,5 @@
+'use strict';
+
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 	.run(function ($rootScope) {
@@ -16,7 +18,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			layerSelectionElement = document.getElementById('layers'),
 			gmapElement = document.getElementById('gmap'),
 			gmap,
-			gStreetMap,
 			olmap,
 			actions = webmapping.actions,
 			measurement = webmapping.measurement,
@@ -44,6 +45,16 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			farmbuild.webmapping.exportKml(document, $scope.farmData);
 		};
 
+		$scope.reloadG = function(gmapType){
+			var targetElement = document.getElementById('olmap');
+			gmap = createGoogleMap(gmapType);
+
+			/** Openlayers 3 does not support google maps as a tile layer,
+			 so we need to keep openlayers map view and google maps in sync,
+			 this helper function does the job for you. */
+			olHelper.integrateGMap(gmap, olmap, dataProjection, targetElement, false);
+		};
+
 		$scope.loadFarmData = function () {
 			var geoJsons;
 
@@ -63,14 +74,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olmap = createOpenLayerMap(geoJsons);
 
 			/**  Create google map object, customise the map object as you like. */
-			gmap = createGoogleMap(google.maps.MapTypeId.SATELLITE);
-			//gStreetMap = createGoogleMap();
+			gmap = createGoogleMap();
 
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-			olHelper.integrateGMap(gmap, olmap, dataProjection);
-			//olHelper.integrateGMap(gStreetMap, olmap, dataProjection);
+			//olHelper.integrateGMap(gmap, olmap, dataProjection);
+			olHelper.integrateGMap(gmap, olmap, dataProjection, document.getElementById('olmap'), true);
 
 			/** Enable address google search for your map */
 			olHelper.initAddressSearch('locationAutoComplete', olmap);
@@ -396,6 +406,16 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.measuredValue = data.value;
 			$scope.measuredUnit = data.unit;
 			$scope.$apply();
+		});
+
+		$rootScope.$on('web-mapping-base-layer-change', function (event, data) {
+			console.log(data);
+			if(data.layer.getProperties().title ===  'Google Street'){
+				$scope.reloadG();
+			}
+			if(data.layer.getProperties().title ===  'Google Imagery'){
+				$scope.reloadG(google.maps.MapTypeId.SATELLITE);
+			}
 		});
 
 	});

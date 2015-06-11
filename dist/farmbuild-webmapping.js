@@ -798,7 +798,7 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, $log) {
     var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _googleProjection = "EPSG:3857", _openLayersDefaultProjection = "EPSG:4326", _extentControl;
     function _transformToGoogleLatLng(latLng, destinationProjection) {
         if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
@@ -855,12 +855,40 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             tipLabel: "Switch on/off farm layers"
         }));
     }
-    function _integrateGMap(gmap, map, dataProjection) {
+    function _init(gmap, map, dataProjection, targetElement, init) {
+        var defaults = {
+            centerNew: [ -36.22488327137526, 145.5826132801325 ],
+            zoomNew: 6
+        };
+        var view = map.getView();
+        var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
+        $log.info("farm extent: %j", extent);
+        if (extent[0] === Infinity) {
+            gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+            targetElement.parentNode.removeChild(targetElement);
+            view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], dataProjection, _googleProjection));
+            view.setZoom(defaults.zoomNew);
+            if (init) {
+                addControls(map);
+            }
+            return;
+        }
+        gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+        targetElement.parentNode.removeChild(targetElement);
+        _extentControl = new ol.control.ZoomToExtent({
+            extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
+        });
+        if (init) {
+            addControls(map);
+        }
+        view.fitExtent(extent, map.getSize());
+    }
+    function _integrateGMap(gmap, map, dataProjection, targetElement, init) {
         if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
             return;
         }
         $log.info("integrating google map ...");
-        var view = map.getView(), targetElement = map.getTargetElement();
+        var view = map.getView();
         view.on("change:center", function() {
             var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
             gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
@@ -873,27 +901,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             google.maps.event.trigger(gmap, "resize");
             gmap.setCenter(center);
         };
-        var defaults = {
-            centerNew: [ -36.22488327137526, 145.5826132801325 ],
-            zoomNew: 6
-        };
-        var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
-        $log.info("farm extent: %j", extent);
-        if (extent[0] === Infinity) {
-            gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
-            targetElement.parentNode.removeChild(targetElement);
-            view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], dataProjection, _googleProjection));
-            view.setZoom(defaults.zoomNew);
-            addControls(map);
-            return;
-        }
-        gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
-        targetElement.parentNode.removeChild(targetElement);
-        _extentControl = new ol.control.ZoomToExtent({
-            extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
-        });
-        addControls(map);
-        view.fitExtent(extent, map.getSize());
+        _init(gmap, map, dataProjection, targetElement, init);
     }
     function _center(coordinates, map) {
         if (!_isDefined(coordinates) || !_isDefined(map)) {
@@ -1209,6 +1217,152 @@ angular.module("farmbuild.webmapping").factory("webMappingTransformation", funct
         intersect: _intersect,
         merge: _merge
     };
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webMappingLayerSwitcherControl", function(validations, $rootScope, $log) {
+    ol.control.LayerSwitcher = function(opt_options) {
+        var options = opt_options || {};
+        var tipLabel = options.tipLabel ? options.tipLabel : "Legend";
+        this.mapListeners = [];
+        this.hiddenClassName = "ol-unselectable ol-control layer-switcher";
+        this.shownClassName = this.hiddenClassName + " shown";
+        var element = document.createElement("div");
+        element.className = this.hiddenClassName;
+        var button = document.createElement("button");
+        button.setAttribute("title", tipLabel);
+        element.appendChild(button);
+        this.panel = document.createElement("div");
+        this.panel.className = "panel";
+        element.appendChild(this.panel);
+        var this_ = this;
+        element.onmouseover = function(e) {
+            this_.showPanel();
+        };
+        button.onclick = function(e) {
+            this_.showPanel();
+        };
+        element.onmouseout = function(e) {
+            e = e || window.event;
+            if (!element.contains(e.toElement)) {
+                this_.hidePanel();
+            }
+        };
+        ol.control.Control.call(this, {
+            element: element,
+            target: options.target
+        });
+    };
+    ol.inherits(ol.control.LayerSwitcher, ol.control.Control);
+    ol.control.LayerSwitcher.prototype.showPanel = function() {
+        if (this.element.className != this.shownClassName) {
+            this.element.className = this.shownClassName;
+            this.renderPanel();
+        }
+    };
+    ol.control.LayerSwitcher.prototype.hidePanel = function() {
+        if (this.element.className != this.hiddenClassName) {
+            this.element.className = this.hiddenClassName;
+        }
+    };
+    ol.control.LayerSwitcher.prototype.renderPanel = function() {
+        this.ensureTopVisibleBaseLayerShown_();
+        while (this.panel.firstChild) {
+            this.panel.removeChild(this.panel.firstChild);
+        }
+        var ul = document.createElement("ul");
+        this.panel.appendChild(ul);
+        this.renderLayers_(this.getMap(), ul);
+    };
+    ol.control.LayerSwitcher.prototype.setMap = function(map) {
+        for (var i = 0, key; i < this.mapListeners.length; i++) {
+            this.getMap().unByKey(this.mapListeners[i]);
+        }
+        this.mapListeners.length = 0;
+        ol.control.Control.prototype.setMap.call(this, map);
+        if (map) {
+            var this_ = this;
+            this.mapListeners.push(map.on("pointerdown", function() {
+                this_.hidePanel();
+            }));
+            this.renderPanel();
+        }
+    };
+    ol.control.LayerSwitcher.prototype.ensureTopVisibleBaseLayerShown_ = function() {
+        var lastVisibleBaseLyr;
+        ol.control.LayerSwitcher.forEachRecursive(this.getMap(), function(l, idx, a) {
+            if (l.get("type") === "base" && l.getVisible()) {
+                lastVisibleBaseLyr = l;
+            }
+        });
+        if (lastVisibleBaseLyr) this.setVisible_(lastVisibleBaseLyr, true);
+    };
+    ol.control.LayerSwitcher.prototype.setVisible_ = function(lyr, visible) {
+        var map = this.getMap();
+        lyr.setVisible(visible);
+        if (visible && lyr.get("type") === "base") {
+            ol.control.LayerSwitcher.forEachRecursive(map, function(l, idx, a) {
+                if (l != lyr && l.get("type") === "base") {
+                    l.setVisible(false);
+                }
+            });
+        }
+    };
+    ol.control.LayerSwitcher.prototype.renderLayer_ = function(lyr, idx) {
+        var this_ = this;
+        var li = document.createElement("li");
+        var lyrTitle = lyr.get("title");
+        var lyrId = lyr.get("title").replace(" ", "-") + "_" + idx;
+        var label = document.createElement("label");
+        if (lyr.getLayers) {
+            li.className = "group";
+            label.innerHTML = lyrTitle;
+            li.appendChild(label);
+            var ul = document.createElement("ul");
+            li.appendChild(ul);
+            this.renderLayers_(lyr, ul);
+        } else {
+            var input = document.createElement("input");
+            if (lyr.get("type") === "base") {
+                input.type = "radio";
+                input.name = "base";
+            } else {
+                input.type = "checkbox";
+            }
+            input.id = lyrId;
+            input.checked = lyr.get("visible");
+            input.onchange = function(e) {
+                $rootScope.$broadcast("web-mapping-base-layer-change", {
+                    layer: lyr
+                });
+                this_.setVisible_(lyr, e.target.checked);
+            };
+            li.appendChild(input);
+            label.htmlFor = lyrId;
+            label.innerHTML = lyrTitle;
+            li.appendChild(label);
+        }
+        return li;
+    };
+    ol.control.LayerSwitcher.prototype.renderLayers_ = function(lyr, elm) {
+        var lyrs = lyr.getLayers().getArray().slice().reverse();
+        for (var i = 0, l; i < lyrs.length; i++) {
+            l = lyrs[i];
+            if (l.get("title")) {
+                elm.appendChild(this.renderLayer_(l, i));
+            }
+        }
+    };
+    ol.control.LayerSwitcher.forEachRecursive = function(lyr, fn) {
+        lyr.getLayers().forEach(function(lyr, idx, a) {
+            fn(lyr, idx, a);
+            if (lyr.getLayers) {
+                ol.control.LayerSwitcher.forEachRecursive(lyr, fn);
+            }
+        });
+    };
+    return {};
 });
 
 "use strict";

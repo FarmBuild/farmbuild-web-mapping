@@ -6,6 +6,7 @@ angular.module('farmbuild.webmapping')
 	          webMappingMeasureControl,
 	          webMappingSnapControl,
 	          webMappingGoogleAddressSearch,
+	          webMappingLayerSwitcherControl,
 	          $log) {
 		var _isDefined = validations.isDefined,
 			_geoJSONFormat = new ol.format['GeoJSON'](),
@@ -61,7 +62,7 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function addControls(map) {
-			if(_isDefined(_extentControl)) {
+			if (_isDefined(_extentControl)) {
 				map.addControl(_extentControl);
 			}
 			map.addControl(new ol.control.ScaleLine());
@@ -73,13 +74,45 @@ angular.module('farmbuild.webmapping')
 			}));
 		}
 
-		function _integrateGMap(gmap, map, dataProjection) {
+		function _init(gmap, map, dataProjection, targetElement, init) {
+			var defaults = {
+				centerNew: [-36.22488327137526, 145.5826132801325],
+				zoomNew: 6
+			};
+			var view = map.getView();
+			var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
+
+			$log.info('farm extent: %j', extent);
+
+			if (extent[0] === Infinity) {
+				gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+				targetElement.parentNode.removeChild(targetElement);
+				view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]],
+					dataProjection, _googleProjection));
+				view.setZoom(defaults.zoomNew);
+				if(init) {
+					addControls(map);
+				}
+				return;
+			}
+
+			gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+			targetElement.parentNode.removeChild(targetElement);
+			_extentControl = new ol.control.ZoomToExtent({
+				extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
+			});
+			if(init) {
+				addControls(map);
+			}
+			view.fitExtent(extent, map.getSize());
+		}
+
+		function _integrateGMap(gmap, map, dataProjection, targetElement, init) {
 			if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
 				return;
 			}
 			$log.info('integrating google map ...');
-			var view = map.getView(),
-				targetElement = map.getTargetElement();
+			var view = map.getView();
 			view.on('change:center', function () {
 				var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
 				gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
@@ -95,32 +128,7 @@ angular.module('farmbuild.webmapping')
 				google.maps.event.trigger(gmap, "resize");
 				gmap.setCenter(center);
 			};
-
-			var defaults = {
-				centerNew: [-36.22488327137526, 145.5826132801325],
-				zoomNew: 6
-			}
-			var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
-
-			$log.info('farm extent: %j', extent);
-
-			if (extent[0] === Infinity) {
-				gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
-				targetElement.parentNode.removeChild(targetElement);
-				view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]],
-					dataProjection, _googleProjection));
-				view.setZoom(defaults.zoomNew);
-				addControls(map);
-				return;
-			}
-
-			gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
-			targetElement.parentNode.removeChild(targetElement);
-			_extentControl = new ol.control.ZoomToExtent({
-				extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
-			});
-			addControls(map);
-			view.fitExtent(extent, map.getSize());
+			_init(gmap, map, dataProjection, targetElement, init);
 		};
 
 		function _center(coordinates, map) {
@@ -251,7 +259,7 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _updateExtent(map) {
-			if(_isDefined(_extentControl)) {
+			if (_isDefined(_extentControl)) {
 				map.removeControl(_extentControl);
 			}
 			_extentControl = new ol.control.ZoomToExtent({
