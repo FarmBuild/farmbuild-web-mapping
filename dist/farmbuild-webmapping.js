@@ -267,7 +267,8 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _draw.init(_clip, _select);
         _snap.init();
     }
-    function _addFeature(layer, feature, properties) {
+    function _addFeature(layer, feature, newProperties) {
+        var properties = newProperties || {};
         if (!_isDefined(feature)) {
             return;
         }

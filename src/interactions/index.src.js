@@ -72,7 +72,8 @@ angular.module('farmbuild.webmapping')
 
 		};
 
-		function _addFeature(layer, feature, properties) {
+		function _addFeature(layer, feature, newProperties) {
+			var properties = newProperties || {};
 			if (!_isDefined(feature)) {
 				return;
 			}
