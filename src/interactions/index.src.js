@@ -83,6 +83,7 @@ angular.module('farmbuild.webmapping')
 					properties.name = 'Paddock ' + (new Date()).getTime();
 				}
 			}
+			properties.geometry = feature.getProperties().geometry;
 			feature.setProperties(properties);
 			$log.info('adding feature ...', feature);
 			layer.getSource().addFeature(feature);
