@@ -439,8 +439,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.reloadG(google.maps.MapTypeId.SATELLITE);
 				return;
 			}
-			var GMAP = document.getElementById('gmap');
-			GMAP.firstChild.firstChild.style.display = 'none'
+			if (data.layer.getProperties().title.indexOf('VicMAP')>-1) {
+				var GMAP = document.getElementById('gmap');
+				GMAP.firstChild.firstChild.style.display = 'none';
+				return;
+			}
 		});
 
 	});
