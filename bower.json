@@ -12,6 +12,6 @@
     "proj4": "2.2.1",
     "turf": "1.4.0",
     "ol3-layerswitcher": "1.0.1",
-    "farmbuild-farmdata": "git://github.com/FarmBuild/farmbuild-farmdata.git#1.0.61"
+    "farmbuild-farmdata": "git://github.com/FarmBuild/farmbuild-farmdata.git#1.0.62"
   }
 }

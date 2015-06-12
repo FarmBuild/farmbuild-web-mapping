@@ -1733,6 +1733,10 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, 
         return {
             name: name,
             _id: id,
+            comment: paddockFeature.properties.comment,
+            type: paddockFeature.properties.type,
+            area: paddockFeature.properties.area,
+            group: paddockFeature.properties.group,
             geometry: farmdataConverter.convertToFarmDataGeometry(paddockFeature.geometry),
             dateLastUpdated: new Date()
         };
