@@ -843,8 +843,11 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         paddocksSource.clear();
         farmSource.clear();
     }
-    function addControls(map) {
-        if (_isDefined(_extentControl)) {
+    function addControls(map, extent) {
+        if (extent) {
+            _extentControl = new ol.control.ZoomToExtent({
+                extent: extent
+            });
             map.addControl(_extentControl);
         }
         map.addControl(new ol.control.ScaleLine());
@@ -855,13 +858,12 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             tipLabel: "Switch on/off farm layers"
         }));
     }
-    function _init(gmap, map, dataProjection, targetElement, init) {
+    function _init(gmap, map, dataProjection, targetElement, init, extent) {
         var defaults = {
             centerNew: [ -36.22488327137526, 145.5826132801325 ],
             zoomNew: 6
         };
         var view = map.getView();
-        var extent = map.getLayers().item(1).getLayers().item(1).getSource().getExtent();
         $log.info("farm extent: %j", extent);
         if (extent[0] === Infinity) {
             gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
@@ -875,15 +877,12 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         }
         gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
         targetElement.parentNode.removeChild(targetElement);
-        _extentControl = new ol.control.ZoomToExtent({
-            extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
-        });
         if (init) {
-            addControls(map);
+            addControls(map, extent);
         }
         view.fitExtent(extent, map.getSize());
     }
-    function _integrateGMap(gmap, map, dataProjection, targetElement, init) {
+    function _integrateGMap(gmap, map, dataProjection, targetElement, init, extent) {
         if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
             return;
         }
@@ -901,7 +900,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             google.maps.event.trigger(gmap, "resize");
             gmap.setCenter(center);
         };
-        _init(gmap, map, dataProjection, targetElement, init);
+        _init(gmap, map, dataProjection, targetElement, init, extent);
     }
     function _center(coordinates, map) {
         if (!_isDefined(coordinates) || !_isDefined(map)) {

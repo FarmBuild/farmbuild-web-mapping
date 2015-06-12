@@ -46,28 +46,32 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			farmbuild.webmapping.exportKml(document, $scope.farmData);
 		};
 
-		$scope.destroyGmap = function(){
+		$scope.destroyGmap = function () {
 			var gmapEl = document.getElementById('gmap'),
 				gmapParentEl = gmapEl.parentNode;
 			gmap.unbindAll();
 			gmap = null;
 			gmapParentEl.removeChild(gmapEl);
 			gmapEl = document.createElement('div');
-			gmapEl.id= 'gmap';
+			gmapEl.id = 'gmap';
 			gmapEl.className = 'fill';
 			gmapParentEl.appendChild(gmapEl);
 			gmapElement = gmapEl;
 		}
 
-		$scope.reloadG = function(gmapType){
-			var targetElement = document.getElementById('olmap');
+		$scope.reloadG = function (gmapType) {
+			var targetElement = document.getElementById('olmap'),
+				extent = olmap.getView().calculateExtent(olmap.getSize()),
+				zoom = olmap.getView().getZoom();
+
 			$scope.destroyGmap();
 			gmap = createGoogleMap(gmapType);
 
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-			olHelper.integrateGMap(gmap, olmap, dataProjection, targetElement, false);
+			olHelper.integrateGMap(gmap, olmap, dataProjection, targetElement, false, extent);
+			olmap.getView().setZoom(zoom);
 		};
 
 		$scope.loadFarmData = function () {
@@ -87,6 +91,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			/** Create openlayers map object, customise the map object as you like. */
 			olmap = createOpenLayerMap(geoJsons);
+			var extent = olmap.getLayers().item(1).getLayers().item(1).getSource().getExtent();
+
 
 			/**  Create google map object, customise the map object as you like. */
 			gmap = createGoogleMap(google.maps.MapTypeId.SATELLITE);
@@ -94,8 +100,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-			//olHelper.integrateGMap(gmap, olmap, dataProjection);
-			olHelper.integrateGMap(gmap, olmap, dataProjection, document.getElementById('olmap'), true);
+				//olHelper.integrateGMap(gmap, olmap, dataProjection);
+			olHelper.integrateGMap(gmap, olmap, dataProjection, document.getElementById('olmap'), true, extent);
 
 			/** Enable address google search for your map */
 			olHelper.initAddressSearch('locationAutoComplete', olmap);
@@ -158,7 +164,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 						params: {LAYERS: 'SATELLITE_WM', VERSION: '1.1.1'}
 					})
 				}),
-			vicMapStreetLayer = new ol.layer.Tile({
+				vicMapStreetLayer = new ol.layer.Tile({
 					title: 'VicMAP Street',
 					type: 'base',
 					visible: false,
@@ -167,12 +173,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 						params: {LAYERS: 'WEB_MERCATOR', VERSION: '1.1.1'}
 					})
 				}),
-			googleImageryLayer = new ol.layer.Tile({
+				googleImageryLayer = new ol.layer.Tile({
 					title: 'Google Imagery',
 					type: 'base',
 					visible: true
 				}),
-			googleStreetLayer = new ol.layer.Tile({
+				googleStreetLayer = new ol.layer.Tile({
 					title: 'Google Street',
 					type: 'base',
 					visible: false
@@ -425,11 +431,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		});
 
 		$rootScope.$on('web-mapping-base-layer-change', function (event, data) {
-			if(data.layer.getProperties().title ===  'Google Street'){
+			if (data.layer.getProperties().title === 'Google Street') {
 				$scope.reloadG();
 				return;
 			}
-			if(data.layer.getProperties().title ===  'Google Imagery'){
+			if (data.layer.getProperties().title === 'Google Imagery') {
 				$scope.reloadG(google.maps.MapTypeId.SATELLITE);
 				return;
 			}
