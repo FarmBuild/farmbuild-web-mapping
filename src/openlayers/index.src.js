@@ -217,8 +217,8 @@ angular.module('farmbuild.webmapping')
         function _reload(map, geoJson, dataProjectionCode, featureProjectionCode) {
             var layers = map.getLayers();
             layers.clear();
-            map.addLayer(_paddocksLayer(geoJson.paddocks, dataProjectionCode, featureProjectionCode));
-            map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
+            map.addLayer(_baseLayers());
+            map.addLayer(_farmLayers(geoJson.farm, geoJson.paddocks, dataProjectionCode, featureProjectionCode));
         };
 
 
