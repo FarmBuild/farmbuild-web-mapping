@@ -8,70 +8,24 @@ angular.module('farmbuild.webmapping')
         var _isDefined = validations.isDefined,
             olHelper = webMappingOpenLayersHelper;
 
-        function _eraseAll(clipee, clippers) {
-            if (!_isDefined(clipee) || !_isDefined(clippers)) {
+        function _transformToGoogleLatLng(latLng, destinationProjection) {
+            if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
                 return;
             }
-            $log.info('erasing feature', clipee);
-            var clipeeGeoJson = olHelper.featureToGeoJson(clipee);
-            clippers.forEach(function (clipper) {
-                var clipperGeoJson = olHelper.featureToGeoJson(clipper);
-                try {
-                    clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
-                } catch (e) {
-                    $log.error(e);
-                }
-            });
-            return olHelper.geoJsonToFeature(clipeeGeoJson);
+            var transformed = ol.proj.transform(latLng, _googleProjection, destinationProjection);
+            return new google.maps.LatLng(transformed[1], transformed[0])
         };
 
-        function _erase(clipee, clipper) {
-            if (!_isDefined(clipee) || !_isDefined(clipper)) {
+        function _transformFromGoogleLatLng(latLng) {
+            if (!_isDefined(latLng)) {
                 return;
             }
-            $log.info('erasing feature 2 from 1', clipee, clipper);
-            var clipeeGeoJson = olHelper.featureToGeoJson(clipee),
-                cliperGeoJson = olHelper.featureToGeoJson(clipper),
-                clipped;
-            try {
-                clipped = turf.erase(clipeeGeoJson, cliperGeoJson);
-                return olHelper.geoJsonToFeature(clipped);
-            } catch (e) {
-                $log.error(e);
-            }
-        };
-
-        function _intersect(olFeature1, olFeature2) {
-            $log.info('intersecting feature', olFeature1, olFeature2);
-            var feature1 = olHelper.featureToGeoJson(olFeature1),
-                feature2 = olHelper.featureToGeoJson(olFeature2),
-                intersection;
-            try {
-                intersection = turf.intersect(feature1, feature2);
-                return olHelper.geoJsonToFeature(intersection);
-            } catch (e) {
-                $log.error(e);
-            }
-        };
-
-        function _merge(olFeatures) {
-            $log.info('merging features ...', olFeatures);
-            var properties, toMerge;
-            toMerge = olHelper.featuresToGeoJson(olFeatures);
-            properties = {name: 'merged ' + (new Date()).getTime()};
-            try {
-                return olHelper.geoJsonToFeature(turf.merge(toMerge), properties);
-            } catch (e) {
-                $log.error(e);
-            }
-
+            return ol.proj.transform([latLng.lng(), latLng.lat()], _openLayersDefaultProjection, _googleProjection);
         };
 
         return {
-            eraseAll: _eraseAll,
-            erase: _erase,
-            intersect: _intersect,
-            merge: _merge
+            transformFromGoogleLatLng: _transformFromGoogleLatLng,
+            transformToGoogleLatLng: _transformToGoogleLatLng
         }
 
     });

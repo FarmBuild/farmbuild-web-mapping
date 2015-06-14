@@ -70,7 +70,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-			olHelper.integrateGMap(gmap, olmap, dataProjection, targetElement, false, extent);
+			olHelper.integrateGoogleMap(gmap, olmap, dataProjection, targetElement, false, extent);
 			olmap.getView().setZoom(zoom);
 		};
 
@@ -100,11 +100,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-				//olHelper.integrateGMap(gmap, olmap, dataProjection);
-			olHelper.integrateGMap(gmap, olmap, dataProjection, document.getElementById('olmap'), true, extent);
+				//olHelper.integrateGoogleMap(gmap, olmap, dataProjection);
+			olHelper.integrateGoogleMap(gmap, olmap, dataProjection, document.getElementById('olmap'), true, extent);
 
 			/** Enable address google search for your map */
-			olHelper.initAddressSearch('locationAutoComplete', olmap);
+			olHelper.initGoogleAddressSearch('locationAutoComplete', olmap);
 
 			layerSelectionElement.addEventListener('change', selectLayer);
 

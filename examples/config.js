@@ -2,6 +2,6 @@
 
 window.farmbuild.examples = {
 	webmapping: {
-		version: '0.1'
+		version: '0.2'
 	}
 };

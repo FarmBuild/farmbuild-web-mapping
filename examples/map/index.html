@@ -1,0 +1,258 @@
+<!doctype>
+<html lang="en" ng-app="farmbuild.webmapping.examples">
+<head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no, width=device-width">
+    <link rel="stylesheet" href="../../dist/ol/ol.css" type="text/css">
+    <link rel="stylesheet" href="../../src/controls/layer-switcher/index.css" type="text/css">
+    <link rel="stylesheet" href="../main.css" type="text/css">
+    <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
+    <title>Load Susan's farm example</title>
+</head>
+<body>
+
+<div ng-controller="MapCtrl">
+
+    <modal ng-show="measuredValue > 0" ng-include="'modal-measure-info.tpl.html'"></modal>
+    <modal ng-if="noResult"
+           ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
+    <div class="col-md-4 col-lg-3"
+         style="overflow: auto;display: block;height: 100%;padding-top: 10px;padding-bottom: 10px;">
+        <paddock-details ng-include="'paddock-details.tpl.html'"></paddock-details>
+        <farm-details ng-include="'farm-details.tpl.html'"></farm-details>
+    </div>
+    <div class="col-md-8 col-lg-9">
+        <div id="map" class="map">
+            <input type="text" id="locationAutoComplete" class="address-search addon">
+            <wrapper>
+                <!--<label for="layers" class="farm-layers-label">Edit layer</label>-->
+                <select id="layers" class="farm-layers addon">
+                    <option value="none">None</option>
+                    <option value="farm">Farm</option>
+                    <option value="paddocks">Paddocks</option>
+                </select>
+            </wrapper>
+        </div>
+        <div id="olmap" class="fill"></div>
+        <div id="gmap" tabindex="0" class="fill"></div>
+    </div>
+</div>
+
+<script src="../../lib/ol/ol-debug.js" type="text/javascript"></script>
+<!--<script src="../../dist/ol/ol.js" type="text/javascript"></script>-->
+<script src="../../dist/proj4/proj4.js"></script>
+<script src="../../dist/turf/turf.min.js"></script>
+
+<script src="https://maps.google.com/maps/api/js?v=3&amp;sensor=false&libraries=places"></script>
+
+<script type="text/javascript" src="../../dist/farmbuild-core.js"></script>
+<script type="text/javascript" src="../../dist/farmbuild-farmdata.js"></script>
+<script type="text/javascript" src="../../dist/farmbuild-webmapping.js"></script>
+
+<script type="text/javascript" src="../config.js"></script>
+<script type="text/javascript" src="index.js"></script>
+<script type="text/ng-template" id="modal-validation-error.tpl.html">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Validation failed</h3>
+            </div>
+            <div class="modal-body">
+                There is a problem with input values.
+                Please see the console for the error log or
+                read <a
+                    href="https://github.com/FarmBuild/farmbuild-dairy-nutrient-calculator">API documentation</a> for
+                more information
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" ng-click="$parent.$parent.noResult=undefined">Ok</button>
+            </div>
+        </div>
+    </div>
+</script>
+
+<script type="text/ng-template" id="paddock-details.tpl.html">
+    <fieldset ng-show="selectedPaddock._id || selectedPaddock.name|| selectedPaddock.geometry">
+        <legend>Paddock information</legend>
+        <form-section>
+            <form-item class="form-group">
+                <label for="selectedPaddockName">Name:</label>
+                <input type="text" id="selectedPaddockName" class="form-control"
+                       ng-model="selectedPaddock.name"
+                       ng-change="onPaddockDetailsChanged()"
+                       required
+                        />
+            </form-item>
+            <form-item class="form-group">
+                <label for="selectedPaddockArea">Area (hectares):</label>
+
+                <p type="text" id="selectedPaddockArea" class="form-control"
+                   ng-bind="selectedPaddock.area | number : 2"
+                        ></p>
+            </form-item>
+            <form-item class="form-group">
+                <label for="selectedPaddockType">Type:</label>
+                <select id="selectedPaddockType" class="form-control" ng-change="onPaddockDetailsChanged()"
+                        ng-model="selectedPaddock.type">
+                    <option value="Annual Pasture">Annual Pasture</option>
+                    <option value="Bull Paddock">Bull Paddock</option>
+                    <option value="Calving paddocks">Calving paddocks</option>
+                    <option value="Calf Rearing Area">Calf Rearing Area</option>
+                    <option value="Dairy">Dairy</option>
+                    <option value="Effluent Paddocks">Effluent Paddocks</option>
+                    <option value="Feedpad">FeedPad</option>
+                    <option value="Lucerne">Lucerne</option>
+                    <option value="Other Crops">Other Crops</option>
+                    <option value="Permanent Pasture">Permanent Pasture</option>
+                    <option value="Springer Paddock">Springer Paddocks</option>
+                    <option value="Sumer Crops">Summer Crops</option>
+                </select>
+            </form-item>
+            <form-item>
+                <label for="selectedPaddockType">Group:</label>
+                <select name="edit_group_type" id="edit_group_type" style="margin-bottom:10px" class="form-control"
+                        ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.group">
+
+                    <option value="0">N/A - Type Not Set</option>
+
+                    <option value="1">E - Effluent</option>
+
+                    <option value="2">N - Night Paddocks</option>
+
+                    <option value="3">A - Average Use and Soil Type Paddock</option>
+
+                    <option value="7">UL - Usually Harvested, Limited Feeding Back</option>
+
+                    <option value="8">UF - Usually Harvested, Usually Fed Back</option>
+
+                    <option value="9">NL - Never Harvested and Limited Feeding Back</option>
+
+                    <option value="10">NF - Never Harvested and Usually Fed Back</option>
+
+                    <option value="11">NL1 - 1st Variation of NL</option>
+
+                    <option value="13">NL2 - 2nd Variation of NL</option>
+
+                    <option value="14">NF1 - 1st Variation of NF</option>
+
+                    <option value="15">NF2 - 2nd Variation of NF</option>
+
+                    <option value="17">UL1 - 1st Variation of UL</option>
+
+                    <option value="18">UF1 - 1st Variation of UF</option>
+
+                    <option value="19">C - Crop</option>
+
+                    <option value="20">FC - Future Crop</option>
+
+                    <option value="21">O - Other</option>
+
+                    <option value="22">O1 - 1st Variation of O</option>
+                </select>
+            </form-item>
+            <form-item class="form-group">
+                <label for="selectedPaddockComment">Comment:</label>
+    <textarea id="selectedPaddockComment" class="form-control" ng-change="onPaddockDetailsChanged()"
+              ng-model="selectedPaddock.comment"></textarea>
+            </form-item>
+            <button class="btn btn-primary" ng-click="enableDonutDrawing()" ng-show="farmData.name && !donutDrawing">
+                Enable donut drawing
+            </button>
+            <button class="btn btn-primary" ng-click="disableDonutDrawing()" ng-show="farmData.name && donutDrawing">
+                Disable donut drawing
+            </button>
+            <button class="btn btn-danger" ng-click="removeSelectedPaddock()" ng-show="farmData.name">
+                Remove
+            </button>
+            <wrapper ng-show="paddockChanged">
+                <button class="btn btn-primary" ng-click="apply()">
+                    Apply
+                </button>
+                <button class="btn btn-default" ng-click="cancel()">
+                    Cancel
+                </button>
+            </wrapper>
+            <hr/>
+        </form-section>
+    </fieldset>
+
+</script>
+<script type="text/ng-template" id="farm-details.tpl.html">
+    <fieldset>
+        <legend>Farm information</legend>
+        <form-section>
+            <form-item class="form-group">
+                <label>Farm name *:</label>
+                <input type="text" id="farmName" name="farmName" class="form-control"
+                       ng-model="farmData.name"
+                       ng-change="onFarmNameChanged()"
+                       required>
+            </form-item>
+            <form-item class="form-group">
+                <label>Area in hectares:</label>
+
+                <p class="form-control"
+                   ng-bind="farmData.area | number : 2"></p>
+            </form-item>
+            <form-item class="form-group">
+                <label>Date last updated:</label>
+          <span class="form-control"
+                ng-bind="farmData.dateLastUpdated | date: 'medium'"></span>
+            </form-item>
+
+            <wrapper ng-show="farmChanged">
+                <button class="btn btn-primary" ng-click="apply()">
+                    Apply
+                </button>
+                <button class="btn btn-default" ng-click="cancel()">
+                    Cancel
+                </button>
+            </wrapper>
+            <wrapper ng-show="farmSelected">
+                <button class="btn btn-danger" ng-click="removeFarm()">
+                    Remove
+                </button>
+            </wrapper>
+            <hr/>
+
+            <wrapper ng-show="!farmChanged && !paddockChanged">
+
+                <button class="btn btn-primary" ng-click="exportFarmData(farmData)">
+                    Export farm data
+                </button>
+
+                <a id="download"></a>
+            </wrapper>
+            <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
+                Clear session
+            </button>
+            <br/>
+            <button class="btn btn-primary" ng-click="toKml()" ng-show="farmData.name">
+                Export KML
+            </button>
+            <button class="btn btn-primary" ng-click="toGeoJson()" ng-show="farmData.name">
+                Export GeoJSON
+            </button>
+            <hr>
+            <a href="../index.html">Load or create another farmData</a>
+        </form-section>
+    </fieldset>
+</script>
+<script type="text/ng-template" id="modal-measure-info.tpl.html">
+    <div class="modal-dialog absolute">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title">Measurement completed</h3>
+            </div>
+            <div class="modal-body">
+                <h4>Measured value is: {{measuredValue | number : 2}} {{measuredUnit}}</h4>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-primary" ng-click="$parent.measuredValue=0">Ok</button>
+            </div>
+        </div>
+    </div>
+</script>
+</body>
+</html>

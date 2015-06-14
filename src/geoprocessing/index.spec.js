@@ -3,7 +3,7 @@
 describe('farmbuild.webMapping module', function () {
 
     // instantiate service
-    var webMappingTransformation, webMapping, olHelper,
+    var webMappingGeoProcessing, webMapping, olHelper,
         $log,
         poly1 = {
             "type": "Feature",
@@ -44,9 +44,9 @@ describe('farmbuild.webMapping module', function () {
         $provide.value('$log', console);
     }));
 
-    beforeEach(inject(function (_webMappingTransformation_, _webmapping_,
+    beforeEach(inject(function (_webMappingGeoProcessing_, _webmapping_,
                                 _$log_) {
-        webMappingTransformation = _webMappingTransformation_;
+        webMappingGeoProcessing = _webMappingGeoProcessing_;
         webMapping = _webmapping_;
         olHelper = webMapping.olHelper;
         $log = _$log_;
