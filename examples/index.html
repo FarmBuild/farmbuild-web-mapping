@@ -6,12 +6,14 @@
     <title>FarmBuild Web Mapping</title>
     <meta name="description" content="">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="stylesheet" href="main.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/form.css">
+    <link rel="stylesheet" href="css/modal.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
 </head>
 <body ng-controller="FarmCtrl">
 <content>
-    <modal ng-if="noResult" ng-include="'modal-validation-error/modal-validation-error.tpl.html'"></modal>
+    <modal ng-if="noResult" ng-include="'modal-validation-error.tpl.html'"></modal>
     <h3>
         FarmBuild Web Mapping
         <small>(angularJS)</small>
@@ -90,24 +92,6 @@
 <script src="../dist/farmbuild-webmapping.js"></script>
 <script src="config.js"></script>
 <script src="index.js"></script>
-<!-- Google Analytics: change UA-XXXXX-X to be your site's ID -->
-<script>
-    (function (i, s, o, g, r, a, m) {
-        i['GoogleAnalyticsObject'] = r;
-        i[r] = i[r] || function () {
-            (i[r].q = i[r].q || []).push(arguments)
-        }, i[r].l = 1 * new Date();
-        a = s.createElement(o),
-                m = s.getElementsByTagName(o)[0];
-        a.async = 1;
-        a.src = g;
-        m.parentNode.insertBefore(a, m)
-    })(window, document, 'script', '//www.google-analytics.com/analytics.js', 'ga');
-
-    var GA_TRACKING_CODE = 'UA-53478356-1';
-
-    ga('create', GA_TRACKING_CODE, 'auto');
-</script>
 
 <script type="text/ng-template" id="modal-validation-error.tpl.html" >
     <div class="modal-dialog">

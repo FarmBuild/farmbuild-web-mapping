@@ -1,0 +1,126 @@
+/* app css stylesheet */
+
+body, html {
+    margin: 0;
+    padding: 0;
+    height: 100%;
+}
+
+body {
+    font-family: arial, sans-serif;
+    width: 100%;
+    position: relative;
+}
+
+buttons {
+    margin-top: 10px;
+    display: block;
+}
+
+empty-message {
+    background-color: #F9F9F9;
+    margin-top: 10px;
+    border: solid 1px #ccc;
+    text-align: center;
+    padding: 60px;
+    display: block;
+}
+
+content {
+    margin: 0 30px 30px;
+    display: block;
+}
+
+summary {
+    margin-bottom: 30px;
+}
+
+table {
+    border: solid 1px #ccc;
+}
+
+version {
+    display: block;
+    height: 40px;
+    border-top: solid 1px #eaeaea;
+    padding: 10px 0;
+    margin-top: 30px;
+}
+
+error {
+    display: block;
+    width: 400px;
+    height: 100px;
+    padding: 10px;
+    margin-bottom: 20px;
+}
+
+#map {
+    width: 100%;
+    height: 100%;
+}
+
+div.fill {
+    width: 100%;
+    height: 100%;
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+
+.ol-scale-line {
+    margin-bottom: 25px;
+}
+
+.draw-control {
+    top: 80px;
+    left: .5em;
+}
+
+.addon {
+    position: absolute;
+    z-index: 1000;
+    display: block;
+    height: 34px;
+    padding: 6px 12px;
+    font-size: 14px;
+    line-height: 1.42857143;
+    color: #555;
+    background-color: #fff;
+    background-image: none;
+    border: 1px solid #ccc;
+    border-radius: 4px;
+    -webkit-box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    box-shadow: inset 0 1px 1px rgba(0, 0, 0, .075);
+    -webkit-transition: border-color ease-in-out .15s, -webkit-box-shadow ease-in-out .15s;
+    -o-transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+    transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
+}
+
+.address-search {
+    top: 6px;
+    left: 40px;
+    width: 400px;
+}
+
+.farm-layers {
+    top: 6px;
+    right: 5px;
+    width: 150px;
+}
+
+.farm-layers-label {
+    top: 6px;
+    right: 5px;
+    width: 150px;
+    position: absolute;
+    color: #ffffff;
+}
+
+.show-errors input.ng-invalid {
+    border: solid 2px #ffe4ea !important;
+}
+
+.btn {
+    margin-top: 10px;
+}

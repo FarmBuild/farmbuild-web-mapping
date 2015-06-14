@@ -8,7 +8,9 @@
     <link rel="stylesheet" href="../../src/controls/layer-switcher/index.css" type="text/css">
     <link rel="stylesheet" href="../../src/controls/measure/index.css" type="text/css">
     <link rel="stylesheet" href="../../src/controls/snap/index.css" type="text/css">
-    <link rel="stylesheet" href="../main.css" type="text/css">
+    <link rel="stylesheet" href="../css/main.css" type="text/css">
+    <link rel="stylesheet" href="../css/form.css">
+    <link rel="stylesheet" href="../css/modal.css">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">
     <title>Load Susan's farm example</title>
 </head>
@@ -18,7 +20,7 @@
 
     <modal ng-show="measuredValue > 0" ng-include="'modal-measure-info.tpl.html'"></modal>
     <modal ng-if="noResult"
-           ng-include="'../modal-validation-error/modal-validation-error.tpl.html'"></modal>
+           ng-include="'modal-validation-error.tpl.html'"></modal>
     <div class="col-md-4 col-lg-3"
          style="overflow: auto;display: block;height: 100%;padding-top: 10px;padding-bottom: 10px;">
         <paddock-details ng-include="'paddock-details.tpl.html'"></paddock-details>
