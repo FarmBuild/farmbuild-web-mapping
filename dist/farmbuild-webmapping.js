@@ -758,31 +758,33 @@ angular.module("farmbuild.webmapping").factory("webMappingSnapInteraction", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function(validations, $log) {
-    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
-    function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
-        if (!_isDefined(olFeature)) {
-            return;
-        }
-        $log.info("Converting openlayer feature to geoJson ...", olFeature);
-        return _geoJSONFormat.writeFeatureObject(olFeature, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
-        });
-    }
+angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function(validations, webMappingConverter, $log) {
+    var _isDefined = validations.isDefined, _converter = webMappingConverter;
     function _areas(features) {
         $log.info("calculating area of features ...", features);
-        return turf.area(features) * 1e-4;
+        try {
+            return turf.area(features) * 1e-4;
+        } catch (e) {
+            $log.error(e);
+        }
     }
     function _area(feature) {
         $log.info("calculating area of polygon ...", feature);
-        var feature = _openLayerFeatureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
-        return turf.area(feature) * 1e-4;
+        feature = _converter.featureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
+        try {
+            return turf.area(feature) * 1e-4;
+        } catch (e) {
+            $log.error(e);
+        }
     }
     function _length(feature) {
         $log.info("calculating length of line ...", feature);
-        var feature = _openLayerFeatureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
-        return turf.lineDistance(feature, "kilometers") * 1e3;
+        feature = _converter.featureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
+        try {
+            return turf.lineDistance(feature, "kilometers") * 1e3;
+        } catch (e) {
+            $log.error(e);
+        }
     }
     return {
         area: _area,
@@ -1015,9 +1017,13 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
     };
 });
 
+angular.module("farmbuild.webmapping").constant("paddockGroupDefaults", {
+    groups: [ "N/A - Type Not Set", "E - Effluent", "N - Night Paddocks", "A - Average Use and Soil Type Paddock", "UL - Usually Harvested, Limited Feeding Back", "UF - Usually Harvested, Usually Fed Back", "NL - Never Harvested and Limited Feeding Back", "NF - Never Harvested and Usually Fed Back", "NL1 - 1st Variation of NL", "NL2 - 2nd Variation of NL", "NF1 - 1st Variation of NF", "NF2 - 2nd Variation of NF", "UL1 - 1st Variation of UL", "UF1 - 1st Variation of UF", "C - Crop", "FC - Future Crop", "O - Other", "O1 - 1st Variation of O" ]
+});
+
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log, validations) {
+angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($log, validations, paddockTypeDefaults, paddockGroupDefaults) {
     var _isDefined = validations.isDefined;
     function _findByCoordinate(coordinate, vectorLayer) {
         var found;
@@ -1032,8 +1038,18 @@ angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($l
         return found;
     }
     return {
-        findByCoordinate: _findByCoordinate
+        findByCoordinate: _findByCoordinate,
+        types: function() {
+            return paddockTypeDefaults.types;
+        },
+        groups: function() {
+            return paddockGroupDefaults.groups;
+        }
     };
+});
+
+angular.module("farmbuild.webmapping").constant("paddockTypeDefaults", {
+    types: [ "Annual Pasture", "Bull Paddock", "Calving paddocks", "Calf Rearing Area", "Dairy", "Effluent Paddocks", "Feedpad", "Lucerne", "Other Crops", "Permanent Pasture", "Springer Paddock", "Sumer Crops" ]
 });
 
 "use strict";

@@ -98,61 +98,16 @@
             <form-item class="form-group">
                 <label for="selectedPaddockType">Type:</label>
                 <select id="selectedPaddockType" class="form-control" ng-change="onPaddockDetailsChanged()"
-                        ng-model="selectedPaddock.type">
-                    <option value="Annual Pasture">Annual Pasture</option>
-                    <option value="Bull Paddock">Bull Paddock</option>
-                    <option value="Calving paddocks">Calving paddocks</option>
-                    <option value="Calf Rearing Area">Calf Rearing Area</option>
-                    <option value="Dairy">Dairy</option>
-                    <option value="Effluent Paddocks">Effluent Paddocks</option>
-                    <option value="Feedpad">FeedPad</option>
-                    <option value="Lucerne">Lucerne</option>
-                    <option value="Other Crops">Other Crops</option>
-                    <option value="Permanent Pasture">Permanent Pasture</option>
-                    <option value="Springer Paddock">Springer Paddocks</option>
-                    <option value="Sumer Crops">Summer Crops</option>
+                        ng-model="selectedPaddock.type" ng-options="paddockType for paddockType in paddockTypes">
+                    <option value=""></option>
                 </select>
             </form-item>
             <form-item>
                 <label for="selectedPaddockType">Group:</label>
                 <select name="edit_group_type" id="edit_group_type" style="margin-bottom:10px" class="form-control"
-                        ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.group">
-
-                    <option value="0">N/A - Type Not Set</option>
-
-                    <option value="1">E - Effluent</option>
-
-                    <option value="2">N - Night Paddocks</option>
-
-                    <option value="3">A - Average Use and Soil Type Paddock</option>
-
-                    <option value="7">UL - Usually Harvested, Limited Feeding Back</option>
-
-                    <option value="8">UF - Usually Harvested, Usually Fed Back</option>
-
-                    <option value="9">NL - Never Harvested and Limited Feeding Back</option>
-
-                    <option value="10">NF - Never Harvested and Usually Fed Back</option>
-
-                    <option value="11">NL1 - 1st Variation of NL</option>
-
-                    <option value="13">NL2 - 2nd Variation of NL</option>
-
-                    <option value="14">NF1 - 1st Variation of NF</option>
-
-                    <option value="15">NF2 - 2nd Variation of NF</option>
-
-                    <option value="17">UL1 - 1st Variation of UL</option>
-
-                    <option value="18">UF1 - 1st Variation of UF</option>
-
-                    <option value="19">C - Crop</option>
-
-                    <option value="20">FC - Future Crop</option>
-
-                    <option value="21">O - Other</option>
-
-                    <option value="22">O1 - 1st Variation of O</option>
+                        ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.group"
+                        ng-options="paddockGroup for paddockGroup in paddockGroups" >
+                    <option value=""></option>
                 </select>
             </form-item>
             <form-item class="form-group">

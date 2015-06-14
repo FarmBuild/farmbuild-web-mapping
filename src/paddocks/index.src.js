@@ -10,25 +10,31 @@
 
 
 angular.module('farmbuild.webmapping')
-	.factory('webMappingPaddocks',
-	function ($log, validations) {
-		var _isDefined = validations.isDefined;
+    .factory('webMappingPaddocks',
+    function ($log, validations, paddockTypeDefaults, paddockGroupDefaults) {
+        var _isDefined = validations.isDefined;
 
-		function _findByCoordinate(coordinate, vectorLayer) {
-			var found;
-			if (!_isDefined(coordinate) || !_isDefined(vectorLayer)) {
-				return;
-			}
-			var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
-			if (paddocks && paddocks.length > 0) {
-				found = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
-			}
-			$log.info('looking up for a paddock at ', coordinate, found);
-			return found;
-		}
+        function _findByCoordinate(coordinate, vectorLayer) {
+            var found;
+            if (!_isDefined(coordinate) || !_isDefined(vectorLayer)) {
+                return;
+            }
+            var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
+            if (paddocks && paddocks.length > 0) {
+                found = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
+            }
+            $log.info('looking up for a paddock at ', coordinate, found);
+            return found;
+        }
 
-		return {
-			findByCoordinate: _findByCoordinate
-		};
+        return {
+            findByCoordinate: _findByCoordinate,
+            types: function () {
+                return paddockTypeDefaults.types;
+            },
+            groups: function () {
+                return paddockGroupDefaults.groups;
+            }
+        };
 
-	});
+    });

@@ -22,9 +22,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
             actions = webmapping.actions,
             measurement = webmapping.measurement,
             parcels = webmapping.parcels,
-            olHelper = webmapping.olHelper;
-        $scope.measuredValue = 0;
+            olHelper = webmapping.olHelper,
+            paddocks = webmapping.paddocks;
 
+        $scope.measuredValue = 0;
         $scope.farmData = {};
         $scope.farmChanged = false;
         $scope.paddockChanged = false;
@@ -37,6 +38,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         };
         $scope.donutDrawing = false;
         $scope.farmSelected = false;
+        $scope.paddockTypes = paddocks.types();
+        $scope.paddockGroups = paddocks.groups();
 
         $scope.toGeoJson = function () {
             farmbuild.webmapping.exportGeoJson(document, $scope.farmData);
