@@ -3,26 +3,26 @@
 angular.module('farmbuild.webmapping')
     .factory('webMappingGeoProcessing',
     function (validations,
-              webMappingOpenLayersHelper,
+              webMappingConverter,
               $log) {
         var _isDefined = validations.isDefined,
-            olHelper = webMappingOpenLayersHelper;
+            converter = webMappingConverter;
 
         function _eraseAll(clipee, clippers) {
             if (!_isDefined(clipee) || !_isDefined(clippers)) {
                 return;
             }
             $log.info('erasing feature', clipee);
-            var clipeeGeoJson = olHelper.featureToGeoJson(clipee);
+            var clipeeGeoJson = converter.featureToGeoJson(clipee);
             clippers.forEach(function (clipper) {
-                var clipperGeoJson = olHelper.featureToGeoJson(clipper);
+                var clipperGeoJson = converter.featureToGeoJson(clipper);
                 try {
                     clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
                 } catch (e) {
                     $log.error(e);
                 }
             });
-            return olHelper.geoJsonToFeature(clipeeGeoJson);
+            return converter.geoJsonToFeature(clipeeGeoJson);
         };
 
         function _erase(clipee, clipper) {
@@ -30,12 +30,12 @@ angular.module('farmbuild.webmapping')
                 return;
             }
             $log.info('erasing feature 2 from 1', clipee, clipper);
-            var clipeeGeoJson = olHelper.featureToGeoJson(clipee),
-                cliperGeoJson = olHelper.featureToGeoJson(clipper),
+            var clipeeGeoJson = converter.featureToGeoJson(clipee),
+                cliperGeoJson = converter.featureToGeoJson(clipper),
                 clipped;
             try {
                 clipped = turf.erase(clipeeGeoJson, cliperGeoJson);
-                return olHelper.geoJsonToFeature(clipped);
+                return converter.geoJsonToFeature(clipped);
             } catch (e) {
                 $log.error(e);
             }
@@ -43,12 +43,12 @@ angular.module('farmbuild.webmapping')
 
         function _intersect(olFeature1, olFeature2) {
             $log.info('intersecting feature', olFeature1, olFeature2);
-            var feature1 = olHelper.featureToGeoJson(olFeature1),
-                feature2 = olHelper.featureToGeoJson(olFeature2),
+            var feature1 = converter.featureToGeoJson(olFeature1),
+                feature2 = converter.featureToGeoJson(olFeature2),
                 intersection;
             try {
                 intersection = turf.intersect(feature1, feature2);
-                return olHelper.geoJsonToFeature(intersection);
+                return converter.geoJsonToFeature(intersection);
             } catch (e) {
                 $log.error(e);
             }
@@ -57,10 +57,10 @@ angular.module('farmbuild.webmapping')
         function _merge(olFeatures) {
             $log.info('merging features ...', olFeatures);
             var properties, toMerge;
-            toMerge = olHelper.featuresToGeoJson(olFeatures);
+            toMerge = converter.featuresToGeoJson(olFeatures);
             properties = {name: 'merged ' + (new Date()).getTime()};
             try {
-                return olHelper.geoJsonToFeature(turf.merge(toMerge), properties);
+                return converter.geoJsonToFeature(turf.merge(toMerge), properties);
             } catch (e) {
                 $log.error(e);
             }

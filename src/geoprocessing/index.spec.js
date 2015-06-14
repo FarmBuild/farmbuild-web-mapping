@@ -3,7 +3,8 @@
 describe('farmbuild.webMapping module', function () {
 
     // instantiate service
-    var webMappingGeoProcessing, webMapping, olHelper,
+    var webMappingGeoProcessing, webMapping,
+        webMappingConverter,
         $log,
         poly1 = {
             "type": "Feature",
@@ -44,11 +45,11 @@ describe('farmbuild.webMapping module', function () {
         $provide.value('$log', console);
     }));
 
-    beforeEach(inject(function (_webMappingGeoProcessing_, _webmapping_,
+    beforeEach(inject(function (_webMappingGeoProcessing_, _webmapping_, _webMappingConverter_,
                                 _$log_) {
         webMappingGeoProcessing = _webMappingGeoProcessing_;
         webMapping = _webmapping_;
-        olHelper = webMapping.olHelper;
+        webMappingConverter = _webMappingConverter_;
         $log = _$log_;
     }));
 
@@ -64,8 +65,8 @@ describe('farmbuild.webMapping module', function () {
             var olPoly1,
                 olPolys,
                 erased;
-            olPoly1 = olHelper.geoJsonToFeature(poly1);
-            olPolys = olHelper.geoJsonToFeatures(polys1);
+            olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+            olPolys = webMappingConverter.geoJsonToFeatures(polys1);
             erased = webMappingTransformation.eraseAll(olPoly1, olPolys);
             expect(erased).toBeUndefined();
         }));
@@ -95,10 +96,10 @@ describe('farmbuild.webMapping module', function () {
                         ]]
                     }
                 };
-            olPoly1 = olHelper.geoJsonToFeature(poly1);
-            olPolys = olHelper.geoJsonToFeatures(polys2);
+            olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+            olPolys = webMappingConverter.geoJsonToFeatures(polys2);
             erased = webMappingTransformation.eraseAll(olPoly1, olPolys);
-            erasedGeoJSON = olHelper.featureToGeoJson(erased);
+            erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
             expect(erased).toBeDefined();
             expect(erasedGeoJSON).toBeDefined();
             expect(erasedGeoJSON).toEqual(expected);
@@ -129,10 +130,10 @@ describe('farmbuild.webMapping module', function () {
                         ]]
                     }
                 };
-            olPoly1 = olHelper.geoJsonToFeature(poly1);
-            olPoly2 = olHelper.geoJsonToFeature(poly2);
+            olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+            olPoly2 = webMappingConverter.geoJsonToFeature(poly2);
             erased = webMappingTransformation.erase(olPoly1, olPoly2);
-            erasedGeoJSON = olHelper.featureToGeoJson(erased);
+            erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
             expect(erased).toBeDefined();
             expect(erasedGeoJSON).toBeDefined();
             expect(erasedGeoJSON).toEqual(expected);
@@ -197,9 +198,9 @@ describe('farmbuild.webMapping module', function () {
                         "fill": "#0f0"
                     }
                 };
-            olPolygons = olHelper.geoJsonToFeatures(polygons);
+            olPolygons = webMappingConverter.geoJsonToFeatures(polygons);
             merged = webMappingTransformation.merge(olPolygons);
-            mergedGeoJSON = olHelper.featureToGeoJson(merged);
+            mergedGeoJSON = webMappingConverter.featureToGeoJson(merged);
             expect(merged).toBeDefined();
             expect(mergedGeoJSON).toBeDefined();
             expect(mergedGeoJSON).toEqual(expected);
@@ -267,10 +268,10 @@ describe('farmbuild.webMapping module', function () {
                         ]
                     }
                 };
-            olPolygon1 = olHelper.geoJsonToFeature(poly1);
-            olPolygon2 = olHelper.geoJsonToFeature(poly2);
+            olPolygon1 = webMappingConverter.geoJsonToFeature(poly1);
+            olPolygon2 = webMappingConverter.geoJsonToFeature(poly2);
             intersection = webMappingTransformation.intersect(olPolygon1, olPolygon2);
-            intersectedGeoJSON = olHelper.featureToGeoJson(intersection);
+            intersectedGeoJSON = webMappingConverter.featureToGeoJson(intersection);
             expect(intersection).toBeDefined();
             expect(intersectedGeoJSON).toBeDefined();
             expect(intersectedGeoJSON).toEqual(expected);

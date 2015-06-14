@@ -11,8 +11,9 @@
 
 angular.module('farmbuild.webmapping')
 	.factory('webMappingParcels',
-	function ($log, $http, validations, webMappingInteractions, webMappingOpenLayersHelper) {
-		var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
+	function ($log, $http, validations, webMappingInteractions, webMappingConverter) {
+		var _isDefined = validations.isDefined,
+            converter = webMappingConverter;
 
 		function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
 			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3857', 'EPSG:3857');
@@ -37,7 +38,7 @@ angular.module('farmbuild.webmapping')
 			return $http({method: 'JSONP', url: serviceUrl, params: config.params}).
 				success(function(data, status) {
 					$log.info('loaded parcels successfully.', status, data);
-					var olFeatures = olHelper.geoJsonToFeatures({
+					var olFeatures = converter.geoJsonToFeatures({
 						"type": "FeatureCollection",
 						"features": data.features
 					});

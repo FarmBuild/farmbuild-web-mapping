@@ -291,61 +291,6 @@ form textarea {
   max-height: 150px;
 }
 
-.measure.area {
-  top: 80px;
-  left: .5em;
-}
-
-.measure.area.active button {
-  background-color: #ff6600;
-}
-
-.measure.length {
-  top: 110px;
-  left: .5em;
-}
-
-.measure.length.active button {
-  background-color: #ff6600;
-}
-
-.ol-touch .measure.length {
-  top: 110px;
-}
-
-.snap {
-  top: 140px;
-  left: .5em;
-}
-
-.snap.active button {
-  background-color: #ff6600;
-}
-
-.ol-touch .snap {
-  top: 140px;
-}
-
-.layer-switcher {
-  top: 4.5em;
-}
-
-.layer-switcher .panel, .layer-switcher .panel ul {
-  margin-bottom: 0px;
-}
-
-.layer-switcher .panel ul {
-  margin-top: 5px;
-}
-
-.layer-switcher .panel label {
-  font-weight: normal;
-}
-
-.layer-switcher .panel input {
-  margin-right: 5px;
-}
-
 .btn {
   margin-top: 10px;
 }

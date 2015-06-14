@@ -39,122 +39,117 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", function(validations, webMappingMeasurement, $rootScope, $log) {
-    var _isDefined = validations.isDefined, _measurement = webMappingMeasurement;
-    function _create(map, type) {
-        var source = new ol.source.Vector(), baseCssClass = "measure ol-unselectable ol-control ", drawInteraction = new ol.interaction.Draw({
-            source: source,
-            type: type,
-            style: new ol.style.Style({
-                fill: new ol.style.Fill({
-                    color: "rgba(255, 255, 255, 0.2)"
-                }),
-                stroke: new ol.style.Stroke({
-                    color: "rgba(0, 0, 0, 0.5)",
-                    lineDash: [ 10, 10 ],
-                    width: 2
-                }),
-                image: new ol.style.Circle({
-                    radius: 5,
-                    stroke: new ol.style.Stroke({
-                        color: "rgba(0, 0, 0, 0.7)"
-                    }),
-                    fill: new ol.style.Fill({
-                        color: "rgba(255, 255, 255, 0.2)"
-                    })
-                })
-            })
+angular.module("farmbuild.webmapping").factory("webMappingConverter", function(validations, $log) {
+    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
+    function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
+        if (!_isDefined(olFeature)) {
+            return;
+        }
+        $log.info("Converting openlayer feature to geoJson ...", olFeature);
+        return _geoJSONFormat.writeFeatureObject(olFeature, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
         });
-        var letter, cssClass, options = {};
-        if (type == "Polygon") {
-            letter = "A";
-            cssClass = "area";
-        } else {
-            letter = "L";
-            cssClass = "length";
+    }
+    function _openLayerFeaturesToGeoJson(olFeatures, dataProjection, featureProjection) {
+        if (!_isDefined(olFeatures)) {
+            return;
         }
-        drawInteraction.on("drawend", function(evt) {
-            if (type == "Polygon") {
-                $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.area(evt.feature),
-                    unit: "hectares"
-                });
-            } else {
-                $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.length(evt.feature),
-                    unit: "metres"
-                });
-            }
-            drawInteraction.setActive(false);
-            document.getElementsByClassName(baseCssClass + cssClass)[0].className = baseCssClass + cssClass;
-        }, this);
-        map.addInteraction(drawInteraction);
-        drawInteraction.setActive(false);
-        function _measureControl(type) {
-            var button = document.createElement("button");
-            button.innerHTML = letter;
-            var handleMeasure = function(e) {
-                drawInteraction.setActive(!drawInteraction.getActive());
-                element.className = baseCssClass + cssClass + (drawInteraction.getActive() ? " active" : "");
-                $rootScope.$broadcast("web-mapping-measure-start");
-            };
-            button.addEventListener("click", handleMeasure, false);
-            button.addEventListener("touchstart", handleMeasure, false);
-            var element = document.createElement("div");
-            element.className = baseCssClass + cssClass;
-            element.title = "Measure " + cssClass;
-            element.appendChild(button);
-            ol.control.Control.call(this, {
-                element: element,
-                target: options.target
-            });
+        $log.info("Converting openlayer feature to geoJson ...", olFeatures);
+        return _geoJSONFormat.writeFeaturesObject(olFeatures, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
+    }
+    function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
+        if (!_isDefined(feature)) {
+            return;
         }
-        ol.inherits(_measureControl, ol.control.Control);
-        return new _measureControl(type);
+        $log.info("Converting geoJson feature to openlayer feature ...", feature);
+        return _geoJSONFormat.readFeature(feature, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
+    }
+    function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
+        if (!_isDefined(features)) {
+            return;
+        }
+        $log.info("Converting geoJson feature to openlayer features ...", features);
+        return _geoJSONFormat.readFeatures(features, {
+            dataProjection: dataProjection,
+            featureProjection: featureProjection
+        });
     }
     return {
-        create: _create
+        featureToGeoJson: _openLayerFeatureToGeoJson,
+        featuresToGeoJson: _openLayerFeaturesToGeoJson,
+        geoJsonToFeature: _geoJsonToOpenLayerFeature,
+        geoJsonToFeatures: _geoJsonToOpenLayerFeatures
     };
 });
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingSnapControl", function(validations, $rootScope, $log) {
-    var _isDefined = validations.isDefined;
-    function _create() {
-        var baseCssClass = "snap ol-unselectable ol-control ";
-        var letter = "S", options = {};
-        var button = document.createElement("button");
-        button.innerHTML = letter;
-        function toggle(e) {
-            var eventToCast;
-            if (farmbuild.webmapping.actions.snapping.active()) {
-                farmbuild.webmapping.actions.snapping.disable();
-                eventToCast = "web-mapping-snap-disabled";
-                element.className = baseCssClass;
-                element.title = "Enable snapping";
-            } else {
-                farmbuild.webmapping.actions.snapping.enable();
-                eventToCast = "web-mapping-snap-enabled";
-                element.className = baseCssClass + "active";
-                element.title = "Disable snapping";
-            }
-            $rootScope.$broadcast(eventToCast);
+angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", function(validations, webMappingConverter, $log) {
+    var _isDefined = validations.isDefined, converter = webMappingConverter;
+    function _eraseAll(clipee, clippers) {
+        if (!_isDefined(clipee) || !_isDefined(clippers)) {
+            return;
         }
-        button.addEventListener("click", toggle, false);
-        button.addEventListener("touchstart", toggle, false);
-        var element = document.createElement("div");
-        element.className = baseCssClass + " active";
-        element.title = "Disable snapping";
-        element.appendChild(button);
-        ol.control.Control.call(this, {
-            element: element,
-            target: options.target
+        $log.info("erasing feature", clipee);
+        var clipeeGeoJson = converter.featureToGeoJson(clipee);
+        clippers.forEach(function(clipper) {
+            var clipperGeoJson = converter.featureToGeoJson(clipper);
+            try {
+                clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
+            } catch (e) {
+                $log.error(e);
+            }
         });
+        return converter.geoJsonToFeature(clipeeGeoJson);
     }
-    ol.inherits(_create, ol.control.Control);
+    function _erase(clipee, clipper) {
+        if (!_isDefined(clipee) || !_isDefined(clipper)) {
+            return;
+        }
+        $log.info("erasing feature 2 from 1", clipee, clipper);
+        var clipeeGeoJson = converter.featureToGeoJson(clipee), cliperGeoJson = converter.featureToGeoJson(clipper), clipped;
+        try {
+            clipped = turf.erase(clipeeGeoJson, cliperGeoJson);
+            return converter.geoJsonToFeature(clipped);
+        } catch (e) {
+            $log.error(e);
+        }
+    }
+    function _intersect(olFeature1, olFeature2) {
+        $log.info("intersecting feature", olFeature1, olFeature2);
+        var feature1 = converter.featureToGeoJson(olFeature1), feature2 = converter.featureToGeoJson(olFeature2), intersection;
+        try {
+            intersection = turf.intersect(feature1, feature2);
+            return converter.geoJsonToFeature(intersection);
+        } catch (e) {
+            $log.error(e);
+        }
+    }
+    function _merge(olFeatures) {
+        $log.info("merging features ...", olFeatures);
+        var properties, toMerge;
+        toMerge = converter.featuresToGeoJson(olFeatures);
+        properties = {
+            name: "merged " + new Date().getTime()
+        };
+        try {
+            return converter.geoJsonToFeature(turf.merge(toMerge), properties);
+        } catch (e) {
+            $log.error(e);
+        }
+    }
     return {
-        create: _create
+        eraseAll: _eraseAll,
+        erase: _erase,
+        intersect: _intersect,
+        merge: _merge
     };
 });
 
@@ -221,8 +216,8 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingTransformation, $rootScope) {
-    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _farmLayer, _paddocksLayer, _map, _transform = webMappingTransformation, _farmName;
+angular.module("farmbuild.webmapping").factory("webMappingInteractions", function(validations, $log, webMappingSelectInteraction, webMappingModifyInteraction, webMappingDrawInteraction, webMappingSnapInteraction, webMappingGeoProcessing, $rootScope) {
+    var _isDefined = validations.isDefined, _select, _modify, _draw, _snap, _activeLayer, _activeLayerName, _mode, _farmLayer, _paddocksLayer, _map, _transform = webMappingGeoProcessing, _farmName;
     function _destroy(map) {
         $log.info("destroying all interactions ...");
         if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
@@ -798,66 +793,8 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, $log) {
-    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _googleProjection = "EPSG:3857", _openLayersDefaultProjection = "EPSG:4326", _extentControl;
-    function _transformToGoogleLatLng(latLng, destinationProjection) {
-        if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
-            return;
-        }
-        var transformed = ol.proj.transform(latLng, _googleProjection, destinationProjection);
-        return new google.maps.LatLng(transformed[1], transformed[0]);
-    }
-    function _transformFromGoogleLatLng(latLng) {
-        if (!_isDefined(latLng)) {
-            return;
-        }
-        return ol.proj.transform([ latLng.lng(), latLng.lat() ], _openLayersDefaultProjection, _googleProjection);
-    }
-    function _exportGeometry(source, dataProjection, featureProjection) {
-        if (!_isDefined(source)) {
-            return;
-        }
-        var format = new ol.format["GeoJSON"]();
-        try {
-            var result = format.writeFeaturesObject(source.getFeatures(), {
-                dataProjection: dataProjection,
-                featureProjection: featureProjection
-            });
-            angular.forEach(result.features, function(feature) {
-                feature.geometry.crs = {
-                    properties: {
-                        name: dataProjection
-                    }
-                };
-            });
-            return result;
-        } catch (e) {
-            $log.error(e);
-        }
-    }
-    function _clear(farmSource, paddocksSource) {
-        if (!_isDefined(farmSource) || !_isDefined(paddocksSource)) {
-            return;
-        }
-        $log.info("clearing source ...");
-        paddocksSource.clear();
-        farmSource.clear();
-    }
-    function addControls(map, extent) {
-        if (extent) {
-            _extentControl = new ol.control.ZoomToExtent({
-                extent: extent
-            });
-            map.addControl(_extentControl);
-        }
-        map.addControl(new ol.control.ScaleLine());
-        map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
-        map.addControl(new webMappingMeasureControl.create(map, "LineString"));
-        map.addControl(new webMappingSnapControl.create());
-        map.addControl(new ol.control.LayerSwitcher({
-            tipLabel: "Switch on/off farm layers"
-        }));
-    }
+angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, webMappingTransformation, $log) {
+    var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _extentControl, _transform = webMappingTransformation;
     function _init(gmap, map, dataProjection, targetElement, init, extent) {
         var defaults = {
             centerNew: [ -36.22488327137526, 145.5826132801325 ],
@@ -882,7 +819,44 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         }
         view.fitExtent(extent, map.getSize());
     }
-    function _integrateGMap(gmap, map, dataProjection, targetElement, init, extent) {
+    function _exportGeometry(source, dataProjection, featureProjection) {
+        if (!_isDefined(source)) {
+            return;
+        }
+        var format = new ol.format["GeoJSON"]();
+        try {
+            var result = format.writeFeaturesObject(source.getFeatures(), {
+                dataProjection: dataProjection,
+                featureProjection: featureProjection
+            });
+            angular.forEach(result.features, function(feature) {
+                feature.geometry.crs = {
+                    properties: {
+                        name: dataProjection
+                    }
+                };
+            });
+            return result;
+        } catch (e) {
+            $log.error(e);
+        }
+    }
+    function addControls(map, extent) {
+        if (extent) {
+            _extentControl = new ol.control.ZoomToExtent({
+                extent: extent
+            });
+            map.addControl(_extentControl);
+        }
+        map.addControl(new ol.control.ScaleLine());
+        map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
+        map.addControl(new webMappingMeasureControl.create(map, "LineString"));
+        map.addControl(new webMappingSnapControl.create());
+        map.addControl(new ol.control.LayerSwitcher({
+            tipLabel: "Switch on/off farm layers"
+        }));
+    }
+    function _integrateGoogleMap(gmap, map, dataProjection, targetElement, init, extent) {
         if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
             return;
         }
@@ -896,7 +870,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             gmap.setZoom(view.getZoom());
         });
         window.onresize = function() {
-            var center = _transformToGoogleLatLng(view.getCenter(), dataProjection);
+            var center = _transform.toGoogleLatLng(view.getCenter(), dataProjection);
             google.maps.event.trigger(gmap, "resize");
             gmap.setCenter(center);
         };
@@ -966,53 +940,13 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         map.addLayer(_paddocksLayer(geoJson.paddocks, dataProjectionCode, featureProjectionCode));
         map.addLayer(_farmLayer(geoJson.farm, dataProjectionCode, featureProjectionCode));
     }
-    function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
-        if (!_isDefined(olFeature)) {
-            return;
-        }
-        $log.info("Converting openlayer feature to geoJson ...", olFeature);
-        return _geoJSONFormat.writeFeatureObject(olFeature, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
-        });
-    }
-    function _openLayerFeaturesToGeoJson(olFeatures, dataProjection, featureProjection) {
-        if (!_isDefined(olFeatures)) {
-            return;
-        }
-        $log.info("Converting openlayer feature to geoJson ...", olFeatures);
-        return _geoJSONFormat.writeFeaturesObject(olFeatures, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
-        });
-    }
-    function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
-        if (!_isDefined(feature)) {
-            return;
-        }
-        $log.info("Converting geoJson feature to openlayer feature ...", feature);
-        return _geoJSONFormat.readFeature(feature, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
-        });
-    }
-    function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
-        if (!_isDefined(features)) {
-            return;
-        }
-        $log.info("Converting geoJson feature to openlayer features ...", features);
-        return _geoJSONFormat.readFeatures(features, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
-        });
-    }
-    function _initAddressSearch(targetElementId, olmap) {
+    function _initGoogleAddressSearch(targetElementId, olmap) {
         if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
             return;
         }
         $log.info("init google address search ...", targetElementId);
         function onPlaceChanged(latLng) {
-            var latLng = _transformFromGoogleLatLng(latLng);
+            latLng = _transform.fromGoogleLatLng(latLng);
             _center(latLng, olmap);
         }
         webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
@@ -1028,19 +962,12 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
     }
     return {
         exportGeometry: _exportGeometry,
-        clear: _clear,
         center: _center,
-        integrateGMap: _integrateGMap,
+        integrateGoogleMap: _integrateGoogleMap,
         paddocksLayer: _paddocksLayer,
         farmLayer: _farmLayer,
         reload: _reload,
-        featureToGeoJson: _openLayerFeatureToGeoJson,
-        featuresToGeoJson: _openLayerFeaturesToGeoJson,
-        geoJsonToFeature: _geoJsonToOpenLayerFeature,
-        geoJsonToFeatures: _geoJsonToOpenLayerFeatures,
-        transformFromGoogleLatLng: _transformFromGoogleLatLng,
-        transformToGoogleLatLng: _transformToGoogleLatLng,
-        initAddressSearch: _initAddressSearch,
+        initGoogleAddressSearch: _initGoogleAddressSearch,
         updateExtent: _updateExtent
     };
 });
@@ -1068,8 +995,8 @@ angular.module("farmbuild.webmapping").factory("webMappingPaddocks", function($l
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingParcels", function($log, $http, validations, webMappingInteractions, webMappingOpenLayersHelper) {
-    var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
+angular.module("farmbuild.webmapping").factory("webMappingParcels", function($log, $http, validations, webMappingInteractions, webMappingConverter) {
+    var _isDefined = validations.isDefined, converter = webMappingConverter;
     function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
         var config = {
             params: {
@@ -1094,7 +1021,7 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
             params: config.params
         }).success(function(data, status) {
             $log.info("loaded parcels successfully.", status, data);
-            var olFeatures = olHelper.geoJsonToFeatures({
+            var olFeatures = converter.geoJsonToFeatures({
                 type: "FeatureCollection",
                 features: data.features
             });
@@ -1156,65 +1083,24 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingTransformation", function(validations, webMappingOpenLayersHelper, $log) {
-    var _isDefined = validations.isDefined, olHelper = webMappingOpenLayersHelper;
-    function _eraseAll(clipee, clippers) {
-        if (!_isDefined(clipee) || !_isDefined(clippers)) {
+angular.module("farmbuild.webmapping").factory("webMappingTransformation", function(validations, $log) {
+    var _isDefined = validations.isDefined, _openLayersDefaultProjection = "EPSG:4326", _googleProjection = "EPSG:3857";
+    function _transformToGoogleLatLng(latLng, destinationProjection) {
+        if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
             return;
         }
-        $log.info("erasing feature", clipee);
-        var clipeeGeoJson = olHelper.featureToGeoJson(clipee);
-        clippers.forEach(function(clipper) {
-            var clipperGeoJson = olHelper.featureToGeoJson(clipper);
-            try {
-                clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
-            } catch (e) {
-                $log.error(e);
-            }
-        });
-        return olHelper.geoJsonToFeature(clipeeGeoJson);
+        var transformed = ol.proj.transform(latLng, _googleProjection, destinationProjection);
+        return new google.maps.LatLng(transformed[1], transformed[0]);
     }
-    function _erase(clipee, clipper) {
-        if (!_isDefined(clipee) || !_isDefined(clipper)) {
+    function _transformFromGoogleLatLng(latLng) {
+        if (!_isDefined(latLng)) {
             return;
         }
-        $log.info("erasing feature 2 from 1", clipee, clipper);
-        var clipeeGeoJson = olHelper.featureToGeoJson(clipee), cliperGeoJson = olHelper.featureToGeoJson(clipper), clipped;
-        try {
-            clipped = turf.erase(clipeeGeoJson, cliperGeoJson);
-            return olHelper.geoJsonToFeature(clipped);
-        } catch (e) {
-            $log.error(e);
-        }
-    }
-    function _intersect(olFeature1, olFeature2) {
-        $log.info("intersecting feature", olFeature1, olFeature2);
-        var feature1 = olHelper.featureToGeoJson(olFeature1), feature2 = olHelper.featureToGeoJson(olFeature2), intersection;
-        try {
-            intersection = turf.intersect(feature1, feature2);
-            return olHelper.geoJsonToFeature(intersection);
-        } catch (e) {
-            $log.error(e);
-        }
-    }
-    function _merge(olFeatures) {
-        $log.info("merging features ...", olFeatures);
-        var properties, toMerge;
-        toMerge = olHelper.featuresToGeoJson(olFeatures);
-        properties = {
-            name: "merged " + new Date().getTime()
-        };
-        try {
-            return olHelper.geoJsonToFeature(turf.merge(toMerge), properties);
-        } catch (e) {
-            $log.error(e);
-        }
+        return ol.proj.transform([ latLng.lng(), latLng.lat() ], _openLayersDefaultProjection, _googleProjection);
     }
     return {
-        eraseAll: _eraseAll,
-        erase: _erase,
-        intersect: _intersect,
-        merge: _merge
+        fromGoogleLatLng: _transformFromGoogleLatLng,
+        toGoogleLatLng: _transformToGoogleLatLng
     };
 });
 
@@ -1362,6 +1248,127 @@ angular.module("farmbuild.webmapping").factory("webMappingLayerSwitcherControl",
         });
     };
     return {};
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", function(validations, webMappingMeasurement, $rootScope, $log) {
+    var _isDefined = validations.isDefined, _measurement = webMappingMeasurement;
+    function _create(map, type) {
+        var source = new ol.source.Vector(), baseCssClass = "measure ol-unselectable ol-control ", drawInteraction = new ol.interaction.Draw({
+            source: source,
+            type: type,
+            style: new ol.style.Style({
+                fill: new ol.style.Fill({
+                    color: "rgba(255, 255, 255, 0.2)"
+                }),
+                stroke: new ol.style.Stroke({
+                    color: "rgba(0, 0, 0, 0.5)",
+                    lineDash: [ 10, 10 ],
+                    width: 2
+                }),
+                image: new ol.style.Circle({
+                    radius: 5,
+                    stroke: new ol.style.Stroke({
+                        color: "rgba(0, 0, 0, 0.7)"
+                    }),
+                    fill: new ol.style.Fill({
+                        color: "rgba(255, 255, 255, 0.2)"
+                    })
+                })
+            })
+        });
+        var letter, cssClass, options = {};
+        if (type == "Polygon") {
+            letter = "A";
+            cssClass = "area";
+        } else {
+            letter = "L";
+            cssClass = "length";
+        }
+        drawInteraction.on("drawend", function(evt) {
+            if (type == "Polygon") {
+                $rootScope.$broadcast("web-mapping-measure-end", {
+                    value: _measurement.area(evt.feature),
+                    unit: "hectares"
+                });
+            } else {
+                $rootScope.$broadcast("web-mapping-measure-end", {
+                    value: _measurement.length(evt.feature),
+                    unit: "metres"
+                });
+            }
+            drawInteraction.setActive(false);
+            document.getElementsByClassName(baseCssClass + cssClass)[0].className = baseCssClass + cssClass;
+        }, this);
+        map.addInteraction(drawInteraction);
+        drawInteraction.setActive(false);
+        function _measureControl(type) {
+            var button = document.createElement("button");
+            button.innerHTML = letter;
+            var handleMeasure = function(e) {
+                drawInteraction.setActive(!drawInteraction.getActive());
+                element.className = baseCssClass + cssClass + (drawInteraction.getActive() ? " active" : "");
+                $rootScope.$broadcast("web-mapping-measure-start");
+            };
+            button.addEventListener("click", handleMeasure, false);
+            button.addEventListener("touchstart", handleMeasure, false);
+            var element = document.createElement("div");
+            element.className = baseCssClass + cssClass;
+            element.title = "Measure " + cssClass;
+            element.appendChild(button);
+            ol.control.Control.call(this, {
+                element: element,
+                target: options.target
+            });
+        }
+        ol.inherits(_measureControl, ol.control.Control);
+        return new _measureControl(type);
+    }
+    return {
+        create: _create
+    };
+});
+
+"use strict";
+
+angular.module("farmbuild.webmapping").factory("webMappingSnapControl", function(validations, $rootScope, $log) {
+    var _isDefined = validations.isDefined;
+    function _create() {
+        var baseCssClass = "snap ol-unselectable ol-control ";
+        var letter = "S", options = {};
+        var button = document.createElement("button");
+        button.innerHTML = letter;
+        function toggle(e) {
+            var eventToCast;
+            if (farmbuild.webmapping.actions.snapping.active()) {
+                farmbuild.webmapping.actions.snapping.disable();
+                eventToCast = "web-mapping-snap-disabled";
+                element.className = baseCssClass;
+                element.title = "Enable snapping";
+            } else {
+                farmbuild.webmapping.actions.snapping.enable();
+                eventToCast = "web-mapping-snap-enabled";
+                element.className = baseCssClass + "active";
+                element.title = "Disable snapping";
+            }
+            $rootScope.$broadcast(eventToCast);
+        }
+        button.addEventListener("click", toggle, false);
+        button.addEventListener("touchstart", toggle, false);
+        var element = document.createElement("div");
+        element.className = baseCssClass + " active";
+        element.title = "Disable snapping";
+        element.appendChild(button);
+        ol.control.Control.call(this, {
+            element: element,
+            target: options.target
+        });
+    }
+    ol.inherits(_create, ol.control.Control);
+    return {
+        create: _create
+    };
 });
 
 "use strict";

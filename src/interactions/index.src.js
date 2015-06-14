@@ -8,13 +8,13 @@ angular.module('farmbuild.webmapping')
 	          webMappingModifyInteraction,
 	          webMappingDrawInteraction,
 	          webMappingSnapInteraction,
-	          webMappingTransformation,
+              webMappingGeoProcessing,
 	          $rootScope) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
 			_farmLayer, _paddocksLayer, _map,
-			_transform = webMappingTransformation,
+			_transform = webMappingGeoProcessing,
 			_farmName;
 
 		// Remove all interactions of map

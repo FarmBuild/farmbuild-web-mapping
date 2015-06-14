@@ -3,12 +3,12 @@
 angular.module('farmbuild.webmapping')
     .factory('webMappingTransformation',
     function (validations,
-              webMappingOpenLayersHelper,
               $log) {
         var _isDefined = validations.isDefined,
-            olHelper = webMappingOpenLayersHelper;
+            _openLayersDefaultProjection = 'EPSG:4326',
+            _googleProjection = 'EPSG:3857';
 
-        function _transformToGoogleLatLng(latLng, destinationProjection) {
+            function _transformToGoogleLatLng(latLng, destinationProjection) {
             if (!_isDefined(latLng) || !_isDefined(destinationProjection)) {
                 return;
             }
@@ -24,8 +24,8 @@ angular.module('farmbuild.webmapping')
         };
 
         return {
-            transformFromGoogleLatLng: _transformFromGoogleLatLng,
-            transformToGoogleLatLng: _transformToGoogleLatLng
+            fromGoogleLatLng: _transformFromGoogleLatLng,
+            toGoogleLatLng: _transformToGoogleLatLng
         }
 
     });

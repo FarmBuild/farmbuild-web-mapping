@@ -43,7 +43,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		};
     function directToSide() {
-      location.href = 'side/index.html?load=true';
+      location.href = 'map/index.html?load=true';
     }
 
 		if (webmapping.session.isLoadFlagSet(location)) {
