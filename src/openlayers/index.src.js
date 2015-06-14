@@ -168,6 +168,52 @@ angular.module('farmbuild.webmapping')
             });
         };
 
+        function _farmLayers(farmGeometry, paddocksGeometry, dataProjection, featureProjection) {
+            return new ol.layer.Group({
+                'title': 'Farm layers',
+                layers: [
+                    _paddocksLayer(paddocksGeometry, dataProjection, featureProjection),
+                    _farmLayer(farmGeometry, dataProjection, featureProjection)
+                ]
+            })
+        }
+
+        function _baseLayers() {
+            var vicMapImageryLayer = new ol.layer.Tile({
+                    title: 'VicMAP Imagery',
+                    type: 'base',
+                    visible: false,
+                    source: new ol.source.TileWMS({
+                        url: 'http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms',
+                        params: {LAYERS: 'SATELLITE_WM', VERSION: '1.1.1'}
+                    })
+                }),
+                vicMapStreetLayer = new ol.layer.Tile({
+                    title: 'VicMAP Street',
+                    type: 'base',
+                    visible: false,
+                    source: new ol.source.TileWMS({
+                        url: 'http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms',
+                        params: {LAYERS: 'WEB_MERCATOR', VERSION: '1.1.1'}
+                    })
+                }),
+                googleImageryLayer = new ol.layer.Tile({
+                    title: 'Google Imagery',
+                    type: 'base',
+                    visible: true
+                }),
+                googleStreetLayer = new ol.layer.Tile({
+                    title: 'Google Street',
+                    type: 'base',
+                    visible: false
+                });
+
+            return new ol.layer.Group({
+                'title': 'Base maps',
+                layers: [vicMapImageryLayer, vicMapStreetLayer, googleStreetLayer, googleImageryLayer]
+            })
+        }
+
         function _reload(map, geoJson, dataProjectionCode, featureProjectionCode) {
             var layers = map.getLayers();
             layers.clear();
@@ -203,8 +249,8 @@ angular.module('farmbuild.webmapping')
             exportGeometry: _exportGeometry,
             center: _center,
             integrateGoogleMap: _integrateGoogleMap,
-            paddocksLayer: _paddocksLayer,
-            farmLayer: _farmLayer,
+            farmLayers: _farmLayers,
+            baseLayers: _baseLayers,
             reload: _reload,
             initGoogleAddressSearch: _initGoogleAddressSearch,
             updateExtent: _updateExtent
