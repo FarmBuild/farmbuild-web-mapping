@@ -936,10 +936,10 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             })
         });
     }
-    function _farmLayers(farmGeometry, paddocksGeometry, dataProjection, featureProjection) {
+    function _farmLayers(geometry, dataProjection, featureProjection) {
         return new ol.layer.Group({
             title: "Farm layers",
-            layers: [ _paddocksLayer(paddocksGeometry, dataProjection, featureProjection), _farmLayer(farmGeometry, dataProjection, featureProjection) ]
+            layers: [ _paddocksLayer(geometry.paddocks, dataProjection, featureProjection), _farmLayer(geometry.farm, dataProjection, featureProjection) ]
         });
     }
     function _baseLayers() {
@@ -980,10 +980,9 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         });
     }
     function _reload(map, geoJson, dataProjectionCode, featureProjectionCode) {
-        var layers = map.getLayers();
-        layers.clear();
-        map.addLayer(_baseLayers());
-        map.addLayer(_farmLayers(geoJson.farm, geoJson.paddocks, dataProjectionCode, featureProjectionCode));
+        var farmLayers = map.getLayers().item(1);
+        map.removeLayer(farmLayers);
+        map.addLayer(_farmLayers(geoJson, dataProjectionCode, featureProjectionCode));
     }
     function _initGoogleAddressSearch(targetElementId, olmap) {
         if (!_isDefined(targetElementId) || !_isDefined(olmap)) {

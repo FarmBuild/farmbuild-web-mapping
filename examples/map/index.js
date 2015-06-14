@@ -156,7 +156,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
         function createOpenLayerMap(geoJsons) {
 
             /** it is recommended to use these helper functions to create your farm and paddocks layers */
-            var farmLayers = olHelper.farmLayers(geoJsons.farm, geoJsons.paddocks, dataProjection, featureProjection),
+            var farmLayers = olHelper.farmLayers(geoJsons, dataProjection, featureProjection),
                 baseLayers = olHelper.baseLayers();
 
             return new ol.Map({
