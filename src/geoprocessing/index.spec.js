@@ -54,26 +54,26 @@ describe('farmbuild.webMapping module', function () {
     }));
 
     describe('Testing Web Mapping Transformation', function () {
-        it('webMappingTransformation should be defined', inject(function () {
+        it('webMappingGeoProcessing should be defined', inject(function () {
             expect(webMapping).toBeDefined();
-            expect(webMappingTransformation).toBeDefined();
+            expect(webMappingGeoProcessing).toBeDefined();
         }));
     });
 
     describe('Testing Web Mapping EraseAll Transformation, removing a polygon from itself should return undefined', function () {
-        it('webMappingTransformation.erase should return a Feature<Polygon>', inject(function () {
+        it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
             var olPoly1,
                 olPolys,
                 erased;
             olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
             olPolys = webMappingConverter.geoJsonToFeatures(polys1);
-            erased = webMappingTransformation.eraseAll(olPoly1, olPolys);
+            erased = webMappingGeoProcessing.eraseAll(olPoly1, olPolys);
             expect(erased).toBeUndefined();
         }));
     });
 
     describe('Testing Web Mapping EraseAll Transformation', function () {
-        it('webMappingTransformation.erase should return a Feature<Polygon>', inject(function () {
+        it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
             var olPoly1,
                 olPolys,
                 erased,
@@ -98,7 +98,7 @@ describe('farmbuild.webMapping module', function () {
                 };
             olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
             olPolys = webMappingConverter.geoJsonToFeatures(polys2);
-            erased = webMappingTransformation.eraseAll(olPoly1, olPolys);
+            erased = webMappingGeoProcessing.eraseAll(olPoly1, olPolys);
             erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
             expect(erased).toBeDefined();
             expect(erasedGeoJSON).toBeDefined();
@@ -107,7 +107,7 @@ describe('farmbuild.webMapping module', function () {
     });
 
     describe('Testing Web Mapping Erase Transformation', function () {
-        it('webMappingTransformation.erase should return a Feature<Polygon>', inject(function () {
+        it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
             var olPoly1,
                 olPoly2,
                 erased,
@@ -132,7 +132,7 @@ describe('farmbuild.webMapping module', function () {
                 };
             olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
             olPoly2 = webMappingConverter.geoJsonToFeature(poly2);
-            erased = webMappingTransformation.erase(olPoly1, olPoly2);
+            erased = webMappingGeoProcessing.erase(olPoly1, olPoly2);
             erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
             expect(erased).toBeDefined();
             expect(erasedGeoJSON).toBeDefined();
@@ -141,7 +141,7 @@ describe('farmbuild.webMapping module', function () {
     });
 
     describe('Testing Web Mapping Merge Transformation', function () {
-        it('webMappingTransformation.erase should return a Feature<Polygon>', inject(function () {
+        it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
             var polygons = {
                     "type": "FeatureCollection",
                     "features": [
@@ -199,7 +199,7 @@ describe('farmbuild.webMapping module', function () {
                     }
                 };
             olPolygons = webMappingConverter.geoJsonToFeatures(polygons);
-            merged = webMappingTransformation.merge(olPolygons);
+            merged = webMappingGeoProcessing.merge(olPolygons);
             mergedGeoJSON = webMappingConverter.featureToGeoJson(merged);
             expect(merged).toBeDefined();
             expect(mergedGeoJSON).toBeDefined();
@@ -208,7 +208,7 @@ describe('farmbuild.webMapping module', function () {
     });
 
     describe('Testing Web Mapping Intersect Transformation', function () {
-        it('webMappingTransformation.erase should return a Feature<Polygon>', inject(function () {
+        it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
 
             var poly1 = {
                     "type": "Feature",
@@ -270,7 +270,7 @@ describe('farmbuild.webMapping module', function () {
                 };
             olPolygon1 = webMappingConverter.geoJsonToFeature(poly1);
             olPolygon2 = webMappingConverter.geoJsonToFeature(poly2);
-            intersection = webMappingTransformation.intersect(olPolygon1, olPolygon2);
+            intersection = webMappingGeoProcessing.intersect(olPolygon1, olPolygon2);
             intersectedGeoJSON = webMappingConverter.featureToGeoJson(intersection);
             expect(intersection).toBeDefined();
             expect(intersectedGeoJSON).toBeDefined();
