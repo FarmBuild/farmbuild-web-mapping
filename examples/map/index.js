@@ -37,62 +37,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			group: ''
 		};
 		$scope.donutDrawing = false;
-		$scope.farmSelected = false;
 		$scope.paddockTypes = paddocks.types();
 		$scope.paddockGroups = paddocks.groups();
-
-		$scope.toGeoJson = function () {
-			farmbuild.webmapping.exportGeoJson(document, $scope.farmData);
-		};
-
-		$scope.toKml = function () {
-			farmbuild.webmapping.exportKml(document, $scope.farmData);
-		};
-
-		$scope.loadFarmData = function () {
-			var geoJsons;
-
-			$scope.farmData = webmapping.find();
-
-			/** Convert geometry data of farmData to valid geoJson */
-			geoJsons = webmapping.toGeoJsons($scope.farmData);
-
-			if (!angular.isDefined(geoJsons)) {
-				$scope.noResult = true;
-				return;
-			}
-
-			dataProjection = $scope.farmData.geometry.crs;
-
-			/** Create openlayers map object, customise the map object as you like. */
-			olMap = createOpenLayerMap(geoJsons);
-			var extent = olMap.getLayers().item(1).getLayers().item(1).getSource().getExtent();
-
-
-			/**  Create google map object, customise the map object as you like. */
-			googleMap = createGoogleMap(google.maps.MapTypeId.SATELLITE);
-
-			/** Openlayers 3 does not support google maps as a tile layer,
-			 so we need to keep openlayers map view and google maps in sync,
-			 this helper function does the job for you. */
-				//olHelper.integrateGoogleMap(gmap, olmap, dataProjection);
-			olHelper.integrateGoogleMap(googleMap, olMap, dataProjection, document.getElementById('olmap'), true, extent);
-
-			/** Enable address google search for your map */
-			olHelper.initGoogleAddressSearch('locationAutoComplete', olMap);
-
-			layerSelectionElement.addEventListener('change', selectLayer);
-
-			actions.keyboardShortcuts.enable('gmap');
-
-			/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
-			webmapping.ga.trackWebMapping('AgSmart');
-
-			/** it is up to you when to load parcels, this example is using map view's change event to load parcels data. Parcels data is used for snapping */
-			olMap.getView().on('change:resolution', loadParcels);
-			olMap.getView().on('change:center', loadParcels);
-			$scope.farmLoaded = true;
-		};
 
 		function loadParcels() {
 			var parcelsServiceUrl = 'https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
@@ -172,61 +118,71 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		}
 
-		function onPaddockChanged(e) {
+		function onPaddockChanged() {
 			$scope.paddockChanged = true;
 			if (!$scope.$$phase) {
 				$scope.$apply();
 			}
 		}
 
-		function onFarmChanged(e) {
+		$scope.onPaddockDetailsChanged = function () {
+			var sp = $scope.selectedPaddock;
+			actions.features.selected().item(0).setProperties({
+				type: sp.type,
+				name: sp.name,
+				comment: sp.comment,
+				area: sp.area,
+				group: sp.group
+			});
+			onPaddockChanged();
+		};
+
+		function onFarmChanged() {
 			$scope.farmChanged = true;
 			if (!$scope.$$phase) {
 				$scope.$apply();
 			}
 		}
 
-		function mapOnClick(event) {
-			var coordinate = event.coordinate, selectedLayer = layerSelectionElement.value,
-				paddockAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, olMap.getLayers().item(1).getLayers().item(0));
+		$scope.onFarmNameChanged = function () {
+			actions.features.selected().item(0).setProperties({
+				name: $scope.farmData.name
+			});
+			onFarmChanged();
+		};
+
+		function onPaddockSelect(event, data) {
+			var selectedPaddock = data.features.item(0);
+			$scope.selectedPaddock = selectedPaddock.getProperties();
+			$scope.selectedPaddock.area = measurement.area(selectedPaddock);
+			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
+			$scope.$apply();
+		};
+
+		function onPaddockDeselect(event, data) {
+			$scope.selectedPaddock = {};
 			if ($scope.paddockChanged) {
 				$scope.cancel();
 			}
-			if ((selectedLayer !== 'paddocks') || !paddockAtCoordinate) {
-				$scope.selectedPaddock = {};
-				$scope.$apply();
-				return;
-			}
-			$scope.selectedPaddock = paddockAtCoordinate.getProperties();
-			$scope.selectedPaddock.area = measurement.area(paddockAtCoordinate);
-			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
-			$scope.$apply();
-		}
+			onPaddockChanged();
+		};
 
 		function selectLayer() {
 			var selectedLayer = this.value;
-			$scope.farmSelected = false;
 
 			if (selectedLayer === '') {
 				actions.destroy(olMap);
 				olMap.un('pointermove', mapOnPointerMove);
-				olMap.un('click', mapOnClick);
 				return;
-			}
-
-			if (selectedLayer === 'farm') {
-				$scope.farmSelected = true;
-				$scope.$apply();
 			}
 
 			actions.destroy(olMap);
 			actions.init(olMap, olMap.getLayers().item(1).getLayers().item(1), olMap.getLayers().item(1).getLayers().item(0), selectedLayer);
 			olMap.on('pointermove', mapOnPointerMove);
-			olMap.on('click', mapOnClick);
 			olMap.getLayers().item(1).getLayers().item(0).getSource().on('changefeature', onPaddockChanged);
 			olMap.getLayers().item(1).getLayers().item(1).getSource().on('changefeature', onFarmChanged);
 			loadParcels();
-		}
+		};
 
 		function clipSelectedPaddock() {
 			$log.info('Clipping selected paddock...');
@@ -247,7 +203,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.farmData = {};
 			webmapping.session.clear();
 			location.href = '../index.html'
-		}
+		};
 
 		$scope.apply = function () {
 			$log.info('apply changes to farm data ...');
@@ -276,62 +232,28 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			actions.features.remove(selectedPaddocks);
 			$scope.paddockChanged = false;
 			$scope.selectedPaddock = {};
-			onFarmChanged();
+			$scope.farmChanged = true;
 		};
 
 		$scope.removeFarm = function () {
 			$log.info('removing farm...');
 			var farmFeature = olMap.getLayers().item(1).getLayers().item(1).getSource().getFeatures();
 			actions.features.remove(farmFeature);
-			$scope.farmSelected = false;
 			onFarmChanged();
 		};
 
 		$scope.cancel = function () {
 			$log.info('cancel...');
-			var selectedLayer = layerSelectionElement.value;
 			$scope.farmData = webmapping.find();
 			var geoJsons = webmapping.toGeoJsons($scope.farmData);
 			if (!angular.isDefined(geoJsons)) {
 				$scope.noResult = true;
 				return;
 			}
-			actions.destroy(olMap);
-			olMap.un('pointermove', mapOnPointerMove);
-			olMap.un('click', mapOnClick);
-
 			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
-
-			actions.init(olMap, olMap.getLayers().item(1).getLayers().item(1), olMap.getLayers().item(1).getLayers().item(0), selectedLayer);
-			olMap.on('pointermove', mapOnPointerMove);
-			olMap.on('click', mapOnClick);
-			olMap.getLayers().item(1).getLayers().item(0).getSource().on('changefeature', onPaddockChanged);
-			olMap.getLayers().item(1).getLayers().item(1).getSource().on('changefeature', onFarmChanged);
-			loadParcels();
+			actions.features.selected().clear();
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
-			if (selectedLayer === 'farm') {
-				$scope.farmSelected = true;
-			}
-		};
-
-		$scope.onFarmNameChanged = function () {
-			olMap.getLayers().item(1).getLayers().item(1).getSource().getFeatures()[0].setProperties({
-				name: $scope.farmData.name
-			});
-			onFarmChanged();
-		};
-
-		$scope.onPaddockDetailsChanged = function () {
-			var sp = $scope.selectedPaddock;
-			actions.features.selected().item(0).setProperties({
-				type: sp.type,
-				name: sp.name,
-				comment: sp.comment,
-				area: sp.area,
-				group: sp.group
-			});
-			onPaddockChanged();
 		};
 
 		$scope.enableDonutDrawing = function () {
@@ -372,6 +294,73 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 		});
+
+		$rootScope.$on('web-mapping-feature-select', function (event, data) {
+			var selectedLayer = layerSelectionElement.value;
+			if (selectedLayer === 'paddocks') {
+				onPaddockSelect(event, data)
+			}
+		});
+
+		$rootScope.$on('web-mapping-feature-deselect', function (event, data) {
+			var selectedLayer = layerSelectionElement.value;
+			if (selectedLayer === 'paddocks') {
+				onPaddockDeselect(event, data)
+			}
+		});
+
+		$scope.toGeoJson = function () {
+			farmbuild.webmapping.exportGeoJson(document, $scope.farmData);
+		};
+
+		$scope.toKml = function () {
+			farmbuild.webmapping.exportKml(document, $scope.farmData);
+		};
+
+		$scope.loadFarmData = function () {
+			var geoJsons;
+
+			$scope.farmData = webmapping.find();
+
+			/** Convert geometry data of farmData to valid geoJson */
+			geoJsons = webmapping.toGeoJsons($scope.farmData);
+
+			if (!angular.isDefined(geoJsons)) {
+				$scope.noResult = true;
+				return;
+			}
+
+			dataProjection = $scope.farmData.geometry.crs;
+
+			/** Create openlayers map object, customise the map object as you like. */
+			olMap = createOpenLayerMap(geoJsons);
+			var extent = olMap.getLayers().item(1).getLayers().item(1).getSource().getExtent();
+
+
+			/**  Create google map object, customise the map object as you like. */
+			googleMap = createGoogleMap(google.maps.MapTypeId.SATELLITE);
+
+			/** Openlayers 3 does not support google maps as a tile layer,
+			 so we need to keep openlayers map view and google maps in sync,
+			 this helper function does the job for you. */
+				//olHelper.integrateGoogleMap(gmap, olmap, dataProjection);
+			olHelper.integrateGoogleMap(googleMap, olMap, dataProjection, document.getElementById('olmap'), true, extent);
+
+			/** Enable address google search for your map */
+			olHelper.initGoogleAddressSearch('locationAutoComplete', olMap);
+
+			layerSelectionElement.addEventListener('change', selectLayer);
+
+			actions.keyboardShortcuts.enable('gmap');
+
+			/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
+			webmapping.ga.trackWebMapping('AgSmart');
+
+			/** it is up to you when to load parcels, this example is using map view's change event to load parcels data. Parcels data is used for snapping */
+			olMap.getView().on('change:resolution', loadParcels);
+			olMap.getView().on('change:center', loadParcels);
+			$scope.farmLoaded = true;
+		};
 
 		$scope.loadFarmData();
 

@@ -653,7 +653,7 @@ angular.module("farmbuild.webmapping").factory("webMappingModifyInteraction", fu
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingSelectInteraction", function(validations, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingSelectInteraction", function(validations, $rootScope, $log) {
     var _isDefined = validations.isDefined;
     function _create(map, layer, multi) {
         if (!_isDefined(multi)) {
@@ -674,6 +674,16 @@ angular.module("farmbuild.webmapping").factory("webMappingSelectInteraction", fu
             $log.info("select interaction init ...");
             map.addInteraction(selectInteraction);
             selectInteraction.setActive(false);
+            selectInteraction.getFeatures().on("change:length", function() {
+                var selections = selectInteraction.getFeatures();
+                if (selections.getLength() > 0) {
+                    $rootScope.$broadcast("web-mapping-feature-select", {
+                        features: selectInteraction.getFeatures()
+                    });
+                    return;
+                }
+                $rootScope.$broadcast("web-mapping-feature-deselect");
+            });
         }
         function _enable() {
             selectInteraction.setActive(true);
@@ -795,7 +805,7 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 
 "use strict";
 
-angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, webMappingTransformation, $log) {
+angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, webMappingTransformation, webMappingConverter, $log) {
     var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _extentControl, _transform = webMappingTransformation;
     function _init(gmap, map, dataProjection, targetElement, init, extent) {
         var defaults = {
@@ -979,10 +989,12 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             layers: [ vicMapImageryLayer, vicMapStreetLayer, googleStreetLayer, googleImageryLayer ]
         });
     }
-    function _reload(map, geoJson, dataProjectionCode, featureProjectionCode) {
-        var farmLayers = map.getLayers().item(1);
-        map.removeLayer(farmLayers);
-        map.addLayer(_farmLayers(geoJson, dataProjectionCode, featureProjectionCode));
+    function _reload(map, geoJsons, dataProjection, featureProjection) {
+        var farmLayers = map.getLayers().item(1).getLayers(), farmSource = farmLayers.item(1).getSource(), paddocksSource = farmLayers.item(0).getSource(), farmFeatures = webMappingConverter.geoJsonToFeatures(geoJsons.farm, dataProjection, featureProjection), paddockFeatures = webMappingConverter.geoJsonToFeatures(geoJsons.paddocks, dataProjection, featureProjection);
+        farmSource.clear();
+        paddocksSource.clear();
+        farmSource.addFeatures(farmFeatures);
+        paddocksSource.addFeatures(paddockFeatures);
     }
     function _initGoogleAddressSearch(targetElementId, olmap) {
         if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
