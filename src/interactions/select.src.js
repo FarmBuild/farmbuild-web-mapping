@@ -35,7 +35,7 @@ angular.module('farmbuild.webmapping')
 				selectInteraction.getFeatures().on('change:length', function(){
 					var selections = selectInteraction.getFeatures();
 					if(selections.getLength() > 0) {
-						$rootScope.$broadcast('web-mapping-feature-select', {features: selectInteraction.getFeatures()});
+						$rootScope.$broadcast('web-mapping-feature-select', selectInteraction.getFeatures().item(0));
 						return;
 					}
 					$rootScope.$broadcast('web-mapping-feature-deselect');

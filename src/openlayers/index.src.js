@@ -116,7 +116,7 @@ angular.module('farmbuild.webmapping')
 			map.getView().setZoom(15);
 		};
 
-		function _paddocksLayer(paddocksGeometry, dataProjection, featureProjection) {
+		function _createPaddocksLayer(paddocksGeometry, dataProjection, featureProjection) {
 			if (!_isDefined(paddocksGeometry) || !_isDefined(dataProjection) || !_isDefined(featureProjection)) {
 				return;
 			}
@@ -143,7 +143,7 @@ angular.module('farmbuild.webmapping')
 			});
 		};
 
-		function _farmLayer(farmGeometry, dataProjection, featureProjection) {
+		function _createFarmLayer(farmGeometry, dataProjection, featureProjection) {
 			if (!_isDefined(farmGeometry) || !_isDefined(dataProjection) || !_isDefined(featureProjection)) {
 				return;
 			}
@@ -170,17 +170,17 @@ angular.module('farmbuild.webmapping')
 			});
 		};
 
-		function _farmLayers(geometry, dataProjection, featureProjection) {
+		function _createFarmLayers(geometry, dataProjection, featureProjection) {
 			return new ol.layer.Group({
 				'title': 'Farm layers',
 				layers: [
-					_paddocksLayer(geometry.paddocks, dataProjection, featureProjection),
-					_farmLayer(geometry.farm, dataProjection, featureProjection)
+					_createPaddocksLayer(geometry.paddocks, dataProjection, featureProjection),
+					_createFarmLayer(geometry.farm, dataProjection, featureProjection)
 				]
 			})
 		}
 
-		function _baseLayers() {
+		function _createBaseLayers() {
 			var vicMapImageryLayer = new ol.layer.Tile({
 					title: 'VicMAP Imagery',
 					type: 'base',
@@ -214,7 +214,7 @@ angular.module('farmbuild.webmapping')
 				'title': 'Base maps',
 				layers: [vicMapImageryLayer, vicMapStreetLayer, googleStreetLayer, googleImageryLayer]
 			})
-		}
+		};
 
 		function _reload(map, geoJsons, dataProjection, featureProjection) {
 			var farmLayers = map.getLayers().item(1).getLayers(),
@@ -252,12 +252,43 @@ angular.module('farmbuild.webmapping')
 			map.addControl(_extentControl);
 		};
 
+		function _farmLayer(map) {
+			if (!_isDefined(map) ||
+				!_isDefined(map.getLayers().item(1)) ||
+				!_isDefined(map.getLayers().item(1).getLayers() ||
+				!_isDefined(map.getLayers().item(1).getLayers().getLength()===2))) {
+				return;
+			}
+			return map.getLayers().item(1).getLayers().item(1);
+		};
+
+		function _paddocksLayer(map) {
+			if (!_isDefined(map) ||
+				!_isDefined(map.getLayers().item(1)) ||
+				!_isDefined(map.getLayers().item(1).getLayers() ||
+				!_isDefined(map.getLayers().item(1).getLayers().getLength()===2))) {
+				return;
+			}
+			return map.getLayers().item(1).getLayers().item(0);
+		};
+
+		function _farmLayerGroup(map) {
+			if (!_isDefined(map) ||
+				!_isDefined(map.getLayers().item(1))) {
+				return;
+			}
+			return map.getLayers().item(1);
+		};
+
 		return {
 			exportGeometry: _exportGeometry,
 			center: _center,
 			integrateGoogleMap: _integrateGoogleMap,
-			farmLayers: _farmLayers,
-			baseLayers: _baseLayers,
+			createFarmLayers: _createFarmLayers,
+			createBaseLayers: _createBaseLayers,
+			farmLayer: _farmLayer,
+			paddocksLayer: _paddocksLayer,
+			farmLayerGroup: _farmLayerGroup,
 			reload: _reload,
 			initGoogleAddressSearch: _initGoogleAddressSearch,
 			updateExtent: _updateExtent

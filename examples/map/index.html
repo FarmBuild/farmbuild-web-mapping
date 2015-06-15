@@ -31,7 +31,7 @@
             <input type="text" id="locationAutoComplete" class="address-search addon">
             <wrapper>
                 <!--<label for="layers" class="farm-layers-label">Edit layer</label>-->
-                <select id="layers" class="farm-layers addon">
+                <select id="layers" class="farm-layers addon" ng-model="selectedLayer" ng-change="selectLayer()">
                     <option value="">Select Edit Layer</option>
                     <option value="farm">Farm</option>
                     <option value="paddocks">Paddocks</option>
@@ -168,7 +168,7 @@
                     Cancel
                 </button>
             </wrapper>
-            <wrapper ng-show="!farmChanged">
+            <wrapper ng-show="!farmChanged && selectedLayer === 'farm'">
                 <button class="btn btn-danger" ng-click="removeFarm()">
                     Remove
                 </button>
