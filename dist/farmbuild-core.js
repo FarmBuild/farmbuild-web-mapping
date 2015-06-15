@@ -7360,7 +7360,7 @@ angular.module("farmbuild.core").factory("collections", function(validations, $l
 "use strict";
 
 angular.module("farmbuild.core").factory("googleAnalytics", function($log, validations) {
-    var googleAnalytics = {}, _isDefined = validations.isDefined, trackerName = "farmbuildTracker", src = ("https:" == document.location.protocol ? "https://ssl" : "http://www") + ".google-analytics.com/ga.js";
+    var googleAnalytics = {}, _isDefined = validations.isDefined, trackerName = "farmbuildTracker", trackingCode = "UA-62295166-1", src = ("https:" == document.location.protocol ? "https://" : "http://") + "www.google-analytics.com/analytics.js";
     (function(i, s, o, g, r, a, m) {
         i["GoogleAnalyticsObject"] = r;
         i[r] = i[r] || function() {
@@ -7374,7 +7374,7 @@ angular.module("farmbuild.core").factory("googleAnalytics", function($log, valid
     function sendPageView(values) {
         ga(trackerName + ".send", "pageview", values);
     }
-    ga("create", "UA-53478356-1", "auto", {
+    ga("create", trackingCode, "auto", {
         name: trackerName
     });
     googleAnalytics.track = function(apiName, clientName) {
