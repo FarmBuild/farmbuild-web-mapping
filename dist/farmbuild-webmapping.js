@@ -455,18 +455,6 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
         return _snap.enable();
     }
-    function _showParcels() {
-        if (!_isDefined(_snap)) {
-            return;
-        }
-        return _snap.show();
-    }
-    function _hideParcels() {
-        if (!_isDefined(_snap)) {
-            return;
-        }
-        return _snap.hide();
-    }
     $rootScope.$on("web-mapping-measure-start", function(event, data) {
         if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_draw)) {
             return;
@@ -554,9 +542,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             remove: _remove
         },
         parcels: {
-            snap: _snapParcels,
-            show: _showParcels,
-            hide: _hideParcels
+            snap: _snapParcels
         },
         keyboardShortcuts: {
             enable: _enableKeyboardShortcuts
