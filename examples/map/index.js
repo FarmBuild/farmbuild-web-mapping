@@ -118,7 +118,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		}
 
-		function updateScope(){
+		function updateNgScope(){
 			if (!$scope.$$phase) {
 				$scope.$apply();
 			}
@@ -126,7 +126,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		function paddockChanged() {
 			$scope.paddockChanged = true;
-			updateScope();
+			updateNgScope();
 		}
 
 		$scope.onPaddockDetailsChanged = function () {
@@ -143,7 +143,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		function farmChanged() {
 			$scope.farmChanged = true;
-			updateScope();
+			updateNgScope();
 		}
 
 		$scope.onFarmNameChanged = function () {
@@ -160,12 +160,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.selectedPaddock = selectedPaddock.getProperties();
 			$scope.selectedPaddock.area = measurement.area(selectedPaddock);
 			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
-			updateScope();
+			updateNgScope();
 		};
 
 		function onPaddockDeselect(event) {
 			$scope.selectedPaddock = {};
-			updateScope();
+			updateNgScope();
 		};
 
 		 $scope.selectLayer = function() {
@@ -275,7 +275,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$rootScope.$on('web-mapping-measure-end', function (event, data) {
 			$scope.measuredValue = data.value;
 			$scope.measuredUnit = data.unit;
-			updateScope();
+			updateNgScope();
 		});
 
 		$rootScope.$on('web-mapping-base-layer-change', function (event, data) {
