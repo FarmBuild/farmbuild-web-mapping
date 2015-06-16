@@ -15,7 +15,7 @@ For more information about API and Testing see the [Wiki](https://github.com/Far
 ## Supported projections
 <a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/src/projections/README.md">Read me</a>
 
-<a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/0.1.17/index.html" target="_blank">API documentation</a>
+<a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/0.1.20/index.html" target="_blank">API documentation</a>
 
 For more information about API and Testing see the [Wiki](https://github.com/FarmBuild/farmbuild-web-mapping/wiki) section.
 

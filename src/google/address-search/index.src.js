@@ -24,7 +24,7 @@ angular.module('farmbuild.webmapping')
          * @method init
          * @param {!string} targetElementId - Auto complete html element in page
          * @param {function} onPlaceChangedCallback - function to call when a location is selected
-         * @public
+         * @private
          * @static
          */
         function _init(targetElementId, onPlaceChangedCallback) {

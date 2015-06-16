@@ -9,8 +9,8 @@
 'use strict';
 
 /**
- * webmapping/webMappingGoogleAnalytics singleton
- * @private-module webmapping/webMappingGoogleAnalytics
+ * webmapping/ga singleton
+ * @module webmapping/ga
  */
 angular.module('farmbuild.webmapping')
 	.factory('webMappingGoogleAnalytics',

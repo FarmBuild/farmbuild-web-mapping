@@ -234,7 +234,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _activeLayerName = undefined;
         _mode = undefined;
     }
-    function _init(map, farmLayerGroup, activeLayerName, active, multi) {
+    function _init(map, farmLayerGroup, activeLayerName, snapping, multi) {
         $log.info("interactions init ...");
         if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(farmLayerGroup)) {
             return;
@@ -260,7 +260,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _select.init();
         _modify.init();
         _draw.init(_clip, _select);
-        _snap.init(active);
+        _snap.init(snapping);
     }
     function _addFeature(layer, feature, newProperties) {
         var properties = newProperties || {};
@@ -1446,3 +1446,5 @@ angular.module("farmbuild.webmapping").factory("webMappingGoogleAnalytics", func
 "use strict";
 
 angular.module("farmbuild.webmapping").run(function(webmapping) {});
+
+angular.injector([ "ng", "farmbuild.webmapping" ]);
