@@ -9,13 +9,14 @@ angular.module('farmbuild.webmapping')
 	          webMappingDrawInteraction,
 	          webMappingSnapInteraction,
 	          webMappingGeoProcessing,
-	          $rootScope, $timeout) {
+	          $rootScope) {
 		var _isDefined = validations.isDefined,
 			_select, _modify, _draw, _snap, _activeLayer, _activeLayerName,
 			_mode,
 			_farmLayerGroup, _farmLayer, _paddocksLayer, _map,
 			_transform = webMappingGeoProcessing,
-			_farmName;
+			_farmName,
+			_donutContainer;
 
 		// Remove all interactions of map
 		function _destroy(map) {
@@ -155,7 +156,7 @@ angular.module('farmbuild.webmapping')
 
 		function _clipDonut(donutFeature) {
 			var properties,
-				paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0],
+				paddockFeature = _donutContainer,
 				clipped = _transform.erase(paddockFeature, donutFeature);
 			if (!_isDefined(paddockFeature)) {
 				$log.error('donut must be inside a paddock');
@@ -201,7 +202,7 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _enableEditing() {
-			if (!_isDefined(_mode) || _mode === 'edit') {
+			if (!_isDefined(_mode) || _mode === 'edit' || _mode === 'measure') {
 				return;
 			}
 			$log.info('editing enabled');
@@ -212,7 +213,7 @@ angular.module('farmbuild.webmapping')
 		};
 
 		function _enableDrawing() {
-			if (!_isDefined(_mode) || _mode === 'draw') {
+			if (!_isDefined(_mode) || _mode === 'draw' || _mode === 'measure') {
 				return;
 			}
 			$log.info('drawing enabled');
@@ -227,6 +228,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('donut drawing enabled');
+			_donutContainer = _selectedFeatures().item(0);
 			_mode = 'donut-draw';
 			_select.disable();
 			_modify.disable();
@@ -315,6 +317,7 @@ angular.module('farmbuild.webmapping')
 			_select.disable();
 			_modify.disable();
 			_draw.disable();
+			_mode = 'measure';
 		});
 
 		$rootScope.$on('web-mapping-measure-end', function (event, data) {
@@ -324,6 +327,7 @@ angular.module('farmbuild.webmapping')
 			_select.enable();
 			_modify.enable();
 			_draw.disable();
+			_mode = 'edit';
 		});
 
 		$rootScope.$on('web-mapping-draw-end', function (event, feature) {
@@ -334,6 +338,7 @@ angular.module('farmbuild.webmapping')
 		$rootScope.$on('web-mapping-donut-draw-end', function (event, feature) {
 			$log.info('donut draw end ...');
 			_select.interaction.getFeatures().push(_clip(feature, _farmLayerGroup));
+			_donutContainer = null;
 		});
 
 		function _enableKeyboardShortcuts(elementId) {

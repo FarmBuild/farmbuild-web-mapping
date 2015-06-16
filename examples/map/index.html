@@ -106,7 +106,7 @@
                 <label for="selectedPaddockType">Group:</label>
                 <select name="edit_group_type" id="edit_group_type" style="margin-bottom:10px" class="form-control"
                         ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.group"
-                        ng-options="paddockGroup for paddockGroup in paddockGroups" >
+                        ng-options="paddockGroup for paddockGroup in paddockGroups">
                     <option value=""></option>
                 </select>
             </form-item>
@@ -182,18 +182,19 @@
                 </button>
 
                 <a id="download"></a>
+                <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
+                    Clear session
+                </button>
+                <br/>
+                <button class="btn btn-primary" ng-click="toKml()" ng-show="farmData.name">
+                    Export KML
+                </button>
+                <button class="btn btn-primary" ng-click="toGeoJson()" ng-show="farmData.name">
+                    Export GeoJSON
+                </button>
+                <hr>
             </wrapper>
-            <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
-                Clear session
-            </button>
-            <br/>
-            <button class="btn btn-primary" ng-click="toKml()" ng-show="farmData.name">
-                Export KML
-            </button>
-            <button class="btn btn-primary" ng-click="toGeoJson()" ng-show="farmData.name">
-                Export GeoJSON
-            </button>
-            <hr>
+
             <a href="../index.html">Load or create another farmData</a>
         </form-section>
     </fieldset>
