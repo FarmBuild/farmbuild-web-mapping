@@ -209,10 +209,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				clipSelectedFeature();
 			}
 			var paddocksGeometry = olHelper.exportGeometry(olHelper.paddocksLayer(olMap).getSource(), dataProjection, featureProjection),
-				farmGeometry = olHelper.exportGeometry(olHelper.farmLayer(olMap).getSource(), dataProjection, featureProjection);
+				farmGeometry = olHelper.exportGeometry(olHelper.farmLayer(olMap).getSource(), dataProjection, featureProjection),
+				farmExtent = olHelper.farmLayer(olMap).getSource().getExtent(),
+				paddocksExtent = olHelper.paddocksLayer(olMap).getSource().getExtent();
 
+			//if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmExtent, paddocksExtent)) {
 			if (farmGeometry.features.length === 0) {
 				$log.error('Draw farm boundary first!');
+				$scope.noResult = true;
 				return;
 			}
 			$scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
