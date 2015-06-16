@@ -19,7 +19,7 @@ angular.module('farmbuild.webmapping')
                 try {
                     clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
                 } catch (e) {
-                    $log.error(e);
+                    $log.warn('This operation is not supported,', e);
                 }
             });
             return converter.geoJsonToFeature(clipeeGeoJson);
@@ -37,7 +37,7 @@ angular.module('farmbuild.webmapping')
                 clipped = turf.erase(clipeeGeoJson, cliperGeoJson);
                 return converter.geoJsonToFeature(clipped);
             } catch (e) {
-                $log.error(e);
+                $log.warn('This operation is not supported,', e);
             }
         };
 
@@ -50,7 +50,7 @@ angular.module('farmbuild.webmapping')
                 intersection = turf.intersect(feature1, feature2);
                 return converter.geoJsonToFeature(intersection);
             } catch (e) {
-                $log.error(e);
+                $log.warn('This operation is not supported,', e);
             }
         };
 
@@ -62,7 +62,7 @@ angular.module('farmbuild.webmapping')
             try {
                 return converter.geoJsonToFeature(turf.merge(toMerge), properties);
             } catch (e) {
-                $log.error(e);
+                $log.warn('This operation is not supported,', e);
             }
 
         };

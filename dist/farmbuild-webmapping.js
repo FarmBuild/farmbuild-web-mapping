@@ -104,7 +104,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", functi
             try {
                 clipeeGeoJson = turf.erase(clipeeGeoJson, clipperGeoJson);
             } catch (e) {
-                $log.error(e);
+                $log.warn("This operation is not supported,", e);
             }
         });
         return converter.geoJsonToFeature(clipeeGeoJson);
@@ -119,7 +119,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", functi
             clipped = turf.erase(clipeeGeoJson, cliperGeoJson);
             return converter.geoJsonToFeature(clipped);
         } catch (e) {
-            $log.error(e);
+            $log.warn("This operation is not supported,", e);
         }
     }
     function _intersect(olFeature1, olFeature2) {
@@ -129,7 +129,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", functi
             intersection = turf.intersect(feature1, feature2);
             return converter.geoJsonToFeature(intersection);
         } catch (e) {
-            $log.error(e);
+            $log.warn("This operation is not supported,", e);
         }
     }
     function _merge(olFeatures) {
@@ -142,7 +142,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", functi
         try {
             return converter.geoJsonToFeature(turf.merge(toMerge), properties);
         } catch (e) {
-            $log.error(e);
+            $log.warn("This operation is not supported,", e);
         }
     }
     return {
@@ -511,7 +511,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
                 if (_isDrawing()) {
                     _finishDrawing();
                 } else {
-                    _clip(_selectedFeatures().item(0), _paddocksLayer.getSource(), _farmLayer.getSource());
+                    _clip(_selectedFeatures().item(0), _farmLayerGroup);
                 }
                 event.preventDefault();
                 event.stopPropagation();

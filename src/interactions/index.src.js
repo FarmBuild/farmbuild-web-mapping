@@ -362,7 +362,7 @@ angular.module('farmbuild.webmapping')
 					if (_isDrawing()) {
 						_finishDrawing();
 					} else {
-						_clip(_selectedFeatures().item(0), _paddocksLayer.getSource(), _farmLayer.getSource());
+						_clip(_selectedFeatures().item(0), _farmLayerGroup);
 					}
 
 					event.preventDefault();

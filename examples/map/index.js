@@ -118,7 +118,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		}
 
-		function updateNgScope(){
+		function updateNgScope() {
 			if (!$scope.$$phase) {
 				$scope.$apply();
 			}
@@ -168,13 +168,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			updateNgScope();
 		};
 
-		 $scope.selectLayer = function() {
+		$scope.selectLayer = function () {
+			$scope.cancel();
 			actions.destroy(olMap);
+			$scope.selectedPaddock = {};
 			if ($scope.selectedLayer === '') {
 				olMap.un('pointermove', mapOnPointerMove);
 				return;
 			}
-
 			actions.init(olMap, olHelper.farmLayerGroup(olMap), $scope.selectedLayer);
 			olMap.on('pointermove', mapOnPointerMove);
 			olHelper.paddocksLayer(olMap).getSource().on('changefeature', paddockChanged);
@@ -185,7 +186,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		function clipSelectedFeature() {
 			$log.info('Clipping selected paddock...');
 			var selectedPaddock = actions.features.selections().item(0);
-				actions.features.clip(selectedPaddock, olHelper.farmLayerGroup(olMap));
+			actions.features.clip(selectedPaddock, olHelper.farmLayerGroup(olMap));
 		};
 
 		$scope.exportFarmData = function (farmData) {
@@ -246,7 +247,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
-			actions.features.selections().clear();
+			if(actions.features.selections()) {
+				actions.features.selections().clear();
+			}
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 		};
