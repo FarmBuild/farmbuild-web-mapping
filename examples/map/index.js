@@ -29,6 +29,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.farmChanged = false;
 		$scope.paddockChanged = false;
 		$scope.noResult = $scope.farmLoaded = false;
+		$scope.selectedLayer = '';
 		$scope.selectedPaddock = {
 			name: '',
 			type: '',
