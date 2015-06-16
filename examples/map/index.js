@@ -213,8 +213,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				farmExtent = olHelper.farmLayer(olMap).getSource().getExtent(),
 				paddocksExtent = olHelper.paddocksLayer(olMap).getSource().getExtent();
 
-			//if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmExtent, paddocksExtent)) {
-			if (farmGeometry.features.length === 0) {
+			if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmExtent, paddocksExtent)) {
 				$log.error('Draw farm boundary first!');
 				$scope.noResult = true;
 				return;
