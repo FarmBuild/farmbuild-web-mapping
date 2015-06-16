@@ -11,37 +11,37 @@
 angular.module('farmbuild.webmapping')
 	.factory('webMappingDrawInteraction',
 	function (validations,
-	          $log, $rootScope, $timeout) {
-		var _isDefined = validations.isDefined;
+	          $log, $rootScope) {
+		var _isDefined = validations.isDefined, _mode;
 
-		function _create(map, farmSource, paddocksSource) {
+		function _create(map) {
 			var drawInteraction = new ol.interaction.Draw({
-				source: paddocksSource,
+				source: new ol.source.Vector(),
 				type: /** @type {ol.geom.GeometryType} */ ('Polygon')
 			}), drawingStatus = false;
 
-			function _init(clipFn, selectInteraction) {
+			function _init() {
 				$log.info('draw interaction init ...');
 				map.addInteraction(drawInteraction);
 				drawInteraction.setActive(false);
 				drawInteraction.on('drawend', function (e) {
-					$log.info('draw end ...');
-					var feature = e.feature;
-					clipFn(feature, paddocksSource, farmSource);
-					$timeout(function () {
-						paddocksSource.removeFeature(feature);
-					}, 100);
 					drawingStatus = false;
-					$rootScope.$broadcast('web-mapping-draw-end');
+					if (_mode === 'draw') {
+						$rootScope.$broadcast('web-mapping-draw-end', e.feature);
+					}
+					if (_mode === 'donut-draw') {
+						$rootScope.$broadcast('web-mapping-donut-draw-end', e.feature);
+					}
+
 				});
 				drawInteraction.on('drawstart', function (event) {
 					$log.info('draw start ...');
-					selectInteraction.interaction.getFeatures().clear();
 					drawingStatus = true;
 				});
 			}
 
-			function _enable() {
+			function _enable(mode) {
+				_mode = mode;
 				drawInteraction.setActive(true);
 			}
 
@@ -49,7 +49,7 @@ angular.module('farmbuild.webmapping')
 				drawInteraction.setActive(false);
 			}
 
-			function _finish(){
+			function _finish() {
 				drawInteraction.finishDrawing();
 			}
 

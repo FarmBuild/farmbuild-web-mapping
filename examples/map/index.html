@@ -31,7 +31,7 @@
             <input type="text" id="locationAutoComplete" class="address-search addon">
             <wrapper>
                 <!--<label for="layers" class="farm-layers-label">Edit layer</label>-->
-                <select id="layers" class="farm-layers addon">
+                <select id="layers" class="farm-layers addon" ng-model="selectedLayer" ng-change="selectLayer()">
                     <option value="">Select Edit Layer</option>
                     <option value="farm">Farm</option>
                     <option value="paddocks">Paddocks</option>
@@ -63,8 +63,8 @@
                 <h3 class="modal-title">Validation failed</h3>
             </div>
             <div class="modal-body">
-                There is a problem with input values.
-                Please see the console for the error log or
+                Farm boundary is invalid
+                <br/>
                 read <a
                     href="https://github.com/FarmBuild/farmbuild-dairy-nutrient-calculator">API documentation</a> for
                 more information
@@ -106,7 +106,7 @@
                 <label for="selectedPaddockType">Group:</label>
                 <select name="edit_group_type" id="edit_group_type" style="margin-bottom:10px" class="form-control"
                         ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.group"
-                        ng-options="paddockGroup for paddockGroup in paddockGroups" >
+                        ng-options="paddockGroup for paddockGroup in paddockGroups">
                     <option value=""></option>
                 </select>
             </form-item>
@@ -168,7 +168,7 @@
                     Cancel
                 </button>
             </wrapper>
-            <wrapper ng-show="farmSelected">
+            <wrapper ng-show="!farmChanged && selectedLayer === 'farm'">
                 <button class="btn btn-danger" ng-click="removeFarm()">
                     Remove
                 </button>
@@ -182,18 +182,19 @@
                 </button>
 
                 <a id="download"></a>
+                <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
+                    Clear session
+                </button>
+                <br/>
+                <button class="btn btn-primary" ng-click="toKml()" ng-show="farmData.name">
+                    Export KML
+                </button>
+                <button class="btn btn-primary" ng-click="toGeoJson()" ng-show="farmData.name">
+                    Export GeoJSON
+                </button>
+                <hr>
             </wrapper>
-            <button class="btn btn-danger" ng-click="clear()" ng-show="farmData.name">
-                Clear session
-            </button>
-            <br/>
-            <button class="btn btn-primary" ng-click="toKml()" ng-show="farmData.name">
-                Export KML
-            </button>
-            <button class="btn btn-primary" ng-click="toGeoJson()" ng-show="farmData.name">
-                Export GeoJSON
-            </button>
-            <hr>
+
             <a href="../index.html">Load or create another farmData</a>
         </form-section>
     </fieldset>

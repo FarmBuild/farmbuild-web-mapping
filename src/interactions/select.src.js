@@ -3,6 +3,7 @@
 angular.module('farmbuild.webmapping')
 	.factory('webMappingSelectInteraction',
 	function (validations,
+	          $rootScope,
 	          $log) {
 		var _isDefined = validations.isDefined;
 
@@ -31,6 +32,14 @@ angular.module('farmbuild.webmapping')
 				$log.info('select interaction init ...');
 				map.addInteraction(selectInteraction);
 				selectInteraction.setActive(false);
+				selectInteraction.getFeatures().on('change:length', function(){
+					var selections = selectInteraction.getFeatures();
+					if(selections.getLength() > 0) {
+						$rootScope.$broadcast('web-mapping-feature-select', selectInteraction.getFeatures().item(0));
+						return;
+					}
+					$rootScope.$broadcast('web-mapping-feature-deselect');
+				})
 			}
 
 			function _enable() {
