@@ -12,7 +12,7 @@ angular.module('farmbuild.webmapping')
 	.factory('webMappingDrawInteraction',
 	function (validations,
 	          $log, $rootScope) {
-		var _isDefined = validations.isDefined;
+		var _isDefined = validations.isDefined, _mode;
 
 		function _create(map) {
 			var drawInteraction = new ol.interaction.Draw({
@@ -26,7 +26,13 @@ angular.module('farmbuild.webmapping')
 				drawInteraction.setActive(false);
 				drawInteraction.on('drawend', function (e) {
 					drawingStatus = false;
-					$rootScope.$broadcast('web-mapping-draw-end', e.feature);
+					if (_mode === 'draw') {
+						$rootScope.$broadcast('web-mapping-draw-end', e.feature);
+					}
+					if (_mode === 'donut-draw') {
+						$rootScope.$broadcast('web-mapping-donut-draw-end', e.feature);
+					}
+
 				});
 				drawInteraction.on('drawstart', function (event) {
 					$log.info('draw start ...');
@@ -34,7 +40,8 @@ angular.module('farmbuild.webmapping')
 				});
 			}
 
-			function _enable() {
+			function _enable(mode) {
+				_mode = mode;
 				drawInteraction.setActive(true);
 			}
 
@@ -42,7 +49,7 @@ angular.module('farmbuild.webmapping')
 				drawInteraction.setActive(false);
 			}
 
-			function _finish(){
+			function _finish() {
 				drawInteraction.finishDrawing();
 			}
 

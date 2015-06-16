@@ -245,6 +245,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
+			actions.features.selections().clear();
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 		};
@@ -264,7 +265,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$rootScope.$on('web-mapping-draw-end', function () {
 			$scope.farmChanged = true;
 			farmChanged();
-			$scope.disableDonutDrawing()
+		});
+
+		$rootScope.$on('web-mapping-donut-draw-end', function () {
+			$scope.disableDonutDrawing();
 		});
 
 		$rootScope.$on('web-mapping-measure-end', function (event, data) {

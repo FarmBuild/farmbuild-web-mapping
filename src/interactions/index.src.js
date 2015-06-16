@@ -90,7 +90,7 @@ angular.module('farmbuild.webmapping')
 			$log.info('adding feature ...', feature);
 			layer.getSource().addFeature(feature);
 			_clearSelections();
-			_select.interaction.getFeatures().push(feature);
+			return feature;
 		};
 
 		function _remove(features, deselect) {
@@ -104,7 +104,7 @@ angular.module('farmbuild.webmapping')
 			features.forEach(function (feature) {
 				try {
 					_activeLayer.getSource().removeFeature(feature);
-				} catch (e){
+				} catch (e) {
 					$log.error(e);
 				}
 			});
@@ -122,15 +122,15 @@ angular.module('farmbuild.webmapping')
 				farmSource = farmLayers.getLayers().item(1).getSource();
 
 			if (_activeLayerName === 'paddocks' && (_mode === 'draw' || _mode === 'edit')) {
-				_clipPaddocks(featureToClip, paddockSource, farmSource);
+				return _clipPaddocks(featureToClip, paddockSource, farmSource);
 			}
 
 			if (_activeLayerName === 'paddocks' && _mode === 'donut-draw') {
-				_clipDonut(featureToClip);
+				return _clipDonut(featureToClip);
 			}
 
 			if (_activeLayerName === 'farm') {
-				_clipFarm(featureToClip, farmSource)
+				return _clipFarm(featureToClip, farmSource)
 
 			}
 		};
@@ -150,7 +150,7 @@ angular.module('farmbuild.webmapping')
 			properties = featureToClip.getProperties();
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
-			_addFeature(_activeLayer, clipped, properties);
+			return _addFeature(_activeLayer, clipped, properties);
 		};
 
 		function _clipDonut(donutFeature) {
@@ -163,14 +163,14 @@ angular.module('farmbuild.webmapping')
 			}
 			properties = paddockFeature.getProperties();
 			if (_isDefined(clipped)) {
-				_addFeature(_activeLayer, clipped, properties);
 				_activeLayer.getSource().removeFeature(paddockFeature);
+				return _addFeature(_activeLayer, clipped, properties);
 			}
 		};
 
 		function _clipFarm(featureToClip, farmSource) {
 			var clipped = featureToClip,
-				properties;
+				properties, result;
 			if (farmSource.getFeatures()[0]) {
 				properties = farmSource.getFeatures()[0].getProperties();
 			}
@@ -180,8 +180,9 @@ angular.module('farmbuild.webmapping')
 				clipped = _transform.merge(farmSource.getFeatures());
 			}
 			_remove(farmSource.getFeatures(), false);
-			_addFeature(_activeLayer, clipped, properties);
+			result = _addFeature(_activeLayer, clipped, properties);
 			_clearSelections();
+			return result;
 		};
 
 		function _merge(features) {
@@ -204,10 +205,10 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('editing enabled');
+			_mode = 'edit';
 			_select.enable();
 			_modify.enable();
 			_draw.disable();
-			_mode = 'edit';
 		};
 
 		function _enableDrawing() {
@@ -215,10 +216,10 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('drawing enabled');
+			_mode = 'draw';
 			_select.disable();
 			_modify.disable();
-			_draw.enable();
-			_mode = 'draw';
+			_draw.enable(_mode);
 		};
 
 		function _enableDonutDrawing() {
@@ -226,10 +227,10 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			$log.info('donut drawing enabled');
+			_mode = 'donut-draw';
 			_select.disable();
 			_modify.disable();
-			_draw.enable();
-			_mode = 'donut-draw';
+			_draw.enable(_mode);
 		};
 
 		function _snapParcels(parcels) {
@@ -328,11 +329,11 @@ angular.module('farmbuild.webmapping')
 		$rootScope.$on('web-mapping-draw-end', function (event, feature) {
 			$log.info('draw end ...');
 			_clip(feature, _farmLayerGroup);
-			//$timeout(function () {
-			//	_paddocksLayer.getSource().removeFeature(feature);
-			//}, 100);
-			_select.interaction.getFeatures().clear();
-			_enableEditing();
+		});
+
+		$rootScope.$on('web-mapping-donut-draw-end', function (event, feature) {
+			$log.info('donut draw end ...');
+			_select.interaction.getFeatures().push(_clip(feature, _farmLayerGroup));
 		});
 
 		function _enableKeyboardShortcuts(elementId) {

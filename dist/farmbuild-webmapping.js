@@ -156,7 +156,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", functi
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", function(validations, $log, $rootScope) {
-    var _isDefined = validations.isDefined;
+    var _isDefined = validations.isDefined, _mode;
     function _create(map) {
         var drawInteraction = new ol.interaction.Draw({
             source: new ol.source.Vector(),
@@ -168,14 +168,20 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
             drawInteraction.setActive(false);
             drawInteraction.on("drawend", function(e) {
                 drawingStatus = false;
-                $rootScope.$broadcast("web-mapping-draw-end", e.feature);
+                if (_mode === "draw") {
+                    $rootScope.$broadcast("web-mapping-draw-end", e.feature);
+                }
+                if (_mode === "donut-draw") {
+                    $rootScope.$broadcast("web-mapping-donut-draw-end", e.feature);
+                }
             });
             drawInteraction.on("drawstart", function(event) {
                 $log.info("draw start ...");
                 drawingStatus = true;
             });
         }
-        function _enable() {
+        function _enable(mode) {
+            _mode = mode;
             drawInteraction.setActive(true);
         }
         function _disable() {
@@ -273,7 +279,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         $log.info("adding feature ...", feature);
         layer.getSource().addFeature(feature);
         _clearSelections();
-        _select.interaction.getFeatures().push(feature);
+        return feature;
     }
     function _remove(features, deselect) {
         if (!_isDefined(features) || !_isDefined(_activeLayer)) {
@@ -301,13 +307,13 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         $log.info("clipping feature ...", featureToClip);
         var paddockSource = farmLayers.getLayers().item(0).getSource(), farmSource = farmLayers.getLayers().item(1).getSource();
         if (_activeLayerName === "paddocks" && (_mode === "draw" || _mode === "edit")) {
-            _clipPaddocks(featureToClip, paddockSource, farmSource);
+            return _clipPaddocks(featureToClip, paddockSource, farmSource);
         }
         if (_activeLayerName === "paddocks" && _mode === "donut-draw") {
-            _clipDonut(featureToClip);
+            return _clipDonut(featureToClip);
         }
         if (_activeLayerName === "farm") {
-            _clipFarm(featureToClip, farmSource);
+            return _clipFarm(featureToClip, farmSource);
         }
     }
     function _clipPaddocks(featureToClip, paddockSource, farmSource) {
@@ -324,7 +330,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         properties = featureToClip.getProperties();
         clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
         clipped = _transform.intersect(clipped, farmFeatures[0]);
-        _addFeature(_activeLayer, clipped, properties);
+        return _addFeature(_activeLayer, clipped, properties);
     }
     function _clipDonut(donutFeature) {
         var properties, paddockFeature = _activeLayer.getSource().getFeaturesInExtent(donutFeature.getGeometry().getExtent())[0], clipped = _transform.erase(paddockFeature, donutFeature);
@@ -334,12 +340,12 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         }
         properties = paddockFeature.getProperties();
         if (_isDefined(clipped)) {
-            _addFeature(_activeLayer, clipped, properties);
             _activeLayer.getSource().removeFeature(paddockFeature);
+            return _addFeature(_activeLayer, clipped, properties);
         }
     }
     function _clipFarm(featureToClip, farmSource) {
-        var clipped = featureToClip, properties;
+        var clipped = featureToClip, properties, result;
         if (farmSource.getFeatures()[0]) {
             properties = farmSource.getFeatures()[0].getProperties();
         }
@@ -349,8 +355,9 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             clipped = _transform.merge(farmSource.getFeatures());
         }
         _remove(farmSource.getFeatures(), false);
-        _addFeature(_activeLayer, clipped, properties);
+        result = _addFeature(_activeLayer, clipped, properties);
         _clearSelections();
+        return result;
     }
     function _merge(features) {
         $log.info("merging features ...", features);
@@ -370,30 +377,30 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             return;
         }
         $log.info("editing enabled");
+        _mode = "edit";
         _select.enable();
         _modify.enable();
         _draw.disable();
-        _mode = "edit";
     }
     function _enableDrawing() {
         if (!_isDefined(_mode) || _mode === "draw") {
             return;
         }
         $log.info("drawing enabled");
+        _mode = "draw";
         _select.disable();
         _modify.disable();
-        _draw.enable();
-        _mode = "draw";
+        _draw.enable(_mode);
     }
     function _enableDonutDrawing() {
         if (!_isDefined(_mode) || _mode === "donut-draw") {
             return;
         }
         $log.info("donut drawing enabled");
+        _mode = "donut-draw";
         _select.disable();
         _modify.disable();
-        _draw.enable();
-        _mode = "donut-draw";
+        _draw.enable(_mode);
     }
     function _snapParcels(parcels) {
         if (!_isDefined(parcels) || !_isDefined(_snap)) {
@@ -478,8 +485,10 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
     $rootScope.$on("web-mapping-draw-end", function(event, feature) {
         $log.info("draw end ...");
         _clip(feature, _farmLayerGroup);
-        _select.interaction.getFeatures().clear();
-        _enableEditing();
+    });
+    $rootScope.$on("web-mapping-donut-draw-end", function(event, feature) {
+        $log.info("donut draw end ...");
+        _select.interaction.getFeatures().push(_clip(feature, _farmLayerGroup));
     });
     function _enableKeyboardShortcuts(elementId) {
         var element = document.getElementById(elementId) || _map.getTargetElement();
