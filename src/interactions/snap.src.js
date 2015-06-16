@@ -47,10 +47,10 @@ angular.module('farmbuild.webmapping')
 				snapVisibleLayer.getSource().addFeatures(parcels);
 			}
 
-			function _init() {
+			function _init(active) {
 				$log.info('snap interaction init ...');
 				map.addInteraction(snapInteraction);
-				snapInteraction.setActive(true);
+				snapInteraction.setActive(active);
 			}
 
 			function _destroy(map) {

@@ -14,7 +14,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/**  This example is using Web Mercator: EPSG:3857 to display data on google map */
 			featureProjection = 'EPSG:3857',
 
-			maxZoom = 18,
+			maxZoom = 19,
 			googleMapElement = document.getElementById('gmap'),
 			googleMap,
 			olMap,
@@ -169,6 +169,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.selectLayer = function () {
+			var snappingStatus = true;
+			if(angular.isDefined(actions.snapping.active())){
+				snappingStatus = actions.snapping.active();
+			}
 			$scope.cancel();
 			actions.destroy(olMap);
 			$scope.selectedPaddock = {};
@@ -176,7 +180,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				olMap.un('pointermove', mapOnPointerMove);
 				return;
 			}
-			actions.init(olMap, olHelper.farmLayerGroup(olMap), $scope.selectedLayer);
+			console.log(snappingStatus);
+			actions.init(olMap, olHelper.farmLayerGroup(olMap), $scope.selectedLayer, snappingStatus);
 			olMap.on('pointermove', mapOnPointerMove);
 			olHelper.paddocksLayer(olMap).getSource().on('changefeature', paddockChanged);
 			olHelper.farmLayer(olMap).getSource().on('changefeature', farmChanged);

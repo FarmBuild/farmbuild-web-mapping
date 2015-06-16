@@ -38,7 +38,7 @@ angular.module('farmbuild.webmapping')
 			_mode = undefined;
 		};
 
-		function _init(map, farmLayerGroup, activeLayerName, multi) {
+		function _init(map, farmLayerGroup, activeLayerName, active, multi) {
 
 			$log.info('interactions init ...');
 			if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(farmLayerGroup)) {
@@ -70,7 +70,7 @@ angular.module('farmbuild.webmapping')
 			_select.init();
 			_modify.init();
 			_draw.init(_clip, _select);
-			_snap.init();
+			_snap.init(active);
 
 		};
 

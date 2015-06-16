@@ -168,7 +168,7 @@
                     Cancel
                 </button>
             </wrapper>
-            <wrapper ng-show="!farmChanged && selectedLayer === 'farm'">
+            <wrapper ng-show="!farmChanged && selectedLayer === 'farm' && farmData.geometry.coordinates.length>0">
                 <button class="btn btn-danger" ng-click="removeFarm()">
                     Remove
                 </button>
