@@ -713,18 +713,18 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
             $log.error(e);
         }
     }
-    function _area(feature) {
+    function _area(feature, dataProjection, featureProjection) {
         $log.info("calculating area of polygon ...", feature);
-        feature = _converter.featureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
+        feature = _converter.featureToGeoJson(feature, dataProjection, featureProjection);
         try {
             return turf.area(feature) * 1e-4;
         } catch (e) {
             $log.error(e);
         }
     }
-    function _length(feature) {
+    function _length(feature, dataProjection, featureProjection) {
         $log.info("calculating length of line ...", feature);
-        feature = _converter.featureToGeoJson(feature, "EPSG:4283", "EPSG:3857");
+        feature = _converter.featureToGeoJson(feature, dataProjection, featureProjection);
         try {
             return turf.lineDistance(feature, "kilometers") * 1e3;
         } catch (e) {
@@ -746,7 +746,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
         targetElement.parentNode.removeChild(targetElement);
     }
-    function addControlsToOlMap(map, extent) {
+    function addControlsToOlMap(map, extent, dataProjection) {
         if (extent) {
             _ZoomToExtentControl = new ol.control.ZoomToExtent({
                 extent: extent
@@ -754,8 +754,8 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             map.addControl(_ZoomToExtentControl);
         }
         map.addControl(new ol.control.ScaleLine());
-        map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
-        map.addControl(new webMappingMeasureControl.create(map, "LineString"));
+        map.addControl(new webMappingMeasureControl.create(map, "Polygon", dataProjection));
+        map.addControl(new webMappingMeasureControl.create(map, "LineString", dataProjection));
         map.addControl(new webMappingSnapControl.create());
         map.addControl(new ol.control.LayerSwitcher({
             tipLabel: "Switch on/off farm layers"
@@ -795,7 +795,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         } else {
             view.fitExtent(extent, map.getSize());
         }
-        addControlsToOlMap(map, extent);
+        addControlsToOlMap(map, extent, dataProjection);
     }
     function _exportGeometry(source, dataProjection, featureProjection) {
         if (!_isDefined(source)) {
@@ -1310,7 +1310,7 @@ angular.module("farmbuild.webmapping").factory("webMappingLayerSwitcherControl",
 
 angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", function(validations, webMappingMeasurement, $rootScope, $log) {
     var _isDefined = validations.isDefined, _measurement = webMappingMeasurement;
-    function _create(map, type) {
+    function _create(map, type, dataProjection) {
         var source = new ol.source.Vector(), baseCssClass = "measure ol-unselectable ol-control ", drawInteraction = new ol.interaction.Draw({
             source: source,
             type: type,
@@ -1345,12 +1345,12 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", funct
         drawInteraction.on("drawend", function(evt) {
             if (type == "Polygon") {
                 $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.area(evt.feature),
+                    value: _measurement.area(evt.feature, dataProjection, map.getView().getProjection()),
                     unit: "hectares"
                 });
             } else {
                 $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.length(evt.feature),
+                    value: _measurement.length(evt.feature, dataProjection, map.getView().getProjection()),
                     unit: "metres"
                 });
             }

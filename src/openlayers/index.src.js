@@ -27,7 +27,7 @@ angular.module('farmbuild.webmapping')
 			targetElement.parentNode.removeChild(targetElement);
 		}
 
-		function addControlsToOlMap(map, extent) {
+		function addControlsToOlMap(map, extent, dataProjection) {
 			if (extent) {
 				_ZoomToExtentControl = new ol.control.ZoomToExtent({
 					extent: extent
@@ -35,8 +35,8 @@ angular.module('farmbuild.webmapping')
 				map.addControl(_ZoomToExtentControl);
 			}
 			map.addControl(new ol.control.ScaleLine());
-			map.addControl(new webMappingMeasureControl.create(map, 'Polygon'));
-			map.addControl(new webMappingMeasureControl.create(map, 'LineString'));
+			map.addControl(new webMappingMeasureControl.create(map, 'Polygon', dataProjection));
+			map.addControl(new webMappingMeasureControl.create(map, 'LineString', dataProjection));
 			map.addControl(new webMappingSnapControl.create());
 			map.addControl(new ol.control.LayerSwitcher({
 				tipLabel: 'Switch on/off farm layers'
@@ -101,7 +101,7 @@ angular.module('farmbuild.webmapping')
 			} else {
 				view.fitExtent(extent, map.getSize());
 			}
-			addControlsToOlMap(map, extent);
+			addControlsToOlMap(map, extent, dataProjection);
 		}
 
 		/**

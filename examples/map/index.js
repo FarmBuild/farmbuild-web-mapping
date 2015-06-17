@@ -159,7 +159,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.cancel();
 			}
 			$scope.selectedPaddock = selectedPaddock.getProperties();
-			$scope.selectedPaddock.area = measurement.area(selectedPaddock);
+			$scope.selectedPaddock.area = measurement.area(selectedPaddock, dataProjection, featureProjection);
 			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
 			updateNgScope();
 		};
