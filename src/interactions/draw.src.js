@@ -60,7 +60,7 @@ angular.module('farmbuild.webmapping')
 			function _discard() {
 				drawingStatus = false;
 				_disable();
-				_enable();
+				_enable(_mode);
 			}
 
 			return {

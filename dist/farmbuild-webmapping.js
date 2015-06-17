@@ -196,7 +196,7 @@ angular.module("farmbuild.webmapping").factory("webMappingDrawInteraction", func
         function _discard() {
             drawingStatus = false;
             _disable();
-            _enable();
+            _enable(_mode);
         }
         return {
             init: _init,
