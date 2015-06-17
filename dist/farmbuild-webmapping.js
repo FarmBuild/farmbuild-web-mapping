@@ -430,6 +430,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
             return;
         }
         _draw.discard();
+        _selectedFeatures().clear();
     }
     function _isEditing() {
         if (!_isDefined(_mode)) {
@@ -506,10 +507,12 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
                 return false;
             }
             if (event.keyCode == 27) {
-                _discardDrawing();
-                event.preventDefault();
-                event.stopPropagation();
-                return false;
+                if (_isDrawing()) {
+                    _discardDrawing();
+                    event.preventDefault();
+                    event.stopPropagation();
+                    return false;
+                }
             }
         }
         element.addEventListener("keydown", onKeyDown);

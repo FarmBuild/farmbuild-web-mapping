@@ -295,6 +295,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 			_draw.discard();
+			_selectedFeatures().clear();
 		};
 
 		function _isEditing() {
@@ -386,10 +387,12 @@ angular.module('farmbuild.webmapping')
 				}
 
 				if (event.keyCode == 27) {
-					_discardDrawing();
-					event.preventDefault();
-					event.stopPropagation();
-					return false;
+					if (_isDrawing()) {
+						_discardDrawing();
+						event.preventDefault();
+						event.stopPropagation();
+						return false;
+					}
 				}
 			}
 
