@@ -34,9 +34,9 @@ angular.module('farmbuild.webmapping')
 			_donutContainer;
 
 		/**
-		 * Remove all the webmapping interactions, this only remove the interactions that webmapping has added
+		 * Remove all the webmapping interactions, this only remove the interactions which is added by webmapping to ol.Map
 		 * @memberof webmapping.actions
-		 * @param {!Object} map - openlayers map object
+		 * @param {!ol.Map} map - openlayers map object
 		 * @method destroy
 		 */
 		function _destroy(map) {
@@ -62,8 +62,8 @@ angular.module('farmbuild.webmapping')
 		 * Initialise mapping actions
 		 * @memberof webmapping.actions
 		 * @method init
-		 * @param {!Object} map - openlayers map object
-		 * @param {!Object} farmLayerGroup - farm LayerGroup, use olHelper class to get this object
+		 * @param {!ol.Map} map - openlayers map object
+		 * @param {!ol.layer.Group} farmLayerGroup - farm LayerGroup, use olHelper class to get this object
 		 * @param {!String} activeLayerName - can be "paddocks" or "farm", the layer which you want to interact with
 		 * @param {Boolean} snappingDefaultStatus - whether to activate snapping, snapping is used between farm, paddocks and rural parcels
 		 * @param {Boolean} initKeyboardInteraction - whether to activate keyboard interaction
@@ -128,6 +128,13 @@ angular.module('farmbuild.webmapping')
 			return feature;
 		};
 
+		/**
+		 * Clips the selected feature, paddcoks are clipped by other paddocks and farm.
+		 * @memberof webmapping.actions.features
+		 * @method remove
+		 * @param {ol.Collection.<ol.Feature>} features feature you want to remove
+		 * @param {Boolean} deselect whether to clear selections after they are removed
+		 */
 		function _remove(features, deselect) {
 			if (!_isDefined(features) || !_isDefined(_activeLayer)) {
 				return;
@@ -148,6 +155,14 @@ angular.module('farmbuild.webmapping')
 			}
 		};
 
+		/**
+		 * Clips the selected feature, selected paddock is clipped by other paddocks and farm boundary.
+		 * @memberof webmapping.actions.features
+		 * @method clip
+		 * @param {!ol.Feature} featureToClip feature you want to clip
+		 * @param {!ol.layer.Group} farmLayers the groupLayer of farm, use olHelper class to get this
+		 * @returns {ol.Feature} Clipped feature
+		 */
 		function _clip(featureToClip, farmLayers) {
 			if (!_isDefined(farmLayers) || !_isDefined(farmLayers.getLayers()) || !_isDefined(featureToClip) || !_isDefined(farmLayers.getLayers().item(0)) || !_isDefined(farmLayers.getLayers().item(1))) {
 				return;
@@ -227,6 +242,12 @@ angular.module('farmbuild.webmapping')
 			_clearSelections();
 		};
 
+		/**
+		 * Selected features by select interaction
+		 * @memberof webmapping.actions.features
+		 * @method selections
+		 * @returns {ol.Collection.<ol.Feature>} Collection of ol.Features, represents selected features
+		 */
 		function _selectedFeatures() {
 			if (!_isDefined(_select) || !_isDefined(_select.interaction)) {
 				return;
@@ -511,30 +532,9 @@ angular.module('farmbuild.webmapping')
 			 * @namespace webmapping.actions.features
 			 */
 			features: {
-				/**
-				 * Selected features by select interaction
-				 * @memberof webmapping.actions.features
-				 * @method selections
-				 * @returns {Object} Collection of ol.Features, reperesents selected features
-				 */
 				selections: _selectedFeatures,
-				/**
-				 * Clips the selected feature, paddcoks are clipped by other paddocks and farm.
-				 * @memberof webmapping.actions.features
-				 * @method clip
-				 * @param featureToClip, feature you want to clip
-				 * @param farmLayers, the groupLayer of farm, use olHelper class to get this
-				 * @returns {ol.Feature} Clipped feature
-				 */
 				clip: _clip,
 				merge: _merge,
-				/**
-				 * Clips the selected feature, paddcoks are clipped by other paddocks and farm.
-				 * @memberof webmapping.actions.features
-				 * @method remove
-				 * @param featureToRemove, feature you want to remove
-				 * @param deselect, whether to clear selections
-				 */
 				remove: _remove
 			},
 			parcels: {

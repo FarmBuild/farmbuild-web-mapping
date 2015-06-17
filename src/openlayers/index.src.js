@@ -295,7 +295,7 @@ angular.module('farmbuild.webmapping')
 		/**
 		 * Reloads the farm layers
 		 * @method reload
-		 * @param {!object} map openlayers map object
+		 * @param {!ol.Map} map openlayers map object
 		 * @param {!object} geoJsons object that containts farm and paddocks geometry to reload from
 		 * @param {!string} dataProjection - data projection code
 		 * @param {!string} featureProjection - feature projection code
