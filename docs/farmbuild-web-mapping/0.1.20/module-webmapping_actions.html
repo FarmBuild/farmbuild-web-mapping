@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>webmapping/actions - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-webmapping.html">webmapping</a><ul class='methods'><li data-type='method'><a href="module-webmapping.html#.create">create</a></li><li data-type='method'><a href="module-webmapping.html#.export">export</a></li><li data-type='method'><a href="module-webmapping.html#.exportGeoJson">exportGeoJson</a></li><li data-type='method'><a href="module-webmapping.html#.exportKml">exportKml</a></li><li data-type='method'><a href="module-webmapping.html#.find">find</a></li><li data-type='method'><a href="module-webmapping.html#.load">load</a></li><li data-type='method'><a href="module-webmapping.html#.save">save</a></li><li data-type='method'><a href="module-webmapping.html#.toGeoJson">toGeoJson</a></li><li data-type='method'><a href="module-webmapping.html#.toKml">toKml</a></li></ul></li><li><a href="module-webmapping_actions.html">webmapping/actions</a><ul class='methods'><li data-type='method'><a href="module-webmapping_actions.html#.destroy">destroy</a></li><li data-type='method'><a href="module-webmapping_actions.html#.init">init</a></li></ul></li><li><a href="module-webmapping_ga.html">webmapping/ga</a><ul class='methods'><li data-type='method'><a href="module-webmapping_ga.html#.trackWebMapping">trackWebMapping</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="webmapping.actions.donut.html">donut</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.donut.html#.enable">enable</a></li></ul></li><li><a href="webmapping.actions.drawing.html">drawing</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.drawing.html#.discard">discard</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.enable">enable</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.finish">finish</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.isDrawing">isDrawing</a></li></ul></li><li><a href="webmapping.actions.editing.html">editing</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.editing.html#.enable">enable</a></li><li data-type='method'><a href="webmapping.actions.editing.html#.isEditing">isEditing</a></li></ul></li><li><a href="webmapping.actions.features.html">features</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.features.html#.clip">clip</a></li><li data-type='method'><a href="webmapping.actions.features.html#.selections">selections</a></li></ul></li><li><a href="webmapping.actions.snapping.html">snapping</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.snapping.html#.active">active</a></li><li data-type='method'><a href="webmapping.actions.snapping.html#.disable">disable</a></li><li data-type='method'><a href="webmapping.actions.snapping.html#.enable">enable</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">webmapping/actions</h1>
+    
+
+    
+
+
+
+
+<section>
+
+<header>
+    
+        
+            
+        
+    
+</header>
+
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>webmapping/actions singleton</p></div>
+        
+
+        
+            
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line11">line 11</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".destroy"><span class="type-signature">(static) </span>destroy<span class="signature">(map<span class="signature-attributes">non-null</span>)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Remove all the webmapping interactions, this only remove the interactions that webmapping has added</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>map</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>openlayers map object</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line34">line 34</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".init"><span class="type-signature">(static) </span>init<span class="signature">(map<span class="signature-attributes">non-null</span>, farmLayerGroup<span class="signature-attributes">non-null</span>, activeLayerName<span class="signature-attributes">non-null</span>, snapping)</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Initialise mapping actions</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>map</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>openlayers map object</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>farmLayerGroup</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Object</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>farm LayerGroup, use olHelper class to get this object</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>activeLayerName</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>can be &quot;paddocks&quot; or &quot;farm&quot;, the layer which you want to interact with</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>snapping</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>whether to activate snapping, snapping is used between farm, paddocks and rural parcels</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line60">line 60</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Jun 16 2015 23:26:21 GMT+1000 (AEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

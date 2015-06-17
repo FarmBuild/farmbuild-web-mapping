@@ -1,4 +1,17 @@
+/**
+ * @since 0.0.1
+ * @copyright 2015 Spatial Vision, Inc. http://spatialvision.com.au
+ * @license The MIT License
+ * @author Spatial Vision
+ * @version 0.1.0
+ */
+
 'use strict';
+
+/**
+ * webmapping/measureControl singleton
+ * @private-module webmapping/measureControl
+ */
 
 angular.module('farmbuild.webmapping')
 	.factory('webMappingMeasureControl',
@@ -67,6 +80,7 @@ angular.module('farmbuild.webmapping')
 			 * @constructor
 			 * @extends {ol.control.Control}
 			 * @param {Object=} opt_options Control options.
+             * @private
 			 */
 			function _measureControl(type) {
 

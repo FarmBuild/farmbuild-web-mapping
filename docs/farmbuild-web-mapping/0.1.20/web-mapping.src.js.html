@@ -23,7 +23,7 @@
 <label for="nav-trigger" class="overlay"></label>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Classes</h3><ul><li><a href="-_anonymous_-_create-_measureControl.html">_measureControl</a></li></ul><h3>Modules</h3><ul><li><a href="module-webmapping.html">webmapping</a><ul class='methods'><li data-type='method'><a href="module-webmapping.html#.create">create</a></li><li data-type='method'><a href="module-webmapping.html#.find">find</a></li><li data-type='method'><a href="module-webmapping.html#.load">load</a></li><li data-type='method'><a href="module-webmapping.html#.save">save</a></li><li data-type='method'><a href="module-webmapping.html#~export">export</a></li></ul></li></ul><h3>Global</h3><ul><li><a href="global.html">init</a></li><li><a href="global.html">trackWebMapping</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="module-webmapping.html">webmapping</a><ul class='methods'><li data-type='method'><a href="module-webmapping.html#.create">create</a></li><li data-type='method'><a href="module-webmapping.html#.export">export</a></li><li data-type='method'><a href="module-webmapping.html#.exportGeoJson">exportGeoJson</a></li><li data-type='method'><a href="module-webmapping.html#.exportKml">exportKml</a></li><li data-type='method'><a href="module-webmapping.html#.find">find</a></li><li data-type='method'><a href="module-webmapping.html#.load">load</a></li><li data-type='method'><a href="module-webmapping.html#.save">save</a></li><li data-type='method'><a href="module-webmapping.html#.toGeoJson">toGeoJson</a></li><li data-type='method'><a href="module-webmapping.html#.toKml">toKml</a></li></ul></li><li><a href="module-webmapping_actions.html">webmapping/actions</a><ul class='methods'><li data-type='method'><a href="module-webmapping_actions.html#.destroy">destroy</a></li><li data-type='method'><a href="module-webmapping_actions.html#.init">init</a></li></ul></li><li><a href="module-webmapping_ga.html">webmapping/ga</a><ul class='methods'><li data-type='method'><a href="module-webmapping_ga.html#.trackWebMapping">trackWebMapping</a></li></ul></li></ul><h3>Namespaces</h3><ul><li><a href="webmapping.actions.donut.html">donut</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.donut.html#.enable">enable</a></li></ul></li><li><a href="webmapping.actions.drawing.html">drawing</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.drawing.html#.discard">discard</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.enable">enable</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.finish">finish</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.isDrawing">isDrawing</a></li></ul></li><li><a href="webmapping.actions.editing.html">editing</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.editing.html#.enable">enable</a></li><li data-type='method'><a href="webmapping.actions.editing.html#.isEditing">isEditing</a></li></ul></li><li><a href="webmapping.actions.features.html">features</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.features.html#.clip">clip</a></li><li data-type='method'><a href="webmapping.actions.features.html#.selections">selections</a></li></ul></li><li><a href="webmapping.actions.snapping.html">snapping</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.snapping.html#.active">active</a></li><li data-type='method'><a href="webmapping.actions.snapping.html#.disable">disable</a></li><li data-type='method'><a href="webmapping.actions.snapping.html#.enable">enable</a></li></ul></li></ul>
 </nav>
 
 <div id="main">
@@ -53,105 +53,137 @@
  * @module webmapping
  */
 angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
-	.factory('webmapping',
-	function (farmdata,
-	          validations,
-	          $log,
-	          geoJsonValidator,
-	          farmdataConverter,
-	          webMappingSession,
-	          webMappingProjections,
-	          webMappingInteractions,
-	          webMappingMeasurement,
-	          webMappingPaddocks,
-	          webMappingOpenLayersHelper,
-	          webMappingGoogleAddressSearch,
-	          webMappingGoogleAnalytics,
-	          webMappingParcels) {
-		$log.info('Welcome to Web Mapping...');
+    .factory('webmapping',
+    function (farmdata,
+              validations,
+              $log,
+              geoJsonValidator,
+              farmdataConverter,
+              webMappingSession,
+              webMappingProjections,
+              webMappingInteractions,
+              webMappingMeasurement,
+              webMappingPaddocks,
+              webMappingOpenLayersHelper,
+              webMappingGoogleAddressSearch,
+              webMappingGoogleAnalytics,
+              webMappingParcels) {
+        $log.info('Welcome to Web Mapping...');
 
-		var _isDefined = validations.isDefined,
-			session = webMappingSession,
-			webMapping = {
-				session: session,
-				farmdata: farmdata,
-				validator: geoJsonValidator,
-				toGeoJsons: farmdataConverter.toGeoJsons,
-				toKml: farmdataConverter.toKml,
-				toGeoJson: farmdataConverter.toGeoJson,
-				exportGeoJson: farmdataConverter.exportGeoJson,
-				exportKml: farmdataConverter.exportKml,
-				actions: webMappingInteractions,
-				paddocks: webMappingPaddocks,
-				olHelper: webMappingOpenLayersHelper,
-				ga: webMappingGoogleAnalytics,
-				parcels: webMappingParcels,
-				measurement: webMappingMeasurement,
-				/**
-				 * Loads the specified farmData into session
-				 * @method load
-				 * @returns {object} the farmData stored in session
-				 * geoJsons.farm: represents the farm
-				 * geoJsonspaddocks: represents the paddocks
-				 * @public
-				 * @static
-				 */
-				load: session.load,
-				/**
-				 * Finds the farmData from the session.
-				 * @method find
-				 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
-				 * @public
-				 * @static
-				 */
-				find: session.find,
-				/**
-				 * Saves the specified geoJson into the farmData in the session.
-				 * @method save
-				 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
-				 * @public
-				 * @static
-				 */
-				save: function (geoJsons) {
-					var farmData = session.find();
-					return session.save(farmData, geoJsons);
-				},
-				/**
-				 * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json
-				 * It creates &lt;a> element with 'download' attribute, the data is attached to href
-				 * and invoke click() function so the user gets the file save dialogue or something equivalent.
-				 * @method export
-				 * @param {object} document
-				 * @param {object} farmData
-				 */
-				export: session.export,
-				/**
-				 * Creates a new farmdata block as Javascript object with the specified name.
-				 * @method create
-				 * @param {!string} name - The name of the farm
-				 * @param {string} id - The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
-				 * with the external system
-				 * @returns {Object} the farmdata object, undefined if the required fields are not provided
-				 * @public
-				 * @static
-				 */
-				create: farmdata.create
-			};
+        var _isDefined = validations.isDefined,
+            session = webMappingSession,
+            webMapping = {
+                session: session,
+                farmdata: farmdata,
+                validator: geoJsonValidator,
+                toGeoJsons: farmdataConverter.toGeoJsons,
+                /**
+                 * converts farmData geometry to KML
+                 * @method toKml
+                 * @param {object} farmData - farmData to convert
+                 * @returns {string} KML string
+                 * @public
+                 * @static
+                 */
+                toKml: farmdataConverter.toKml,
+                /**
+                 * converts farmData geometry to geoJSON
+                 * @method toGeoJson
+                 * @param {object} farmData - farmData to convert
+                 * @returns {object} geoJSON object
+                 * @public
+                 * @static
+                 */
+                toGeoJson: farmdataConverter.toGeoJson,
+                /**
+                 * converts farmData geometry to geoJSON and exports the file
+                 * @method exportGeoJson
+                 * @param {object} farmData - farmData to convert
+                 * @public
+                 * @static
+                 */
+                exportGeoJson: farmdataConverter.exportGeoJson,
+                /**
+                 * converts farmData geometry to KML and exports the file
+                 * @method exportKml
+                 * @param {object} farmData - farmData to convert
+                 * @public
+                 * @static
+                 */
+                exportKml: farmdataConverter.exportKml,
+                actions: webMappingInteractions,
+                paddocks: webMappingPaddocks,
+                olHelper: webMappingOpenLayersHelper,
+                ga: webMappingGoogleAnalytics,
+                parcels: webMappingParcels,
+                measurement: webMappingMeasurement,
+                /**
+                 * Loads the specified farmData into session
+                 * @method load
+                 * @returns {object} the farmData stored in session
+                 * geoJsons.farm: represents the farm
+                 * geoJsonspaddocks: represents the paddocks
+                 * @public
+                 * @static
+                 */
+                load: session.load,
+                /**
+                 * Finds the farmData from the session.
+                 * @method find
+                 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+                 * @public
+                 * @static
+                 */
+                find: session.find,
+                /**
+                 * Saves the specified geoJson into the farmData in the session.
+                 * @method save
+                 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+                 * @public
+                 * @static
+                 */
+                save: function (geoJsons) {
+                    var farmData = session.find();
+                    return session.save(farmData, geoJsons);
+                },
+                /**
+                 * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json
+                 * It creates &lt;a> element with 'download' attribute, the data is attached to href
+                 * and invoke click() function so the user gets the file save dialogue or something equivalent.
+                 * @method export
+                 * @param {object} document - browser document object reference
+                 * @param {object} farmData - farmData to export
+                 * @public
+                 * @static
+                 */
+                export: session.export,
+                /**
+                 * Creates a new farmdata block as Javascript object with the specified name.
+                 * @method create
+                 * @param {!string} name - The name of the farm
+                 * @param {string} id - The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
+                 * with the external system
+                 * @returns {Object} the farmdata object, undefined if the required fields are not provided
+                 * @public
+                 * @static
+                 */
+                create: farmdata.create
+            };
 
-		// Provide a shortcut for modules
-		webMapping.version = '0.1.0';
+        // Provide a shortcut for modules
+        webMapping.version = '0.1.0';
 
-		if (typeof window.farmbuild === 'undefined') {
-			window.farmbuild = {
-				webmapping: webMapping
-			};
-		} else {
-			window.farmbuild.webmapping = webMapping;
-		}
+        if (typeof window.farmbuild === 'undefined') {
+            window.farmbuild = {
+                webmapping: webMapping
+            };
+        } else {
+            window.farmbuild.webmapping = webMapping;
+        }
 
-		return webMapping;
+        return webMapping;
 
-	});
+    });
 </code></pre>
         </article>
     </section>
@@ -164,7 +196,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a> on Wed Jun 17 2015 12:02:18 GMT+1000 (AEST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Jun 16 2015 23:26:21 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

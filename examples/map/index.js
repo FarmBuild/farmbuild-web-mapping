@@ -355,7 +355,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-				//olHelper.integrateGoogleMap(gmap, olmap, dataProjection);
 			olHelper.integrateGoogleMap(googleMap, olMap, dataProjection, document.getElementById('olmap'), true, extent);
 
 			/** Enable address google search for your map */
