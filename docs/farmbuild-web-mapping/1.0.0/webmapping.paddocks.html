@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>editing - Documentation</title>
+    <title>paddocks - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">editing</h1>
+    <h1 class="page-title">paddocks</h1>
     
 
     
@@ -41,9 +41,9 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a><a href="webmapping.actions.html">.actions</a>.</span>
+            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
         
-        editing
+        paddocks
         </h2>
         
     
@@ -53,7 +53,7 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Editing namespace of webmapping.actions</p></div>
+            <div class="description"><p>webmapping paddocks</p></div>
         
 
         
@@ -88,7 +88,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line412">line 412</a>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -124,14 +124,14 @@
 
     
 
-    <h4 class="name" id=".enable"><span class="type-signature">(static) </span>enable<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".findByCoordinate"><span class="type-signature">(static) </span>findByCoordinate<span class="signature">(coordinate<span class="signature-attributes">non-null</span>, vectorLayer<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {ol.Feature}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Enables webmapping edit mode</p>
+    <p>finds a paddock based on the coordinate</p>
 </div>
 
 
@@ -142,86 +142,76 @@
 
 
 
-
-
-
-
-<dl class="details">
-
+    <h5>Parameters:</h5>
     
 
-    
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line419">line 419</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        <th>Type</th>
 
         
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>coordinate</code></td>
             
 
+            <td class="type">
+            
+                
+<span class="param-type">ol.Coordinate</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>openlayers map object</p></td>
+        </tr>
+
     
 
-    <h4 class="name" id=".isEditing"><span class="type-signature">(static) </span>isEditing<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+        <tr>
+            
+                <td class="name"><code>vectorLayer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.layer.Vector</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>paddocks layer</p></td>
+        </tr>
 
     
-
-
-
-<div class="description">
-    <p>Whether editng is in progress</p>
-</div>
-
-
-
-
-
-
-
+    </tbody>
+</table>
 
 
 
@@ -257,7 +247,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line425">line 425</a>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -284,7 +274,7 @@
 
         
 <div class="param-desc">
-    <p>is editing is in progress</p>
+    <p>the first paddock found in that coordinate</p>
 </div>
 
 
@@ -295,7 +285,215 @@
     </dt>
     <dd>
         
-<span class="param-type">boolean</span>
+<span class="param-type">ol.Feature</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".groups"><span class="type-signature">(static) </span>groups<span class="signature">()</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Paddock groups reference</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line52">line 52</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>paddock groups</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".types"><span class="type-signature">(static) </span>types<span class="signature">()</span><span class="type-signature"> &rarr; {array}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Paddock types reference</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line43">line 43</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>paddock types</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">array</span>
 
 
     </dd>

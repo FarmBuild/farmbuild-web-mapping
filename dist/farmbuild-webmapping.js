@@ -741,17 +741,17 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, webMappingTransformation, webMappingConverter, $log) {
-    var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _extentControl, _transform = webMappingTransformation, _converter = webMappingConverter;
+    var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _ZoomToExtentControl, _transform = webMappingTransformation, _converter = webMappingConverter;
     function addControlsToGmap(gmap, targetElement) {
         gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
         targetElement.parentNode.removeChild(targetElement);
     }
     function addControlsToOlMap(map, extent) {
         if (extent) {
-            _extentControl = new ol.control.ZoomToExtent({
+            _ZoomToExtentControl = new ol.control.ZoomToExtent({
                 extent: extent
             });
-            map.addControl(_extentControl);
+            map.addControl(_ZoomToExtentControl);
         }
         map.addControl(new ol.control.ScaleLine());
         map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
@@ -956,25 +956,28 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         farmSource.addFeatures(farmFeatures);
         paddocksSource.addFeatures(paddockFeatures);
     }
-    function _initGoogleAddressSearch(targetElementId, olmap) {
-        if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
+    function _initGoogleAddressSearch(textInputElement, olmap) {
+        if (!_isDefined(textInputElement) || !_isDefined(olmap)) {
             return;
         }
-        $log.info("init google address search ...", targetElementId);
+        $log.info("init google address search ...", textInputElement);
         function onPlaceChanged(latLng) {
             latLng = _transform.fromGoogleLatLng(latLng);
             _center(latLng, olmap);
         }
-        webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
+        webMappingGoogleAddressSearch.init(textInputElement, onPlaceChanged);
     }
-    function _updateExtent(map) {
-        if (_isDefined(_extentControl)) {
-            map.removeControl(_extentControl);
+    function _updateZoomToExtent() {
+        var map;
+        if (!_isDefined(_ZoomToExtentControl)) {
+            return;
         }
-        _extentControl = new ol.control.ZoomToExtent({
+        map = _ZoomToExtentControl.getMap();
+        map.removeControl(_ZoomToExtentControl);
+        _ZoomToExtentControl = new ol.control.ZoomToExtent({
             extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
         });
-        map.addControl(_extentControl);
+        map.addControl(_ZoomToExtentControl);
     }
     function _farmLayer(map) {
         if (!_isDefined(map) || !_isDefined(map.getLayers().item(1)) || !_isDefined(map.getLayers().item(1).getLayers() || !_isDefined(map.getLayers().item(1).getLayers().getLength() === 2))) {
@@ -1007,7 +1010,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         farmLayerGroup: _farmLayerGroup,
         reload: _reload,
         initGoogleAddressSearch: _initGoogleAddressSearch,
-        updateExtent: _updateExtent
+        updateExtent: _updateZoomToExtent
     };
 });
 

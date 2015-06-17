@@ -18,7 +18,7 @@ angular.module('farmbuild.webmapping')
 	          $log) {
 		var _isDefined = validations.isDefined,
 			_googleProjection = 'EPSG:3857',
-			_extentControl,
+			_ZoomToExtentControl,
 			_transform = webMappingTransformation,
 			_converter = webMappingConverter;
 
@@ -29,10 +29,10 @@ angular.module('farmbuild.webmapping')
 
 		function addControlsToOlMap(map, extent) {
 			if (extent) {
-				_extentControl = new ol.control.ZoomToExtent({
+				_ZoomToExtentControl = new ol.control.ZoomToExtent({
 					extent: extent
 				});
-				map.addControl(_extentControl);
+				map.addControl(_ZoomToExtentControl);
 			}
 			map.addControl(new ol.control.ScaleLine());
 			map.addControl(new webMappingMeasureControl.create(map, 'Polygon'));
@@ -313,28 +313,42 @@ angular.module('farmbuild.webmapping')
 			paddocksSource.addFeatures(paddockFeatures);
 		};
 
-
-		function _initGoogleAddressSearch(targetElementId, olmap) {
-			if (!_isDefined(targetElementId) || !_isDefined(olmap)) {
+		/**
+		 * Initialises google address search and creates a autocomplete for given text input.
+		 * @method initGoogleAddressSearch
+		 * @param {!object} textInputElement Text input dom element which is used to show autocomplete
+		 * @param {!ol.Map} olmap object to interact with when user chooses a location from autocomplete
+		 * @memberof webmapping.olHelper
+		 */
+		function _initGoogleAddressSearch(textInputElement, olmap) {
+			if (!_isDefined(textInputElement) || !_isDefined(olmap)) {
 				return;
 			}
-			$log.info('init google address search ...', targetElementId);
+			$log.info('init google address search ...', textInputElement);
 			function onPlaceChanged(latLng) {
 				latLng = _transform.fromGoogleLatLng(latLng);
 				_center(latLng, olmap);
 			}
 
-			webMappingGoogleAddressSearch.init(targetElementId, onPlaceChanged);
+			webMappingGoogleAddressSearch.init(textInputElement, onPlaceChanged);
 		};
 
-		function _updateExtent(map) {
-			if (_isDefined(_extentControl)) {
-				map.removeControl(_extentControl);
+		/**
+		 * Updates the extent of ZoomToExtent control, call this method after a change to farm boundaries.
+		 * @method updateZoomToExtent
+		 * @memberof webmapping.olHelper
+		 */
+		function _updateZoomToExtent() {
+			var map;
+			if (!_isDefined(_ZoomToExtentControl)) {
+				return;
 			}
-			_extentControl = new ol.control.ZoomToExtent({
+			map = _ZoomToExtentControl.getMap();
+			map.removeControl(_ZoomToExtentControl);
+			_ZoomToExtentControl = new ol.control.ZoomToExtent({
 				extent: map.getLayers().item(1).getLayers().item(1).getSource().getExtent()
 			});
-			map.addControl(_extentControl);
+			map.addControl(_ZoomToExtentControl);
 		};
 
 		function _farmLayer(map) {
@@ -371,7 +385,7 @@ angular.module('farmbuild.webmapping')
 			farmLayerGroup: _farmLayerGroup,
 			reload: _reload,
 			initGoogleAddressSearch: _initGoogleAddressSearch,
-			updateExtent: _updateExtent
+			updateExtent: _updateZoomToExtent
 		}
 
 	});
