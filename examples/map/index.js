@@ -75,7 +75,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			/** it is recommended to use these helper functions to create your farm and paddocks layers */
 			var farmLayers = olHelper.createFarmLayers(geoJsons, dataProjection, featureProjection),
-				//baseLayers = olHelper.createBaseLayers();
+			//baseLayers = olHelper.createBaseLayers();
 				baseLayers = olHelper.createBaseLayersWithGoogleMaps();
 
 			return new ol.Map({
@@ -115,6 +115,30 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				actions.editing.enable();
 			}
 			if (!featureAtCoordinate && !actions.editing.isEditing()) {
+				actions.drawing.enable();
+			}
+		}
+
+		function mapOnSigleClick(event) {
+
+			/** don't do anything if user is dragging */
+			if (event.dragging) {
+				return;
+			}
+
+			var selectedLayer = $scope.selectedLayer, coordinate = event.coordinate,
+				featureAtCoordinate;
+			if (selectedLayer === "paddocks") {
+				selectedLayer = olHelper.paddocksLayer(olMap);
+			}
+			if (selectedLayer === "farm") {
+				selectedLayer = olHelper.farmLayer(olMap);
+			}
+			featureAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, selectedLayer);
+			if (featureAtCoordinate) {
+				actions.editing.enable();
+			}
+			if (!featureAtCoordinate) {
 				actions.drawing.enable();
 			}
 		}
@@ -176,7 +200,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				farmLayer = olHelper.farmLayer(olMap),
 				paddocksLayer = olHelper.paddocksLayer(olMap),
 				selectedLayer = $scope.selectedLayer;
-			if(angular.isDefined(actions.snapping.active())){
+			if (angular.isDefined(actions.snapping.active())) {
 				activateSnapping = actions.snapping.active();
 			}
 			$scope.cancel();
@@ -187,7 +211,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
-			olMap.on('pointermove', mapOnPointerMove);
+			if (ol.has.TOUCH) {
+				olMap.on('singleclick', mapOnSigleClick);
+			} else {
+				olMap.on('pointermove', mapOnPointerMove);
+			}
 			farmLayer.getSource().on('changefeature', farmChanged);
 			paddocksLayer.getSource().on('changefeature', paddockChanged);
 			loadParcels();
@@ -223,8 +251,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				paddocksGeometry = olHelper.exportGeometry(paddocksSource, dataProjection, featureProjection),
 				farmGeometry = olHelper.exportGeometry(farmSource, dataProjection, featureProjection);
 
-			if (farmGeometry.features.length === 0 ||
-				!ol.extent.containsExtent(farmSource.getExtent(), paddocksSource.getExtent())) {
+			if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmSource.getExtent(), paddocksSource.getExtent())) {
 				$log.error('Draw farm boundary first!');
 				$scope.noResult = true;
 				return;
@@ -261,7 +288,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
-			if(actions.features.selections()) {
+			if (actions.features.selections()) {
 				actions.features.selections().clear();
 			}
 			$scope.farmChanged = false;
