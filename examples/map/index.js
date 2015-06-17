@@ -119,30 +119,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		}
 
-		function mapOnSigleClick(event) {
-
-			/** don't do anything if user is dragging */
-			if (event.dragging) {
-				return;
-			}
-
-			var selectedLayer = $scope.selectedLayer, coordinate = event.coordinate,
-				featureAtCoordinate;
-			if (selectedLayer === "paddocks") {
-				selectedLayer = olHelper.paddocksLayer(olMap);
-			}
-			if (selectedLayer === "farm") {
-				selectedLayer = olHelper.farmLayer(olMap);
-			}
-			featureAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, selectedLayer);
-			if (featureAtCoordinate) {
-				actions.editing.enable();
-			}
-			if (!featureAtCoordinate) {
-				actions.drawing.enable();
-			}
-		}
-
 		function updateNgScope() {
 			if (!$scope.$$phase) {
 				$scope.$apply();
@@ -211,11 +187,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
-			if (ol.has.TOUCH) {
-				olMap.on('singleclick', mapOnSigleClick);
-			} else {
-				olMap.on('pointermove', mapOnPointerMove);
-			}
+			olMap.on('pointermove', mapOnPointerMove);
 			farmLayer.getSource().on('changefeature', farmChanged);
 			paddocksLayer.getSource().on('changefeature', paddockChanged);
 			loadParcels();
