@@ -136,6 +136,13 @@ angular.module('farmbuild.webmapping')
 			}
 		};
 
+		/**
+		 * Centers map at the specified coordinates and set zoom to a proper level
+		 * @method center
+		 * @param {!ol.Coordinate} coordinates
+		 * @param {!ol.Map} map object to interact with
+		 * @memberof webmapping.olHelper
+		 */
 		function _center(coordinates, map) {
 			if (!_isDefined(coordinates) || !_isDefined(map)) {
 				return;
@@ -351,6 +358,13 @@ angular.module('farmbuild.webmapping')
 			map.addControl(_ZoomToExtentControl);
 		};
 
+		/**
+		 * Returns farm layer from passed map
+		 * @method farmLayer
+		 * @param {!ol.Map} map object with farm layers and base layers
+		 * @returns {ol.layer.Vector} farm Layer
+		 * @memberof webmapping.olHelper
+		 */
 		function _farmLayer(map) {
 			if (!_isDefined(map) || !_isDefined(map.getLayers().item(1)) || !_isDefined(map.getLayers().item(1).getLayers() || !_isDefined(map.getLayers().item(1).getLayers().getLength() === 2))) {
 				return;
@@ -358,6 +372,13 @@ angular.module('farmbuild.webmapping')
 			return map.getLayers().item(1).getLayers().item(1);
 		};
 
+		/**
+		 * Returns paddocks layer from passed map
+		 * @method paddocksLayer
+		 * @param {!ol.Map} map object with farm layers and base layers
+		 * @returns {ol.layer.Vector} paddocks Layer
+		 * @memberof webmapping.olHelper
+		 */
 		function _paddocksLayer(map) {
 			if (!_isDefined(map) || !_isDefined(map.getLayers().item(1)) || !_isDefined(map.getLayers().item(1).getLayers() || !_isDefined(map.getLayers().item(1).getLayers().getLength() === 2))) {
 				return;
@@ -365,6 +386,13 @@ angular.module('farmbuild.webmapping')
 			return map.getLayers().item(1).getLayers().item(0);
 		};
 
+		/**
+		 * Returns farm layer group from passed map, this group contains farm and paddocks vector layers
+		 * @method farmLayerGroup
+		 * @param {!ol.Map} map object with farm layers and base layers
+		 * @returns {ol.layer.Group} farm Layer Group
+		 * @memberof webmapping.olHelper
+		 */
 		function _farmLayerGroup(map) {
 			if (!_isDefined(map) || !_isDefined(map.getLayers().item(1))) {
 				return;
