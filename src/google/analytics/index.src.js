@@ -1,16 +1,17 @@
 /**
  * @since 0.0.1
- * @copyright 2015 Spatial Vision, Inc. http://spatialvision.com.au
- * @license The MIT License
- * @author Spatial Vision
- * @version 0.1.0
+ * @copyright 2015 State of Victoria.
+
+ * @author State of Victoria
+ * @version 1.0.0
  */
 
 'use strict';
 
 /**
- * webmapping/ga singleton
- * @module webmapping/ga
+ * webmapping ga
+ * @type {object}
+ * @namespace webmapping.ga
  */
 angular.module('farmbuild.webmapping')
 	.factory('webMappingGoogleAnalytics',
@@ -23,10 +24,9 @@ angular.module('farmbuild.webmapping')
 		 * Sends api usage statistic to google analytics
 		 * @method trackWebMapping
 		 * @param {!string} clientName
-		 * @public
-		 * @static
+		 * @memberof webmapping.ga
 		 */
-		 function _trackWebMapping(clientName) {
+		function _trackWebMapping(clientName) {
 			if (!_isDefined(clientName)) {
 				$log.error('client name is not specified');
 				return;

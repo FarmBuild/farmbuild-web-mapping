@@ -1,7 +1,7 @@
 
 
 .measure.area {
-    top: 80px;
+    top: 85px;
     left: .5em;
 }
 
@@ -10,7 +10,7 @@
 }
 
 .measure.length {
-    top: 110px;
+    top: 112px;
     left: .5em;
 }
 
@@ -19,5 +19,9 @@
 }
 
 .ol-touch .measure.length {
-    top: 110px;
+    top: 130px;
+}
+
+.ol-touch .measure.area {
+    top: 95px;
 }

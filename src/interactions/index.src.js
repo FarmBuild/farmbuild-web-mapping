@@ -1,16 +1,18 @@
 /**
  * @since 0.0.1
- * @copyright 2015 Spatial Vision, Inc. http://spatialvision.com.au
- * @license The MIT License
- * @author Spatial Vision
- * @version 0.1.0
+ * @copyright 2015 State of Victoria.
+
+ * @author State of Victoria
+ * @version 1.0.0
  */
 
 'use strict';
 
 /**
- * webmapping/actions singleton
- * @module webmapping/actions
+ * webmapping actions namespace
+ * @memberof webmapping
+ * @type {object}
+ * @namespace webmapping.actions
  */
 
 angular.module('farmbuild.webmapping')
@@ -31,13 +33,12 @@ angular.module('farmbuild.webmapping')
 			_farmName,
 			_donutContainer;
 
-        /**
-         * Remove all the webmapping interactions, this only remove the interactions that webmapping has added
-         * @method destroy
-         * @param {!Object} map - openlayers map object
-         * @public
-         * @static
-         */
+		/**
+		 * Remove all the webmapping interactions, this only remove the interactions that webmapping has added
+		 * @memberof webmapping.actions
+		 * @param {!Object} map - openlayers map object
+		 * @method destroy
+		 */
 		function _destroy(map) {
 			$log.info('destroying all interactions ...');
 			if (!_isDefined(_select) || !_isDefined(_modify) || !_isDefined(_snap) || !_isDefined(_draw)) {
@@ -57,17 +58,17 @@ angular.module('farmbuild.webmapping')
 			_mode = undefined;
 		};
 
-        /**
-         * Initialise mapping actions
-         * @method init
-         * @param {!Object} map - openlayers map object
-         * @param {!Object} farmLayerGroup - farm LayerGroup, use olHelper class to get this object
-         * @param {!String} activeLayerName - can be "paddocks" or "farm", the layer which you want to interact with
-         * @param {Boolean} snapping - whether to activate snapping, snapping is used between farm, paddocks and rural parcels
-         * @public
-         * @static
-         */
-		function _init(map, farmLayerGroup, activeLayerName, snapping, multi) {
+		/**
+		 * Initialise mapping actions
+		 * @memberof webmapping.actions
+		 * @method init
+		 * @param {!Object} map - openlayers map object
+		 * @param {!Object} farmLayerGroup - farm LayerGroup, use olHelper class to get this object
+		 * @param {!String} activeLayerName - can be "paddocks" or "farm", the layer which you want to interact with
+		 * @param {Boolean} snappingDefaultStatus - whether to activate snapping, snapping is used between farm, paddocks and rural parcels
+		 * @param {Boolean} initKeyboardInteraction - whether to activate keyboard interaction
+		 */
+		function _init(map, farmLayerGroup, activeLayerName, snappingDefaultStatus, initKeyboardInteraction) {
 
 			$log.info('interactions init ...');
 			if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(farmLayerGroup)) {
@@ -89,7 +90,7 @@ angular.module('farmbuild.webmapping')
 				return;
 			}
 
-			_select = webMappingSelectInteraction.create(map, _activeLayer, multi);
+			_select = webMappingSelectInteraction.create(map, _activeLayer);
 			_modify = webMappingModifyInteraction.create(map, _select);
 			_draw = webMappingDrawInteraction.create(map, farmLayerGroup);
 			_snap = webMappingSnapInteraction.create(map, _farmLayer.getSource(), _paddocksLayer.getSource());
@@ -98,8 +99,12 @@ angular.module('farmbuild.webmapping')
 
 			_select.init();
 			_modify.init();
-			_draw.init(_clip, _select);
-			_snap.init(snapping);
+			_draw.init();
+			_snap.init(snappingDefaultStatus);
+
+			if (initKeyboardInteraction) {
+				_enableKeyboardShortcuts();
+			}
 
 		};
 
@@ -357,8 +362,9 @@ angular.module('farmbuild.webmapping')
 			_donutContainer = null;
 		});
 
-		function _enableKeyboardShortcuts(elementId) {
-			var element = document.getElementById(elementId) || _map.getTargetElement();
+		function _enableKeyboardShortcuts() {
+			var element = _map.getTargetElement();
+			element.tabIndex = 0;
 
 			function onKeyDown(event) {
 				var selectedFeatures = _selectedFeatures();
@@ -403,125 +409,132 @@ angular.module('farmbuild.webmapping')
 		return {
 			init: _init,
 			destroy: _destroy,
-            /**
-             * Editing namespace of webmapping.actions
-             * @memberof webmapping.actions
-             * @type {object}
-             * @namespace webmapping.actions.editing
-             */
+			/**
+			 * Editing namespace of webmapping.actions
+			 * @memberof webmapping.actions
+			 * @type {object}
+			 * @namespace webmapping.actions.editing
+			 */
 			editing: {
-                /**
-                 * Enables webmapping edit mode
-                 * @memberof webmapping.actions.editing
-                 * @method enable
-                 */
+				/**
+				 * Enables webmapping edit mode
+				 * @memberof webmapping.actions.editing
+				 * @method enable
+				 */
 				enable: _enableEditing,
-                /**
-                 * Whether editng is in progress
-                 * @memberof webmapping.actions.editing
-                 * @method isEditing
-                 * @returns {boolean} is editing is in progress
-                 */
+				/**
+				 * Whether editng is in progress
+				 * @memberof webmapping.actions.editing
+				 * @method isEditing
+				 * @returns {boolean} is editing is in progress
+				 */
 				isEditing: _isEditing
 			},
-            /**
-             * Drawing namespace of webmapping.actions
-             * @memberof webmapping.actions
-             * @type {object}
-             * @namespace webmapping.actions.drawing
-             */
+			/**
+			 * Drawing namespace of webmapping.actions
+			 * @memberof webmapping.actions
+			 * @type {object}
+			 * @namespace webmapping.actions.drawing
+			 */
 			drawing: {
-                /**
-                 * Discard drawing if it is in progress
-                 * @memberof webmapping.actions.drawing
-                 * @method discard
-                 */
+				/**
+				 * Discard drawing if it is in progress
+				 * @memberof webmapping.actions.drawing
+				 * @method discard
+				 */
 				discard: _discardDrawing,
-                /**
-                 * Finish drawing if it is in progress, this require drawing at least to have two point to draw a polygon
-                 * @memberof webmapping.actions.drawing
-                 * @method finish
-                 */
+				/**
+				 * Finish drawing if it is in progress, this require drawing at least to have two point to draw a polygon
+				 * @memberof webmapping.actions.drawing
+				 * @method finish
+				 */
 				finish: _finishDrawing,
-                /**
-                 * Enables webmapping draw mode
-                 * @memberof webmapping.actions.drawing
-                 * @method enable
-                 */
+				/**
+				 * Enables webmapping draw mode
+				 * @memberof webmapping.actions.drawing
+				 * @method enable
+				 */
 				enable: _enableDrawing,
-                /**
-                 * Whether drawing is in progress
-                 * @memberof webmapping.actions.drawing
-                 * @method isDrawing
-                 * @returns {boolean} is drawing is in progress
-                 */
+				/**
+				 * Whether drawing is in progress
+				 * @memberof webmapping.actions.drawing
+				 * @method isDrawing
+				 * @returns {boolean} is drawing is in progress
+				 */
 				isDrawing: _isDrawing
 			},
-            /**
-             * Donut Drawing namespace of webmapping.actions
-             * @memberof webmapping.actions
-             * @type {object}
-             * @namespace webmapping.actions.donut
-             */
+			/**
+			 * Donut Drawing namespace of webmapping.actions
+			 * @memberof webmapping.actions
+			 * @type {object}
+			 * @namespace webmapping.actions.donut
+			 */
 			donut: {
-                /**
-                 * Enables webmapping donut draw mode
-                 * @memberof webmapping.actions.donut
-                 * @method enable
-                 */
+				/**
+				 * Enables webmapping donut draw mode
+				 * @memberof webmapping.actions.donut
+				 * @method enable
+				 */
 				enable: _enableDonutDrawing
 			},
-            /**
-             * Snapping namespace of webmapping.actions
-             * @memberof webmapping.actions
-             * @type {object}
-             * @namespace webmapping.actions.snapping
-             */
+			/**
+			 * Snapping namespace of webmapping.actions
+			 * @memberof webmapping.actions
+			 * @type {object}
+			 * @namespace webmapping.actions.snapping
+			 */
 			snapping: {
-                /**
-                 * Enables webmapping snap interaction
-                 * @memberof webmapping.actions.snapping
-                 * @method enable
-                 */
+				/**
+				 * Enables webmapping snap interaction
+				 * @memberof webmapping.actions.snapping
+				 * @method enable
+				 */
 				enable: _enableSnapping,
-                /**
-                 * Disable webmapping snap interaction
-                 * @memberof webmapping.actions.snapping
-                 * @method disable
-                 */
+				/**
+				 * Disable webmapping snap interaction
+				 * @memberof webmapping.actions.snapping
+				 * @method disable
+				 */
 				disable: _disableSnapping,
-                /**
-                 * Is webmapping snap interaction active?
-                 * @memberof webmapping.actions.snapping
-                 * @method active
-                 * @returns {boolean} whether snap interaction is active
-                 */
+				/**
+				 * Is webmapping snap interaction active?
+				 * @memberof webmapping.actions.snapping
+				 * @method active
+				 * @returns {boolean} whether snap interaction is active
+				 */
 				active: _isSnappingActive
 			},
-            /**
-             * Features namespace of webmapping.actions
-             * @memberof webmapping.actions
-             * @type {object}
-             * @namespace webmapping.actions.features
-             */
+			/**
+			 * Features namespace of webmapping.actions
+			 * @memberof webmapping.actions
+			 * @type {object}
+			 * @namespace webmapping.actions.features
+			 */
 			features: {
-                /**
-                 * Selected features by select interaction
-                 * @memberof webmapping.actions.features
-                 * @method selections
-                 * @returns {Object} Collection of ol.Features, reperesents selected features
-                 */
+				/**
+				 * Selected features by select interaction
+				 * @memberof webmapping.actions.features
+				 * @method selections
+				 * @returns {Object} Collection of ol.Features, reperesents selected features
+				 */
 				selections: _selectedFeatures,
-                /**
-                 * Clips the selected feature, paddcoks are clipped by other paddocks and farm.
-                 * @memberof webmapping.actions.features
-                 * @method clip
-                 * @param featureToClip, feature you want to clip
-                 * @param farmLayers, the groupLayer of farm, use olHelper class to get this
-                 * @returns {ol.Feature} Clipped feature
-                 */
+				/**
+				 * Clips the selected feature, paddcoks are clipped by other paddocks and farm.
+				 * @memberof webmapping.actions.features
+				 * @method clip
+				 * @param featureToClip, feature you want to clip
+				 * @param farmLayers, the groupLayer of farm, use olHelper class to get this
+				 * @returns {ol.Feature} Clipped feature
+				 */
 				clip: _clip,
 				merge: _merge,
+				/**
+				 * Clips the selected feature, paddcoks are clipped by other paddocks and farm.
+				 * @memberof webmapping.actions.features
+				 * @method remove
+				 * @param featureToRemove, feature you want to remove
+				 * @param deselect, whether to clear selections
+				 */
 				remove: _remove
 			},
 			parcels: {

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>google/analytics/index.src.js - Documentation</title>
+
+    <script src="scripts/prettify/prettify.js"></script>
+    <script src="scripts/prettify/lang-css.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="https://code.ionicframework.com/ionicons/2.0.1/css/ionicons.min.css">
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+<body>
+
+<input type="checkbox" id="nav-trigger" class="nav-trigger" />
+<label for="nav-trigger" class="navicon-button x">
+  <div class="navicon"></div>
+</label>
+
+<label for="nav-trigger" class="overlay"></label>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Namespaces</h3><ul><li><a href="webmapping.html">webmapping</a><ul class='methods'><li data-type='method'><a href="webmapping.html#.create">create</a></li><li data-type='method'><a href="webmapping.html#.export">export</a></li><li data-type='method'><a href="webmapping.html#.exportGeoJson">exportGeoJson</a></li><li data-type='method'><a href="webmapping.html#.exportKml">exportKml</a></li><li data-type='method'><a href="webmapping.html#.find">find</a></li><li data-type='method'><a href="webmapping.html#.load">load</a></li><li data-type='method'><a href="webmapping.html#.save">save</a></li><li data-type='method'><a href="webmapping.html#.toGeoJson">toGeoJson</a></li><li data-type='method'><a href="webmapping.html#.toKml">toKml</a></li></ul></li><li><a href="webmapping.actions.html">actions</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.html#.destroy">destroy</a></li><li data-type='method'><a href="webmapping.actions.html#.init">init</a></li></ul></li><li><a href="webmapping.actions.donut.html">donut</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.donut.html#.enable">enable</a></li></ul></li><li><a href="webmapping.actions.drawing.html">drawing</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.drawing.html#.discard">discard</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.enable">enable</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.finish">finish</a></li><li data-type='method'><a href="webmapping.actions.drawing.html#.isDrawing">isDrawing</a></li></ul></li><li><a href="webmapping.actions.editing.html">editing</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.editing.html#.enable">enable</a></li><li data-type='method'><a href="webmapping.actions.editing.html#.isEditing">isEditing</a></li></ul></li><li><a href="webmapping.actions.features.html">features</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.features.html#.clip">clip</a></li><li data-type='method'><a href="webmapping.actions.features.html#.remove">remove</a></li><li data-type='method'><a href="webmapping.actions.features.html#.selections">selections</a></li></ul></li><li><a href="webmapping.actions.snapping.html">snapping</a><ul class='methods'><li data-type='method'><a href="webmapping.actions.snapping.html#.active">active</a></li><li data-type='method'><a href="webmapping.actions.snapping.html#.disable">disable</a></li><li data-type='method'><a href="webmapping.actions.snapping.html#.enable">enable</a></li></ul></li><li><a href="webmapping.ga.html">ga</a><ul class='methods'><li data-type='method'><a href="webmapping.ga.html#.trackWebMapping">trackWebMapping</a></li></ul></li><li><a href="webmapping.measurement.html">measurement</a><ul class='methods'><li data-type='method'><a href="webmapping.measurement.html#.area">area</a></li><li data-type='method'><a href="webmapping.measurement.html#.length">length</a></li></ul></li><li><a href="webmapping.olHelper.html">olHelper</a><ul class='methods'><li data-type='method'><a href="webmapping.olHelper.html#.createBaseLayers">createBaseLayers</a></li><li data-type='method'><a href="webmapping.olHelper.html#.createBaseLayersWithGoogleMaps">createBaseLayersWithGoogleMaps</a></li><li data-type='method'><a href="webmapping.olHelper.html#.createFarmLayers">createFarmLayers</a></li><li data-type='method'><a href="webmapping.olHelper.html#.exportGeometry">exportGeometry</a></li><li data-type='method'><a href="webmapping.olHelper.html#.init">init</a></li><li data-type='method'><a href="webmapping.olHelper.html#.initWithGoogleMap">initWithGoogleMap</a></li><li data-type='method'><a href="webmapping.olHelper.html#.reload">reload</a></li></ul></li></ul>
+</nav>
+
+<div id="main">
+    
+    <h1 class="page-title">google/analytics/index.src.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @since 0.0.1
+ * @copyright 2015 State of Victoria.
+
+ * @author State of Victoria
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/**
+ * webmapping ga
+ * @type {object}
+ * @namespace webmapping.ga
+ */
+angular.module('farmbuild.webmapping')
+	.factory('webMappingGoogleAnalytics',
+	function ($log, validations, googleAnalytics) {
+
+		var api = 'farmbuild-webmapping',
+			_isDefined = validations.isDefined;
+
+		/**
+		 * Sends api usage statistic to google analytics
+		 * @method trackWebMapping
+		 * @param {!string} clientName
+		 * @memberof webmapping.ga
+		 */
+		function _trackWebMapping(clientName) {
+			if (!_isDefined(clientName)) {
+				$log.error('client name is not specified');
+				return;
+			}
+
+			$log.info('googleAnalyticsWebMapping.trackWebMapping clientName: %s', clientName);
+			googleAnalytics.track(api, clientName)
+		}
+
+		return {
+			trackWebMapping: _trackWebMapping
+		};
+
+	});
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.1</a> on Wed Jun 17 2015 17:42:13 GMT+1000 (AEST) using the Minami theme.
+</footer>
+
+<script>prettyPrint();</script>
+<script src="scripts/linenumber.js"></script>
+</body>
+</html>

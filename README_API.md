@@ -21,7 +21,7 @@ GA implementation.
 
 Example
 ```
-var organisationName = 'Spatial Vision';
+var organisationName = 'State of Victoria';
 //Calling the track API for the usage
 farmbuild.webmapping.ga.trackCalculate(organisationName);
 ```

@@ -26,7 +26,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         "export": session.export,
         create: farmdata.create
     };
-    webMapping.version = "0.1.0";
+    webMapping.version = "1.0.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
             webmapping: webMapping
@@ -234,7 +234,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _activeLayerName = undefined;
         _mode = undefined;
     }
-    function _init(map, farmLayerGroup, activeLayerName, snapping, multi) {
+    function _init(map, farmLayerGroup, activeLayerName, snappingDefaultStatus, initKeyboardInteraction) {
         $log.info("interactions init ...");
         if (!_isDefined(activeLayerName) || !_isDefined(map) || !_isDefined(farmLayerGroup)) {
             return;
@@ -251,7 +251,7 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         } else {
             return;
         }
-        _select = webMappingSelectInteraction.create(map, _activeLayer, multi);
+        _select = webMappingSelectInteraction.create(map, _activeLayer);
         _modify = webMappingModifyInteraction.create(map, _select);
         _draw = webMappingDrawInteraction.create(map, farmLayerGroup);
         _snap = webMappingSnapInteraction.create(map, _farmLayer.getSource(), _paddocksLayer.getSource());
@@ -259,8 +259,11 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _activeLayerName = activeLayerName;
         _select.init();
         _modify.init();
-        _draw.init(_clip, _select);
-        _snap.init(snapping);
+        _draw.init();
+        _snap.init(snappingDefaultStatus);
+        if (initKeyboardInteraction) {
+            _enableKeyboardShortcuts();
+        }
     }
     function _addFeature(layer, feature, newProperties) {
         var properties = newProperties || {};
@@ -483,8 +486,9 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         _select.interaction.getFeatures().push(_clip(feature, _farmLayerGroup));
         _donutContainer = null;
     });
-    function _enableKeyboardShortcuts(elementId) {
-        var element = document.getElementById(elementId) || _map.getTargetElement();
+    function _enableKeyboardShortcuts() {
+        var element = _map.getTargetElement();
+        element.tabIndex = 0;
         function onKeyDown(event) {
             var selectedFeatures = _selectedFeatures();
             if (!_isDefined(selectedFeatures)) {
@@ -738,7 +742,47 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 
 angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, webMappingTransformation, webMappingConverter, $log) {
     var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _extentControl, _transform = webMappingTransformation, _converter = webMappingConverter;
-    function _init(gmap, map, dataProjection, targetElement, init, extent) {
+    function addControlsToGmap(gmap, targetElement) {
+        gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
+        targetElement.parentNode.removeChild(targetElement);
+    }
+    function addControlsToOlMap(map, extent) {
+        if (extent) {
+            _extentControl = new ol.control.ZoomToExtent({
+                extent: extent
+            });
+            map.addControl(_extentControl);
+        }
+        map.addControl(new ol.control.ScaleLine());
+        map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
+        map.addControl(new webMappingMeasureControl.create(map, "LineString"));
+        map.addControl(new webMappingSnapControl.create());
+        map.addControl(new ol.control.LayerSwitcher({
+            tipLabel: "Switch on/off farm layers"
+        }));
+    }
+    function _initWithGoogleMap(map, dataProjection, extent, gmap, targetElement) {
+        if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
+            return;
+        }
+        $log.info("integrating google map ...");
+        var view = map.getView();
+        view.on("change:center", function() {
+            var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
+            gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
+        });
+        view.on("change:resolution", function() {
+            gmap.setZoom(view.getZoom());
+        });
+        window.onresize = function() {
+            var center = _transform.toGoogleLatLng(view.getCenter(), dataProjection);
+            google.maps.event.trigger(gmap, "resize");
+            gmap.setCenter(center);
+        };
+        _init(map, dataProjection, extent);
+        addControlsToGmap(gmap, targetElement);
+    }
+    function _init(map, dataProjection, extent) {
         var defaults = {
             centerNew: [ -36.22488327137526, 145.5826132801325 ],
             zoomNew: 6
@@ -746,21 +790,12 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         var view = map.getView();
         $log.info("farm extent: %j", extent);
         if (extent[0] === Infinity) {
-            gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
-            targetElement.parentNode.removeChild(targetElement);
             view.setCenter(ol.proj.transform([ defaults.centerNew[1], defaults.centerNew[0] ], dataProjection, _googleProjection));
             view.setZoom(defaults.zoomNew);
-            if (init) {
-                addControls(map);
-            }
-            return;
+        } else {
+            view.fitExtent(extent, map.getSize());
         }
-        gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
-        targetElement.parentNode.removeChild(targetElement);
-        if (init) {
-            addControls(map, extent);
-        }
-        view.fitExtent(extent, map.getSize());
+        addControlsToOlMap(map, extent);
     }
     function _exportGeometry(source, dataProjection, featureProjection) {
         if (!_isDefined(source)) {
@@ -783,41 +818,6 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         } catch (e) {
             $log.error(e);
         }
-    }
-    function addControls(map, extent) {
-        if (extent) {
-            _extentControl = new ol.control.ZoomToExtent({
-                extent: extent
-            });
-            map.addControl(_extentControl);
-        }
-        map.addControl(new ol.control.ScaleLine());
-        map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
-        map.addControl(new webMappingMeasureControl.create(map, "LineString"));
-        map.addControl(new webMappingSnapControl.create());
-        map.addControl(new ol.control.LayerSwitcher({
-            tipLabel: "Switch on/off farm layers"
-        }));
-    }
-    function _integrateGoogleMap(gmap, map, dataProjection, targetElement, init, extent) {
-        if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
-            return;
-        }
-        $log.info("integrating google map ...");
-        var view = map.getView();
-        view.on("change:center", function() {
-            var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
-            gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
-        });
-        view.on("change:resolution", function() {
-            gmap.setZoom(view.getZoom());
-        });
-        window.onresize = function() {
-            var center = _transform.toGoogleLatLng(view.getCenter(), dataProjection);
-            google.maps.event.trigger(gmap, "resize");
-            gmap.setCenter(center);
-        };
-        _init(gmap, map, dataProjection, targetElement, init, extent);
     }
     function _center(coordinates, map) {
         if (!_isDefined(coordinates) || !_isDefined(map)) {
@@ -884,6 +884,35 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         });
     }
     function _createBaseLayers() {
+        var vicMapImageryLayer = new ol.layer.Tile({
+            title: "VicMAP Imagery",
+            type: "base",
+            visible: true,
+            source: new ol.source.TileWMS({
+                url: "http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms",
+                params: {
+                    LAYERS: "SATELLITE_WM",
+                    VERSION: "1.1.1"
+                }
+            })
+        }), vicMapStreetLayer = new ol.layer.Tile({
+            title: "VicMAP Street",
+            type: "base",
+            visible: false,
+            source: new ol.source.TileWMS({
+                url: "http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms",
+                params: {
+                    LAYERS: "WEB_MERCATOR",
+                    VERSION: "1.1.1"
+                }
+            })
+        });
+        return new ol.layer.Group({
+            title: "Base maps",
+            layers: [ vicMapImageryLayer, vicMapStreetLayer ]
+        });
+    }
+    function _createBaseLayersWithGoogleMaps() {
         var vicMapImageryLayer = new ol.layer.Tile({
             title: "VicMAP Imagery",
             type: "base",
@@ -966,11 +995,13 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         return map.getLayers().item(1);
     }
     return {
+        init: _init,
         exportGeometry: _exportGeometry,
         center: _center,
-        integrateGoogleMap: _integrateGoogleMap,
+        initWithGoogleMap: _initWithGoogleMap,
         createFarmLayers: _createFarmLayers,
         createBaseLayers: _createBaseLayers,
+        createBaseLayersWithGoogleMaps: _createBaseLayersWithGoogleMaps,
         farmLayer: _farmLayer,
         paddocksLayer: _paddocksLayer,
         farmLayerGroup: _farmLayerGroup,

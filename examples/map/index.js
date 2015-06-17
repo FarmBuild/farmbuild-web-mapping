@@ -75,7 +75,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			/** it is recommended to use these helper functions to create your farm and paddocks layers */
 			var farmLayers = olHelper.createFarmLayers(geoJsons, dataProjection, featureProjection),
-				baseLayers = olHelper.createBaseLayers();
+				//baseLayers = olHelper.createBaseLayers();
+				baseLayers = olHelper.createBaseLayersWithGoogleMaps();
 
 			return new ol.Map({
 				layers: [baseLayers, farmLayers],
@@ -169,9 +170,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.selectLayer = function () {
-			var snappingStatus = true;
+			var activateSnapping = true,
+				activateKeyboardInteractions = true,
+				farmLayerGroup = olHelper.farmLayerGroup(olMap),
+				farmLayer = olHelper.farmLayer(olMap),
+				paddocksLayer = olHelper.paddocksLayer(olMap),
+				selectedLayer = $scope.selectedLayer;
 			if(angular.isDefined(actions.snapping.active())){
-				snappingStatus = actions.snapping.active();
+				activateSnapping = actions.snapping.active();
 			}
 			$scope.cancel();
 			actions.destroy(olMap);
@@ -180,11 +186,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				olMap.un('pointermove', mapOnPointerMove);
 				return;
 			}
-			console.log(snappingStatus);
-			actions.init(olMap, olHelper.farmLayerGroup(olMap), $scope.selectedLayer, snappingStatus);
+			actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
 			olMap.on('pointermove', mapOnPointerMove);
-			olHelper.paddocksLayer(olMap).getSource().on('changefeature', paddockChanged);
-			olHelper.farmLayer(olMap).getSource().on('changefeature', farmChanged);
+			farmLayer.getSource().on('changefeature', paddockChanged);
+			paddocksLayer.getSource().on('changefeature', farmChanged);
 			loadParcels();
 		};
 
@@ -346,7 +351,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			/** Create openlayers map object, customise the map object as you like. */
 			olMap = createOpenLayerMap(geoJsons);
-			var extent = olHelper.farmLayer(olMap).getSource().getExtent();
+			var extent = olHelper.farmLayer(olMap).getSource().getExtent(),
+				openlayersMapEl = olMap.getTargetElement();
 
 
 			/**  Create google map object, customise the map object as you like. */
@@ -355,12 +361,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
 			 this helper function does the job for you. */
-			olHelper.integrateGoogleMap(googleMap, olMap, dataProjection, document.getElementById('olmap'), true, extent);
+			olHelper.initWithGoogleMap(olMap, dataProjection, extent, googleMap, openlayersMapEl);
+			//olHelper.init(olMap, dataProjection, extent);
 
 			/** Enable address google search for your map */
 			olHelper.initGoogleAddressSearch('locationAutoComplete', olMap);
-
-			actions.keyboardShortcuts.enable('gmap');
 
 			/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
 			webmapping.ga.trackWebMapping('AgSmart');

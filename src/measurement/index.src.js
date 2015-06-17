@@ -1,5 +1,11 @@
 'use strict';
 
+/**
+ * webmapping measurement
+ * @type {object}
+ * @namespace webmapping.measurement
+ */
+
 angular.module('farmbuild.webmapping')
     .factory('webMappingMeasurement',
     function (validations,
@@ -17,6 +23,13 @@ angular.module('farmbuild.webmapping')
             }
         };
 
+        /**
+         * Calculates are of a feature
+         * @method area
+         * @returns {number} area in hectare
+         * @param {!ol.Feature} feature
+         * @memberof webmapping.measurement
+         */
         function _area(feature) {
             $log.info('calculating area of polygon ...', feature);
             feature = _converter.featureToGeoJson(feature, 'EPSG:4283', 'EPSG:3857');
@@ -27,6 +40,13 @@ angular.module('farmbuild.webmapping')
             }
         };
 
+        /**
+         * Calculates length of a line
+         * @method length
+         * @returns {number} length in metre
+         * @param {!ol.Feature} feature
+         * @memberof webmapping.measurement
+         */
         function _length(feature) {
             $log.info('calculating length of line ...', feature);
             feature = _converter.featureToGeoJson(feature, 'EPSG:4283', 'EPSG:3857');
