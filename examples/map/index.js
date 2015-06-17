@@ -188,8 +188,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 			actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
 			olMap.on('pointermove', mapOnPointerMove);
-			farmLayer.getSource().on('changefeature', paddockChanged);
-			paddocksLayer.getSource().on('changefeature', farmChanged);
+			farmLayer.getSource().on('changefeature', farmChanged);
+			paddocksLayer.getSource().on('changefeature', paddockChanged);
 			loadParcels();
 		};
 
