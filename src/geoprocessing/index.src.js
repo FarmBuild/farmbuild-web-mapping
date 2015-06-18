@@ -60,7 +60,8 @@ angular.module('farmbuild.webmapping')
                 feature2 = converter.featureToGeoJson(olFeature2),
                 intersection;
             try {
-                intersection = turf.intersect(feature1, feature2);
+                intersection = turf.erase(feature2, feature1);
+                intersection = turf.erase(feature2, intersection);
                 return converter.geoJsonToFeature(intersection);
             } catch (e) {
                 $log.warn('This operation is not supported,', e);
