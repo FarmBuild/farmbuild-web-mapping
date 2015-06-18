@@ -376,7 +376,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olHelper.initGoogleAddressSearch('locationAutoComplete', olMap);
 
 			/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
-			webmapping.ga.trackWebMapping('AgSmart');
+			webmapping.ga.trackWebMapping('farmbuild-test-client');
 
 			/** it is up to you when to load parcels, this example is using map view's change event to load parcels data. Parcels data is used for snapping */
 			olMap.getView().on('change:resolution', loadParcels);

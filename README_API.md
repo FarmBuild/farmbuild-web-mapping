@@ -1,6 +1,8 @@
 #FarmBuild Web Mapping
 
-This is the webmapping module of farm build JavaScript library.
+This is the web mapping component of FarmBuild project.
+
+version 1.0.0
 
 
 ## Getting Started
@@ -21,7 +23,7 @@ GA implementation.
 
 Example
 ```
-var organisationName = 'State of Victoria';
+var organisationName = 'your organisation name';
 //Calling the track API for the usage
 farmbuild.webmapping.ga.trackCalculate(organisationName);
 ```

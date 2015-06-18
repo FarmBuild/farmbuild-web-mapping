@@ -22,7 +22,7 @@ describe('farmbuild.webmapping module', function() {
         }));
 
         it('webMappingGoogleAnalytics.track should create a track', inject(function() {
-            webMappingGoogleAnalytics.trackWebMapping('AgSmart')
+            webMappingGoogleAnalytics.trackWebMapping('farmbuild-test-client')
         }));
     });
 

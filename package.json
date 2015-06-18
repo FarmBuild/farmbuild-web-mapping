@@ -4,7 +4,6 @@
   "version": "1.0.0",
   "description": "This project is the web mapping module of farm build JavaScript library",
   "repository": "https://github.com/FarmBuild/farmbuild-web-mapping",
-  "license": "MIT",
   "dependencies": {
     "mkdirp": "^0.5.1"
   },
