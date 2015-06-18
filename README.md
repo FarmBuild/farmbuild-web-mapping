@@ -2,7 +2,7 @@
 
 This is the web mapping component of FarmBuild project.
 
-For more information on the FarmBuild project and its registration process, please visit the FarmBuild website.
+For more information on the FarmBuild project and its registration process, please visit the <a href="http://farmbuild.github.io/farmbuild/">FarmBuild website</a>.
 
 ## Getting Started
 
