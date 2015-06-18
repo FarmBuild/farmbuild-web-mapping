@@ -1059,7 +1059,7 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
                 service: "WFS",
                 version: "1.0.0",
                 request: "GetFeature",
-                typeName: "farmbuild:parcels",
+                typeName: "farmbuild:ruralparcels",
                 outputFormat: "text/javascript",
                 format_options: "callback:JSON_CALLBACK",
                 srsname: responseProjection,
