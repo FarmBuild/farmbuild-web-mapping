@@ -73,7 +73,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		/** Create openlayers map object, customise the map object as you like. */
 		function createOpenLayerMap(geoJsons) {
 
-			/** it is recommended to use these helper functions to create your farm and paddocks layers */
+			/** it is recommended to use these helper functions to create your farm and paddocks layers
+			 If you are using olHelper.createBaseLayers(), use olHelper.init() to initialise webmapping
+			 If you are using olHelper.createBaseLayersWithGoogleMaps(), use olHelper.initWithGoogleMap() to initialise webmapping
+			 */
 			var farmLayers = olHelper.createFarmLayers(geoJsons, dataProjection, featureProjection),
 			//baseLayers = olHelper.createBaseLayers();
 				baseLayers = olHelper.createBaseLayersWithGoogleMaps();
@@ -148,7 +151,11 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		$scope.onFarmNameChanged = function () {
-			actions.features.selections().item(0).setProperties({
+			if($scope.selectedLayer !== 'farm'){
+				$scope.noResult = 'Select farm from edit layers drop down, to edit farm details!';
+				return;
+			}
+			olHelper.farmLayer(olMap).getSource().getFeatures()[0].setProperties({
 				name: $scope.farmData.name
 			});
 			farmChanged();
@@ -224,8 +231,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				farmGeometry = olHelper.exportGeometry(farmSource, dataProjection, featureProjection);
 
 			if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmSource.getExtent(), paddocksSource.getExtent())) {
-				$log.error('Draw farm boundary first!');
-				$scope.noResult = true;
+				$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
 				return;
 			}
 			$scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
@@ -256,7 +262,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$scope.farmData = webmapping.find();
 			var geoJsons = webmapping.toGeoJsons($scope.farmData);
 			if (!angular.isDefined(geoJsons)) {
-				$scope.noResult = true;
+				$scope.noResult = 'Farm data is invalid';
 				return;
 			}
 			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
@@ -342,7 +348,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			geoJsons = webmapping.toGeoJsons($scope.farmData);
 
 			if (!angular.isDefined(geoJsons)) {
-				$scope.noResult = true;
+				$scope.noResult = 'Farm data is invalid';
 				return;
 			}
 
@@ -359,7 +365,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 			/** Openlayers 3 does not support google maps as a tile layer,
 			 so we need to keep openlayers map view and google maps in sync,
-			 this helper function does the job for you. */
+			 this helper function does the job for you.
+			 If you want to init with google map, you need to use olHelper.createBaseLayersWithGoogleMaps()
+			 If you want to init without google map, you need to use olHelper.createBaseLayers()
+			 */
 			olHelper.initWithGoogleMap(olMap, dataProjection, extent, googleMap, openlayersMapEl);
 			//olHelper.init(olMap, dataProjection, extent);
 

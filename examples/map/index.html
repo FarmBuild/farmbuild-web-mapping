@@ -63,7 +63,7 @@
                 <h3 class="modal-title">Validation failed</h3>
             </div>
             <div class="modal-body">
-                Farm boundary is invalid
+                {{noResult}}
                 <br/>
                 read <a
                     href="https://github.com/FarmBuild/farmbuild-web-mapping" target="_blank">API documentation</a> for
@@ -77,7 +77,7 @@
 </script>
 
 <script type="text/ng-template" id="paddock-details.tpl.html">
-    <fieldset ng-show="selectedPaddock._id || selectedPaddock.name|| selectedPaddock.geometry">
+    <fieldset ng-show="selectedPaddock.geometry">
         <legend>Paddock information</legend>
         <form-section>
             <form-item class="form-group">
