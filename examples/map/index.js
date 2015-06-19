@@ -234,8 +234,17 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			//	$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
 			//	return;
 			//}
-			$scope.farmData = webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
+			webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry})
+			$scope.farmData = webmapping.find();
 			olHelper.updateExtent(olMap);
+
+			var geoJsons = webmapping.toGeoJsons($scope.farmData);
+			if (!angular.isDefined(geoJsons)) {
+				$scope.noResult = 'Farm data is invalid';
+				return;
+			}
+			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
+
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
 			$scope.selectedPaddock = {};
