@@ -2036,7 +2036,7 @@ angular.module("farmbuild.farmdata").constant("crsSupported", [ {
 }, {
     label: "VicGrid 94: EPSG:3111",
     name: "EPSG:3111",
-    projection: "+proj=merc +a=6378137 +b=6378137 +lat_ts=0.0 +lon_0=0.0 +x_0=0.0 +y_0=0 +k=1.0 +units=m +nadgrids=@null +wktext  +no_defs"
+    projection: "+proj=lcc +lat_1=-36 +lat_2=-38 +lat_0=-37 +lon_0=145 +x_0=2500000 +y_0=2500000 +ellps=GRS80 +towgs84=0,0,0,0,0,0,0 +units=m +no_defs"
 }, {
     label: "NSW Lamberts: EPSG:3308",
     name: "EPSG:3308",

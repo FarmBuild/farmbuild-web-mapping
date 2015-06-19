@@ -87,6 +87,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				keyboardEventTarget: googleMapElement,
 				view: new ol.View({
 					rotation: 0,
+					//projection: featureProjection,
 					maxZoom: maxZoom
 				}),
 				interactions: ol.interaction.defaults({

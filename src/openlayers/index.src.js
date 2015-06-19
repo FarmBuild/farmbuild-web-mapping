@@ -54,13 +54,13 @@ angular.module('farmbuild.webmapping')
 		 * @memberof webmapping.olHelper
 		 */
 		function _initWithGoogleMap(map, dataProjection, extent, gmap, targetElement) {
-			if (!_isDefined(gmap) || !_isDefined(map) || !_isDefined(dataProjection)) {
+			if (!_isDefined(gmap) || !_isDefined(map)) {
 				return;
 			}
 			$log.info('integrating google map ...');
 			var view = map.getView();
 			view.on('change:center', function () {
-				var center = ol.proj.transform(view.getCenter(), _googleProjection, dataProjection);
+				var center = ol.proj.transform(view.getCenter(), _googleProjection, 'EPSG:4326');
 				gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
 			});
 
@@ -70,7 +70,7 @@ angular.module('farmbuild.webmapping')
 
 			// Google Map and vector layers go out of sync when window is resized.
 			window.onresize = function () {
-				var center = _transform.toGoogleLatLng(view.getCenter(), dataProjection);
+				var center = _transform.toGoogleLatLng(view.getCenter(), 'EPSG:4326');
 				google.maps.event.trigger(gmap, "resize");
 				gmap.setCenter(center);
 			};
@@ -96,7 +96,7 @@ angular.module('farmbuild.webmapping')
 
 			if (extent[0] === Infinity) {
 				view.setCenter(ol.proj.transform([defaults.centerNew[1], defaults.centerNew[0]],
-					dataProjection, _googleProjection));
+					'EPSG:4283', _googleProjection));
 				view.setZoom(defaults.zoomNew);
 			} else {
 				view.fitExtent(extent, map.getSize());
