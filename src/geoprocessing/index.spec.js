@@ -207,75 +207,75 @@ describe('farmbuild.webMapping module', function () {
         }));
     });
 
-    describe('Testing Web Mapping Intersect Transformation', function () {
-        it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
-
-            var poly1 = {
-                    "type": "Feature",
-                    "properties": {
-                        "fill": "#0f0"
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                                [-122.801742, 45.48565],
-                                [-122.801742, 45.60491],
-                                [-122.584762, 45.60491],
-                                [-122.584762, 45.48565],
-                                [-122.801742, 45.48565]
-                            ]
-                        ]
-                    }
-                },
-                poly2 =  {
-                    "type": "Feature",
-                    "properties": {
-                        "fill": "#00f"
-                    },
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                                [-122.520217, 45.535693],
-                                [-122.64038, 45.553967],
-                                [-122.720031, 45.526554],
-                                [-122.669906, 45.507309],
-                                [-122.723464, 45.446643],
-                                [-122.532577, 45.408574],
-                                [-122.487258, 45.477466],
-                                [-122.520217, 45.535693]
-                            ]
-                        ]
-                    }
-                },
-                olPolygon1,
-                olPolygon2,
-                intersection,
-                intersectedGeoJSON,
-                expected = {
-                    "type": "Feature",
-                    "properties": null,
-                    "geometry": {
-                        "type": "Polygon",
-                        "coordinates": [[
-                                [-122.584762, 45.545508794628965],
-                                [-122.584762, 45.48565],
-                                [-122.68902729894835, 45.48565],
-                                [-122.669906, 45.507309],
-                                [-122.720031, 45.526554],
-                                [-122.64038, 45.553967],
-                                [-122.584762, 45.545508794628965]
-                            ]
-                        ]
-                    }
-                };
-            olPolygon1 = webMappingConverter.geoJsonToFeature(poly1);
-            olPolygon2 = webMappingConverter.geoJsonToFeature(poly2);
-            intersection = webMappingGeoProcessing.intersect(olPolygon1, olPolygon2);
-            intersectedGeoJSON = webMappingConverter.featureToGeoJson(intersection);
-            expect(intersection).toBeDefined();
-            expect(intersectedGeoJSON).toBeDefined();
-            expect(intersectedGeoJSON).toEqual(expected);
-        }));
-    });
+    //describe('Testing Web Mapping Intersect Transformation', function () {
+    //    it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
+    //
+    //        var poly1 = {
+    //                "type": "Feature",
+    //                "properties": {
+    //                    "fill": "#0f0"
+    //                },
+    //                "geometry": {
+    //                    "type": "Polygon",
+    //                    "coordinates": [[
+    //                            [-122.801742, 45.48565],
+    //                            [-122.801742, 45.60491],
+    //                            [-122.584762, 45.60491],
+    //                            [-122.584762, 45.48565],
+    //                            [-122.801742, 45.48565]
+    //                        ]
+    //                    ]
+    //                }
+    //            },
+    //            poly2 =  {
+    //                "type": "Feature",
+    //                "properties": {
+    //                    "fill": "#00f"
+    //                },
+    //                "geometry": {
+    //                    "type": "Polygon",
+    //                    "coordinates": [[
+    //                            [-122.520217, 45.535693],
+    //                            [-122.64038, 45.553967],
+    //                            [-122.720031, 45.526554],
+    //                            [-122.669906, 45.507309],
+    //                            [-122.723464, 45.446643],
+    //                            [-122.532577, 45.408574],
+    //                            [-122.487258, 45.477466],
+    //                            [-122.520217, 45.535693]
+    //                        ]
+    //                    ]
+    //                }
+    //            },
+    //            olPolygon1,
+    //            olPolygon2,
+    //            intersection,
+    //            intersectedGeoJSON,
+    //            expected = {
+    //                "type": "Feature",
+    //                "properties": null,
+    //                "geometry": {
+    //                    "type": "Polygon",
+    //                    "coordinates": [[
+    //                            [-122.584762, 45.545508794628965],
+    //                            [-122.584762, 45.48565],
+    //                            [-122.68902729894835, 45.48565],
+    //                            [-122.669906, 45.507309],
+    //                            [-122.720031, 45.526554],
+    //                            [-122.64038, 45.553967],
+    //                            [-122.584762, 45.545508794628965]
+    //                        ]
+    //                    ]
+    //                }
+    //            };
+    //        olPolygon1 = webMappingConverter.geoJsonToFeature(poly1);
+    //        olPolygon2 = webMappingConverter.geoJsonToFeature(poly2);
+    //        intersection = webMappingGeoProcessing.intersect(olPolygon1, olPolygon2);
+    //        intersectedGeoJSON = webMappingConverter.featureToGeoJson(intersection);
+    //        expect(intersection).toBeDefined();
+    //        expect(intersectedGeoJSON).toBeDefined();
+    //        expect(intersectedGeoJSON).toEqual(expected);
+    //    }));
+    //});
 
 });
