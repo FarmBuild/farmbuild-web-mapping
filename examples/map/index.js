@@ -230,10 +230,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				paddocksGeometry = olHelper.exportGeometry(paddocksSource, dataProjection),
 				farmGeometry = olHelper.exportGeometry(farmSource, dataProjection);
 
-			//if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmSource.getExtent(), paddocksSource.getExtent())) {
-			//	$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
-			//	return;
-			//}
+			if (farmGeometry.features.length === 0) {
+				$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
+				return;
+			}
 			webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
 			$scope.farmData = webmapping.find();
 			olHelper.updateExtent(olMap);
