@@ -294,22 +294,22 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			paddockChanged();
 		};
 
-		$rootScope.$on('web-mapping-draw-end', function () {
+		webmapping.on('web-mapping-draw-end', function () {
 			$scope.farmChanged = true;
 			farmChanged();
 		});
 
-		$rootScope.$on('web-mapping-donut-draw-end', function () {
+		webmapping.on('web-mapping-donut-draw-end', function () {
 			$scope.disableDonutDrawing();
 		});
 
-		$rootScope.$on('web-mapping-measure-end', function (event, data) {
+		webmapping.on('web-mapping-measure-end', function (event, data) {
 			$scope.measuredValue = data.value;
 			$scope.measuredUnit = data.unit;
 			updateNgScope();
 		});
 
-		$rootScope.$on('web-mapping-base-layer-change', function (event, data) {
+		webmapping.on('web-mapping-base-layer-change', function (event, data) {
 			if (data.layer.getProperties().title === 'Google Street') {
 				googleMapElement.firstChild.firstChild.style.display = 'block';
 				googleMap.setMapTypeId(google.maps.MapTypeId.ROADMAP);
@@ -326,14 +326,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		});
 
-		$rootScope.$on('web-mapping-feature-select', function (event, data) {
+		webmapping.on('web-mapping-feature-select', function (event, data) {
 			var selectedLayer = $scope.selectedLayer;
 			if (selectedLayer === 'paddocks') {
 				onPaddockSelect(event, data)
 			}
 		});
 
-		$rootScope.$on('web-mapping-feature-deselect', function (event, data) {
+		webmapping.on('web-mapping-feature-deselect', function (event, data) {
 			var selectedLayer = $scope.selectedLayer;
 			if (selectedLayer === 'paddocks') {
 				onPaddockDeselect(event, data)

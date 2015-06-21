@@ -154,7 +154,7 @@ angular.module('farmbuild.webmapping')
             if (!_isDefined(paddocksGeometry) || !_isDefined(dataProjection)) {
                 return;
             }
-            $log.info('creating paddocks vector layer ...', _googleProjection);
+            $log.info('creating paddocks vector layer ...', dataProjection, _googleProjection);
             var paddocksSource = new ol.source.Vector({
                 features: (new ol.format.GeoJSON()).readFeatures(paddocksGeometry, {
                     dataProjection: dataProjection,

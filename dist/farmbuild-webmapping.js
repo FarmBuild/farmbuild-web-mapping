@@ -1,6 +1,6 @@
 "use strict";
 
-angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingMeasurement, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch, webMappingGoogleAnalytics, webMappingParcels) {
+angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" ]).factory("webmapping", function(farmdata, validations, $log, $rootScope, geoJsonValidator, farmdataConverter, webMappingSession, webMappingProjections, webMappingInteractions, webMappingMeasurement, webMappingPaddocks, webMappingOpenLayersHelper, webMappingGoogleAddressSearch, webMappingGoogleAnalytics, webMappingParcels) {
     $log.info("Welcome to Web Mapping...");
     var _isDefined = validations.isDefined, session = webMappingSession, webMapping = {
         session: session,
@@ -24,7 +24,10 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
             return session.save(farmData, geoJsons);
         },
         "export": session.export,
-        create: farmdata.create
+        create: farmdata.create,
+        on: function(name, listener) {
+            $rootScope.$on(name, listener);
+        }
     };
     webMapping.version = "1.0.0";
     if (typeof window.farmbuild === "undefined") {
@@ -832,7 +835,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         if (!_isDefined(paddocksGeometry) || !_isDefined(dataProjection)) {
             return;
         }
-        $log.info("creating paddocks vector layer ...", _googleProjection);
+        $log.info("creating paddocks vector layer ...", dataProjection, _googleProjection);
         var paddocksSource = new ol.source.Vector({
             features: new ol.format.GeoJSON().readFeatures(paddocksGeometry, {
                 dataProjection: dataProjection,

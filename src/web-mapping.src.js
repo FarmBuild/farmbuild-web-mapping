@@ -18,6 +18,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	function (farmdata,
 	          validations,
 	          $log,
+              $rootScope,
 	          geoJsonValidator,
 	          farmdataConverter,
 	          webMappingSession,
@@ -127,7 +128,17 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				 * @returns {Object} the farmdata object, undefined if the required fields are not provided
 				 * @memberof webmapping
 				 */
-				create: farmdata.create
+				create: farmdata.create,
+
+                /**
+                 * Listens on events of a given type.
+                 * @method on
+                 * @param {!string} name Event name to listen on.
+                 * @param {!function(event, ...args)} listener - Function to call when the event is emitted.
+                 * @returns {function()} Returns a deregistration function for this listener.
+                 * @memberof webmapping
+                 */
+                on: function(name, listener){$rootScope.$on(name, listener)}
 			};
 
 		// Provide a shortcut for modules
