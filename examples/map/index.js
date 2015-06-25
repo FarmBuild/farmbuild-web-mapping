@@ -77,7 +77,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			 If you are using olHelper.createBaseLayers(), use olHelper.init() to initialise webmapping
 			 If you are using olHelper.createBaseLayersWithGoogleMaps(), use olHelper.initWithGoogleMap() to initialise webmapping
 			 */
-			var farmLayers = olHelper.createFarmLayers(geoJsons, dataProjection, featureProjection),
+			var farmLayers = olHelper.createFarmLayers(geoJsons, dataProjection),
 			//baseLayers = olHelper.createBaseLayers();
 				baseLayers = olHelper.createBaseLayersWithGoogleMaps();
 
@@ -87,7 +87,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				keyboardEventTarget: googleMapElement,
 				view: new ol.View({
 					rotation: 0,
-					//projection: featureProjection,
 					maxZoom: maxZoom
 				}),
 				interactions: ol.interaction.defaults({
@@ -208,8 +207,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		};
 
 		$scope.exportFarmData = function (farmData) {
-			var paddocksGeometry = olHelper.exportGeometry(olHelper.paddocksLayer(olMap).getSource(), dataProjection, featureProjection),
-				farmGeometry = olHelper.exportGeometry(olHelper.farmLayer(olMap).getSource(), dataProjection, featureProjection);
+			var paddocksGeometry = olHelper.exportGeometry(olHelper.paddocksLayer(olMap).getSource(), dataProjection),
+				farmGeometry = olHelper.exportGeometry(olHelper.farmLayer(olMap).getSource(), dataProjection);
 			webmapping.export(document, farmData, {paddocks: paddocksGeometry, farm: farmGeometry});
 		};
 
@@ -228,14 +227,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 			var farmSource = olHelper.farmLayer(olMap).getSource(),
 				paddocksSource = olHelper.paddocksLayer(olMap).getSource(),
-				paddocksGeometry = olHelper.exportGeometry(paddocksSource, dataProjection, featureProjection),
-				farmGeometry = olHelper.exportGeometry(farmSource, dataProjection, featureProjection);
+				paddocksGeometry = olHelper.exportGeometry(paddocksSource, dataProjection),
+				farmGeometry = olHelper.exportGeometry(farmSource, dataProjection);
 
-			//if (farmGeometry.features.length === 0 || !ol.extent.containsExtent(farmSource.getExtent(), paddocksSource.getExtent())) {
-			//	$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
-			//	return;
-			//}
-			webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry})
+			if (farmGeometry.features.length === 0) {
+				$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
+				return;
+			}
+			webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
 			$scope.farmData = webmapping.find();
 			olHelper.updateExtent(olMap);
 
@@ -244,7 +243,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.noResult = 'Farm data is invalid';
 				return;
 			}
-			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
+			olHelper.reload(olMap, geoJsons, dataProjection);
 
 			$scope.farmChanged = false;
 			$scope.paddockChanged = false;
@@ -275,7 +274,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.noResult = 'Farm data is invalid';
 				return;
 			}
-			olHelper.reload(olMap, geoJsons, dataProjection, featureProjection);
+			olHelper.reload(olMap, geoJsons, dataProjection);
 			if (actions.features.selections()) {
 				actions.features.selections().clear();
 			}
@@ -295,22 +294,22 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			paddockChanged();
 		};
 
-		$rootScope.$on('web-mapping-draw-end', function () {
+		webmapping.on('web-mapping-draw-end', function () {
 			$scope.farmChanged = true;
 			farmChanged();
 		});
 
-		$rootScope.$on('web-mapping-donut-draw-end', function () {
+		webmapping.on('web-mapping-donut-draw-end', function () {
 			$scope.disableDonutDrawing();
 		});
 
-		$rootScope.$on('web-mapping-measure-end', function (event, data) {
+		webmapping.on('web-mapping-measure-end', function (event, data) {
 			$scope.measuredValue = data.value;
 			$scope.measuredUnit = data.unit;
 			updateNgScope();
 		});
 
-		$rootScope.$on('web-mapping-base-layer-change', function (event, data) {
+		webmapping.on('web-mapping-base-layer-change', function (event, data) {
 			if (data.layer.getProperties().title === 'Google Street') {
 				googleMapElement.firstChild.firstChild.style.display = 'block';
 				googleMap.setMapTypeId(google.maps.MapTypeId.ROADMAP);
@@ -327,14 +326,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			}
 		});
 
-		$rootScope.$on('web-mapping-feature-select', function (event, data) {
+		webmapping.on('web-mapping-feature-select', function (event, data) {
 			var selectedLayer = $scope.selectedLayer;
 			if (selectedLayer === 'paddocks') {
 				onPaddockSelect(event, data)
 			}
 		});
 
-		$rootScope.$on('web-mapping-feature-deselect', function (event, data) {
+		webmapping.on('web-mapping-feature-deselect', function (event, data) {
 			var selectedLayer = $scope.selectedLayer;
 			if (selectedLayer === 'paddocks') {
 				onPaddockDeselect(event, data)

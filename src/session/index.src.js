@@ -10,7 +10,7 @@
 
 angular.module('farmbuild.webmapping')
   .factory('webMappingSession',
-  function ($log, farmdata, validations, webMappingMeasurement) {
+  function ($log, farmdata, validations, webMappingMeasurement, webMappingConverter) {
 
     var webMappingSession = {},
       _isDefined = validations.isDefined;
@@ -28,11 +28,16 @@ angular.module('farmbuild.webmapping')
     webMappingSession.load = load;
 
     function save(farmData, geoJsons) {
+        var _googleProjection = 'EPSG:3857',
+            _openlayersDefaultProjection = 'EPSG:4326',
+            featureForArea;
       if(!_isDefined(farmData)) {
         $log.error('Unable to save the undefined farmData!');
         return undefined;
       }
-      farmData.area = webMappingMeasurement.areas(geoJsons.farm);
+       featureForArea = webMappingConverter.geoJsonToFeatures(geoJsons.farm, farmData.geometry.crs, _googleProjection);
+        featureForArea = webMappingConverter.featuresToGeoJson(featureForArea, _openlayersDefaultProjection, _googleProjection);
+      farmData.area = webMappingMeasurement.areas(featureForArea);
       farmData.name = geoJsons.farm.features[0].properties.name;
       $log.info('new geoJson', geoJsons);
       return farmdata.merge(farmData, geoJsons);

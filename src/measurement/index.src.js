@@ -12,6 +12,8 @@ angular.module('farmbuild.webmapping')
 	          webMappingConverter,
 	          $log) {
 		var _isDefined = validations.isDefined,
+            _googleProjection = 'EPSG:3857',
+            _openlayersDefaultProjection = 'EPSG:4326',
 			_converter = webMappingConverter;
 
 		function _areas(features) {
@@ -32,7 +34,7 @@ angular.module('farmbuild.webmapping')
 		 */
 		function _area(feature) {
 			$log.info('calculating area of polygon ...', feature);
-			feature = _converter.featureToGeoJson(feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
 			try {
 				return turf.area(feature) * 0.0001;
 			} catch (e) {
@@ -49,7 +51,7 @@ angular.module('farmbuild.webmapping')
 		 */
 		function _length(feature) {
 			$log.info('calculating length of line ...', feature);
-			feature = _converter.featureToGeoJson(feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
 			try {
 				return turf.lineDistance(feature, 'kilometers') * 1000;
 			} catch (e) {
