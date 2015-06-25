@@ -28,13 +28,11 @@ angular.module('farmbuild.webmapping')
 		 * @method area
 		 * @returns {number} area in hectare
 		 * @param {!ol.Feature} feature
-		 * @param {!String} dataProjection
-		 * @param {!String} featureProjection
 		 * @memberof webmapping.measurement
 		 */
-		function _area(feature, dataProjection, featureProjection) {
+		function _area(feature) {
 			$log.info('calculating area of polygon ...', feature);
-			feature = _converter.featureToGeoJson(feature, dataProjection, featureProjection);
+			feature = _converter.featureToGeoJson(feature);
 			try {
 				return turf.area(feature) * 0.0001;
 			} catch (e) {
@@ -47,13 +45,11 @@ angular.module('farmbuild.webmapping')
 		 * @method length
 		 * @returns {number} length in metre
 		 * @param {!ol.Feature} feature
-		 * @param {!String} dataProjection
-		 * @param {!String} featureProjection
 		 * @memberof webmapping.measurement
 		 */
-		function _length(feature, dataProjection, featureProjection) {
+		function _length(feature) {
 			$log.info('calculating length of line ...', feature);
-			feature = _converter.featureToGeoJson(feature, dataProjection, featureProjection);
+			feature = _converter.featureToGeoJson(feature);
 			try {
 				return turf.lineDistance(feature, 'kilometers') * 1000;
 			} catch (e) {

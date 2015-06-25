@@ -167,7 +167,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.cancel();
 			}
 			$scope.selectedPaddock = selectedPaddock.getProperties();
-			$scope.selectedPaddock.area = measurement.area(selectedPaddock, dataProjection, featureProjection);
+			$scope.selectedPaddock.area = measurement.area(selectedPaddock);
 			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
 			updateNgScope();
 		};
@@ -379,8 +379,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			 If you want to init with google map, you need to use olHelper.createBaseLayersWithGoogleMaps()
 			 If you want to init without google map, you need to use olHelper.createBaseLayers()
 			 */
-			olHelper.initWithGoogleMap(olMap, dataProjection, extent, googleMap, openlayersMapEl);
-			//olHelper.init(olMap, dataProjection, extent);
+			olHelper.initWithGoogleMap(olMap, extent, googleMap, openlayersMapEl);
+			//olHelper.init(olMap, extent);
 
 			/** Enable address google search for your map */
 			olHelper.initGoogleAddressSearch('locationAutoComplete', olMap);

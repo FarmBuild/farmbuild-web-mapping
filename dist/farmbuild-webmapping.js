@@ -40,45 +40,45 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingConverter", function(validations, $log) {
-    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"]();
-    function _openLayerFeatureToGeoJson(olFeature, dataProjection, featureProjection) {
+    var _isDefined = validations.isDefined, _geoJSONFormat = new ol.format["GeoJSON"](), _dataProjection = "EPSG:4326", _featureProjection = "EPSG:3857";
+    function _openLayerFeatureToGeoJson(olFeature) {
         if (!_isDefined(olFeature)) {
             return;
         }
         $log.info("Converting openlayer feature to geoJson ...", olFeature);
         return _geoJSONFormat.writeFeatureObject(olFeature, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
+            dataProjection: _dataProjection,
+            featureProjection: _featureProjection
         });
     }
-    function _openLayerFeaturesToGeoJson(olFeatures, dataProjection, featureProjection) {
+    function _openLayerFeaturesToGeoJson(olFeatures) {
         if (!_isDefined(olFeatures)) {
             return;
         }
         $log.info("Converting openlayer feature to geoJson ...", olFeatures);
         return _geoJSONFormat.writeFeaturesObject(olFeatures, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
+            dataProjection: _dataProjection,
+            featureProjection: _featureProjection
         });
     }
-    function _geoJsonToOpenLayerFeature(feature, dataProjection, featureProjection) {
+    function _geoJsonToOpenLayerFeature(feature) {
         if (!_isDefined(feature)) {
             return;
         }
         $log.info("Converting geoJson feature to openlayer feature ...", feature);
         return _geoJSONFormat.readFeature(feature, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
+            dataProjection: _dataProjection,
+            featureProjection: _featureProjection
         });
     }
-    function _geoJsonToOpenLayerFeatures(features, dataProjection, featureProjection) {
+    function _geoJsonToOpenLayerFeatures(features) {
         if (!_isDefined(features)) {
             return;
         }
         $log.info("Converting geoJson feature to openlayer features ...", features);
         return _geoJSONFormat.readFeatures(features, {
-            dataProjection: dataProjection,
-            featureProjection: featureProjection
+            dataProjection: _dataProjection,
+            featureProjection: _featureProjection
         });
     }
     return {
@@ -126,8 +126,7 @@ angular.module("farmbuild.webmapping").factory("webMappingGeoProcessing", functi
         $log.info("intersecting feature", olFeature1, olFeature2);
         var feature1 = converter.featureToGeoJson(olFeature1), feature2 = converter.featureToGeoJson(olFeature2), intersection;
         try {
-            intersection = turf.erase(feature2, feature1);
-            intersection = turf.erase(feature2, intersection);
+            intersection = turf.intersect(feature1, feature2);
             return converter.geoJsonToFeature(intersection);
         } catch (e) {
             $log.warn("This operation is not supported,", e);
@@ -714,18 +713,18 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
             $log.error(e);
         }
     }
-    function _area(feature, dataProjection, featureProjection) {
+    function _area(feature) {
         $log.info("calculating area of polygon ...", feature);
-        feature = _converter.featureToGeoJson(feature, dataProjection, featureProjection);
+        feature = _converter.featureToGeoJson(feature);
         try {
             return turf.area(feature) * 1e-4;
         } catch (e) {
             $log.error(e);
         }
     }
-    function _length(feature, dataProjection, featureProjection) {
+    function _length(feature) {
         $log.info("calculating length of line ...", feature);
-        feature = _converter.featureToGeoJson(feature, dataProjection, featureProjection);
+        feature = _converter.featureToGeoJson(feature);
         try {
             return turf.lineDistance(feature, "kilometers") * 1e3;
         } catch (e) {
@@ -742,12 +741,12 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasurement", function
 "use strict";
 
 angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", function(validations, webMappingMeasureControl, webMappingSnapControl, webMappingGoogleAddressSearch, webMappingLayerSwitcherControl, webMappingTransformation, webMappingConverter, $log) {
-    var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _ZoomToExtentControl, _transform = webMappingTransformation, _converter = webMappingConverter;
+    var _isDefined = validations.isDefined, _googleProjection = "EPSG:3857", _olDefaultProjection = "EPSG:4326", _ZoomToExtentControl, _transform = webMappingTransformation, _converter = webMappingConverter;
     function addControlsToGmap(gmap, targetElement) {
         gmap.controls[google.maps.ControlPosition.TOP_LEFT].push(targetElement);
         targetElement.parentNode.removeChild(targetElement);
     }
-    function addControlsToOlMap(map, extent, dataProjection) {
+    function addControlsToOlMap(map, extent) {
         if (extent) {
             _ZoomToExtentControl = new ol.control.ZoomToExtent({
                 extent: extent
@@ -755,35 +754,35 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             map.addControl(_ZoomToExtentControl);
         }
         map.addControl(new ol.control.ScaleLine());
-        map.addControl(new webMappingMeasureControl.create(map, "Polygon", dataProjection));
-        map.addControl(new webMappingMeasureControl.create(map, "LineString", dataProjection));
+        map.addControl(new webMappingMeasureControl.create(map, "Polygon"));
+        map.addControl(new webMappingMeasureControl.create(map, "LineString"));
         map.addControl(new webMappingSnapControl.create());
         map.addControl(new ol.control.LayerSwitcher({
             tipLabel: "Switch on/off farm layers"
         }));
     }
-    function _initWithGoogleMap(map, dataProjection, extent, gmap, targetElement) {
+    function _initWithGoogleMap(map, extent, gmap, targetElement) {
         if (!_isDefined(gmap) || !_isDefined(map)) {
             return;
         }
         $log.info("integrating google map ...");
         var view = map.getView();
         view.on("change:center", function() {
-            var center = ol.proj.transform(view.getCenter(), _googleProjection, "EPSG:4326");
+            var center = ol.proj.transform(view.getCenter(), _googleProjection, _olDefaultProjection);
             gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
         });
         view.on("change:resolution", function() {
             gmap.setZoom(view.getZoom());
         });
         window.onresize = function() {
-            var center = _transform.toGoogleLatLng(view.getCenter(), "EPSG:4326");
+            var center = _transform.toGoogleLatLng(view.getCenter(), _olDefaultProjection);
             google.maps.event.trigger(gmap, "resize");
             gmap.setCenter(center);
         };
-        _init(map, dataProjection, extent);
+        _init(map, extent);
         addControlsToGmap(gmap, targetElement);
     }
-    function _init(map, dataProjection, extent) {
+    function _init(map, extent) {
         var defaults = {
             centerNew: [ -36.22488327137526, 145.5826132801325 ],
             zoomNew: 6
@@ -796,7 +795,7 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
         } else {
             view.fitExtent(extent, map.getSize());
         }
-        addControlsToOlMap(map, extent, dataProjection);
+        addControlsToOlMap(map, extent);
     }
     function _exportGeometry(source, dataProjection, featureProjection) {
         if (!_isDefined(source)) {
@@ -1312,7 +1311,7 @@ angular.module("farmbuild.webmapping").factory("webMappingLayerSwitcherControl",
 
 angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", function(validations, webMappingMeasurement, $rootScope, $log) {
     var _isDefined = validations.isDefined, _measurement = webMappingMeasurement;
-    function _create(map, type, dataProjection) {
+    function _create(map, type) {
         var source = new ol.source.Vector(), baseCssClass = "measure ol-unselectable ol-control ", drawInteraction = new ol.interaction.Draw({
             source: source,
             type: type,
@@ -1347,12 +1346,12 @@ angular.module("farmbuild.webmapping").factory("webMappingMeasureControl", funct
         drawInteraction.on("drawend", function(evt) {
             if (type == "Polygon") {
                 $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.area(evt.feature, dataProjection, map.getView().getProjection()),
+                    value: _measurement.area(evt.feature),
                     unit: "hectares"
                 });
             } else {
                 $rootScope.$broadcast("web-mapping-measure-end", {
-                    value: _measurement.length(evt.feature, dataProjection, map.getView().getProjection()),
+                    value: _measurement.length(evt.feature),
                     unit: "metres"
                 });
             }

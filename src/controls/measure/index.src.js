@@ -22,7 +22,7 @@ angular.module('farmbuild.webmapping')
 		var _isDefined = validations.isDefined,
 			_measurement = webMappingMeasurement;
 
-		function _create(map, type, dataProjection) {
+		function _create(map, type) {
 			var source = new ol.source.Vector(),
 				baseCssClass = 'measure ol-unselectable ol-control ',
 
@@ -63,9 +63,9 @@ angular.module('farmbuild.webmapping')
 				function (evt) {
 					// unset sketch
 					if (type == 'Polygon') {
-						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.area(evt.feature, dataProjection, map.getView().getProjection()), unit: 'hectares'});
+						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.area(evt.feature), unit: 'hectares'});
 					} else {
-						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.length(evt.feature, dataProjection, map.getView().getProjection()), unit: 'metres'});
+						$rootScope.$broadcast('web-mapping-measure-end', {value: _measurement.length(evt.feature), unit: 'metres'});
 
 					}
 					drawInteraction.setActive(false);

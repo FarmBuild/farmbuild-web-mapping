@@ -18,6 +18,7 @@ angular.module('farmbuild.webmapping')
 	          $log) {
 		var _isDefined = validations.isDefined,
 			_googleProjection = 'EPSG:3857',
+			_olDefaultProjection = 'EPSG:4326',
 			_ZoomToExtentControl,
 			_transform = webMappingTransformation,
 			_converter = webMappingConverter;
@@ -27,7 +28,7 @@ angular.module('farmbuild.webmapping')
 			targetElement.parentNode.removeChild(targetElement);
 		}
 
-		function addControlsToOlMap(map, extent, dataProjection) {
+		function addControlsToOlMap(map, extent) {
 			if (extent) {
 				_ZoomToExtentControl = new ol.control.ZoomToExtent({
 					extent: extent
@@ -35,8 +36,8 @@ angular.module('farmbuild.webmapping')
 				map.addControl(_ZoomToExtentControl);
 			}
 			map.addControl(new ol.control.ScaleLine());
-			map.addControl(new webMappingMeasureControl.create(map, 'Polygon', dataProjection));
-			map.addControl(new webMappingMeasureControl.create(map, 'LineString', dataProjection));
+			map.addControl(new webMappingMeasureControl.create(map, 'Polygon'));
+			map.addControl(new webMappingMeasureControl.create(map, 'LineString'));
 			map.addControl(new webMappingSnapControl.create());
 			map.addControl(new ol.control.LayerSwitcher({
 				tipLabel: 'Switch on/off farm layers'
@@ -53,14 +54,14 @@ angular.module('farmbuild.webmapping')
 		 * @param {!object} targetElement - openlayers map html element
 		 * @memberof webmapping.olHelper
 		 */
-		function _initWithGoogleMap(map, dataProjection, extent, gmap, targetElement) {
+		function _initWithGoogleMap(map, extent, gmap, targetElement) {
 			if (!_isDefined(gmap) || !_isDefined(map)) {
 				return;
 			}
 			$log.info('integrating google map ...');
 			var view = map.getView();
 			view.on('change:center', function () {
-				var center = ol.proj.transform(view.getCenter(), _googleProjection, 'EPSG:4326');
+				var center = ol.proj.transform(view.getCenter(), _googleProjection, _olDefaultProjection);
 				gmap.setCenter(new google.maps.LatLng(center[1], center[0]));
 			});
 
@@ -70,11 +71,11 @@ angular.module('farmbuild.webmapping')
 
 			// Google Map and vector layers go out of sync when window is resized.
 			window.onresize = function () {
-				var center = _transform.toGoogleLatLng(view.getCenter(), 'EPSG:4326');
+				var center = _transform.toGoogleLatLng(view.getCenter(), _olDefaultProjection);
 				google.maps.event.trigger(gmap, "resize");
 				gmap.setCenter(center);
 			};
-			_init(map, dataProjection, extent);
+			_init(map, extent);
 			addControlsToGmap(gmap, targetElement);
 		};
 
@@ -86,7 +87,7 @@ angular.module('farmbuild.webmapping')
 		 * @param {!ol.Extent} extent - extent of the farm to initialise the map
 		 * @memberof webmapping.olHelper
 		 */
-		function _init(map, dataProjection, extent) {
+		function _init(map, extent) {
 			var defaults = {
 				centerNew: [-36.22488327137526, 145.5826132801325],
 				zoomNew: 6
@@ -101,7 +102,7 @@ angular.module('farmbuild.webmapping')
 			} else {
 				view.fitExtent(extent, map.getSize());
 			}
-			addControlsToOlMap(map, extent, dataProjection);
+			addControlsToOlMap(map, extent);
 		}
 
 		/**
