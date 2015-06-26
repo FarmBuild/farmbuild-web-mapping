@@ -72,73 +72,73 @@ describe('farmbuild.webMapping module', function () {
 		}));
 	});
 
-	//describe('Testing Web Mapping EraseAll Transformation', function () {
-	//	it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
-	//		var olPoly1,
-	//			olPolys,
-	//			erased,
-	//			erasedGeoJSON,
-	//			expected = {
-	//				"type": "Feature",
-	//				"properties": {
-	//					"name": "P1"
-	//				},
-	//				"geometry": {
-	//					"type": "Polygon",
-	//					"coordinates": [[
-	//						[-46.738586, -23.596710999999985],
-	//						[-46.738586, -23.458207000000016],
-	//						[-46.56005799999999, -23.458207000000016],
-	//						[-46.56005799999999, -23.523700000000005],
-	//						[-46.65000899999999, -23.523700000000005],
-	//						[-46.65000899999999, -23.596710999999985],
-	//						[-46.738586, -23.596710999999985]
-	//					]]
-	//				}
-	//			};
-	//		olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
-	//		olPolys = webMappingConverter.geoJsonToFeatures(polys2);
-	//		erased = webMappingGeoProcessing.eraseAll(olPoly1, olPolys);
-	//		erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
-	//		expect(erased).toBeDefined();
-	//		expect(erasedGeoJSON).toBeDefined();
-	//		expect(erasedGeoJSON).toEqual(expected);
-	//	}));
-	//});
+	describe('Testing Web Mapping EraseAll Transformation', function () {
+		it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
+			var olPoly1,
+				olPolys,
+				erased,
+				erasedGeoJSON,
+				expected = {
+					"type": "Feature",
+					"properties": {
+						"name": "P1"
+					},
+					"geometry": {
+						"type": "Polygon",
+						"coordinates": [[
+							[-46.738586, -23.596711],
+							[-46.738586, -23.458207],
+							[-46.560058, -23.458207],
+							[-46.560058, -23.5237],
+							[-46.650009, -23.5237],
+							[-46.650009, -23.596711],
+							[-46.738586, -23.596711]
+						]]
+					}
+				};
+			olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+			olPolys = webMappingConverter.geoJsonToFeatures(polys2);
+			erased = webMappingGeoProcessing.eraseAll(olPoly1, olPolys);
+			erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
+			expect(erased).toBeDefined();
+			expect(erasedGeoJSON).toBeDefined();
+			expect(erasedGeoJSON).toEqual(expected);
+		}));
+	});
 
-	//describe('Testing Web Mapping Erase Transformation', function () {
-	//	it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
-	//		var olPoly1,
-	//			olPoly2,
-	//			erased,
-	//			erasedGeoJSON,
-	//			expected = {
-	//				"type": "Feature",
-	//				"properties": {
-	//					"name": "P1"
-	//				},
-	//				"geometry": {
-	//					"type": "Polygon",
-	//					"coordinates": [
-	//						[[-46.738586, -23.596710999999985],
-	//							[-46.738586, -23.458207000000016],
-	//							[-46.56005799999999, -23.458207000000016],
-	//							[-46.56005799999999, -23.523700000000005],
-	//							[-46.65000899999999, -23.523700000000005],
-	//							[-46.65000899999999, -23.596710999999985],
-	//							[-46.738586, -23.596710999999985]
-	//						]]
-	//				}
-	//			};
-	//		olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
-	//		olPoly2 = webMappingConverter.geoJsonToFeature(poly2);
-	//		erased = webMappingGeoProcessing.erase(olPoly1, olPoly2);
-	//		erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
-	//		expect(erased).toBeDefined();
-	//		expect(erasedGeoJSON).toBeDefined();
-	//		expect(erasedGeoJSON).toEqual(expected);
-	//	}));
-	//});
+	describe('Testing Web Mapping Erase Transformation', function () {
+		it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
+			var olPoly1,
+				olPoly2,
+				erased,
+				erasedGeoJSON,
+				expected = {
+					"type": "Feature",
+					"properties": {
+						"name": "P1"
+					},
+					"geometry": {
+						"type": "Polygon",
+						"coordinates": [[
+							[-46.738586, -23.596711],
+							[-46.738586, -23.458207],
+							[-46.560058, -23.458207],
+							[-46.560058, -23.5237],
+							[-46.650009, -23.5237],
+							[-46.650009, -23.596711],
+							[-46.738586, -23.596711]
+						]]
+					}
+				};
+			olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+			olPoly2 = webMappingConverter.geoJsonToFeature(poly2);
+			erased = webMappingGeoProcessing.erase(olPoly1, olPoly2);
+			erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
+			expect(erased).toBeDefined();
+			expect(erasedGeoJSON).toBeDefined();
+			expect(erasedGeoJSON).toEqual(expected);
+		}));
+	});
 
 	describe('Testing Web Mapping Merge Transformation', function () {
 		it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
@@ -184,14 +184,15 @@ describe('farmbuild.webMapping module', function () {
 					"geometry": {
 						"type": "Polygon",
 						"coordinates": [[
-							[10.005390809136088, 53.559363798672535],
-							[10.046996999999998, 53.598209],
-							[10.117721, 53.53173699999999],
-							[10.026838636912654, 53.54486184801601],
-							[10.000991, 53.50417999999999],
-							[9.926834, 53.55173099999996],
-							[10.005390809136088, 53.559363798672535]
-						]]
+							[10.005390809136088, 53.55936379867258],
+							[10.046997, 53.598209],
+							[10.117721, 53.531737],
+							[10.026838636912657, 53.54486184801601],
+							[10.000991, 53.50418],
+							[9.926834, 53.551731],
+							[10.005390809136088, 53.55936379867258]
+						]
+						]
 					},
 					"properties": {
 						"fill": "#0f0"
@@ -256,14 +257,15 @@ describe('farmbuild.webMapping module', function () {
 					"geometry": {
 						"type": "Polygon",
 						"coordinates": [[
-							[-122.584762, 45.545508794629],
-							[-122.584762, 45.48564999999999],
-							[-122.68902729894835, 45.48564999999999],
-							[-122.66990600000001, 45.50730899999999],
-							[-122.720031, 45.526554000000004],
-							[-122.64038000000001, 45.553967],
-							[-122.584762, 45.545508794629]
-						]]
+							[-122.584762, 45.545508794628965],
+							[-122.584762, 45.48565],
+							[-122.68902729894835, 45.48565],
+							[-122.669906, 45.507309],
+							[-122.720031, 45.526554],
+							[-122.64038, 45.553967],
+							[-122.584762, 45.545508794628965]
+						]
+						]
 					}
 				};
 			olPolygon1 = webMappingConverter.geoJsonToFeature(poly1);
