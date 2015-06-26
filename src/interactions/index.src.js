@@ -200,6 +200,24 @@ angular.module('farmbuild.webmapping')
 			properties = featureToClip.getProperties();
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
+
+			if (clipped.getGeometry().getType() === 'GeometryCollection') {
+				var temp = [];
+				clipped.getGeometry().getGeometries().forEach(function (f) {
+					if (f.getType() !== 'LineString') {
+						temp.push(new ol.Feature({
+							geometry: new ol.geom.Polygon(f.getCoordinates())
+						}))
+					}
+				});
+				var merged = _transform.merge(temp);
+				merged.setProperties({
+					name: clipped.getProperties().name,
+					_id: clipped.getProperties()._id
+				});
+				clipped = merged;
+			}
+
 			return _addFeature(_activeLayer, clipped, properties);
 		};
 

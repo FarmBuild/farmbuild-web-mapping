@@ -336,6 +336,22 @@ angular.module("farmbuild.webmapping").factory("webMappingInteractions", functio
         properties = featureToClip.getProperties();
         clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
         clipped = _transform.intersect(clipped, farmFeatures[0]);
+        if (clipped.getGeometry().getType() === "GeometryCollection") {
+            var temp = [];
+            clipped.getGeometry().getGeometries().forEach(function(f) {
+                if (f.getType() !== "LineString") {
+                    temp.push(new ol.Feature({
+                        geometry: new ol.geom.Polygon(f.getCoordinates())
+                    }));
+                }
+            });
+            var merged = _transform.merge(temp);
+            merged.setProperties({
+                name: clipped.getProperties().name,
+                _id: clipped.getProperties()._id
+            });
+            clipped = merged;
+        }
         return _addFeature(_activeLayer, clipped, properties);
     }
     function _clipDonut(donutFeature) {
@@ -1124,13 +1140,6 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
             $log.error("Unable to save the undefined farmData!");
             return undefined;
         }
-        console.log(geoJsons.paddocks.features.length);
-        angular.forEach(geoJsons.paddocks.features, function(p, i) {
-            if (p.geometry.type === "GeometryCollection") {
-                geoJsons.paddocks.features.splice(i, 1);
-            }
-        });
-        console.log(geoJsons.paddocks.features.length);
         featureForArea = webMappingConverter.geoJsonToFeatures(geoJsons.farm, farmData.geometry.crs, _googleProjection);
         featureForArea = webMappingConverter.featuresToGeoJson(featureForArea, _openlayersDefaultProjection, _googleProjection);
         farmData.area = webMappingMeasurement.areas(featureForArea);

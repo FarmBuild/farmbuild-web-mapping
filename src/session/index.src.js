@@ -35,13 +35,6 @@ angular.module('farmbuild.webmapping')
 				$log.error('Unable to save the undefined farmData!');
 				return undefined;
 			}
-			console.log(geoJsons.paddocks.features.length)
-			angular.forEach(geoJsons.paddocks.features, function (p, i) {
-				if (p.geometry.type === 'GeometryCollection') {
-					geoJsons.paddocks.features.splice(i, 1);
-				}
-			})
-			console.log(geoJsons.paddocks.features.length)
 			featureForArea = webMappingConverter.geoJsonToFeatures(geoJsons.farm, farmData.geometry.crs, _googleProjection);
 			featureForArea = webMappingConverter.featuresToGeoJson(featureForArea, _openlayersDefaultProjection, _googleProjection);
 			farmData.area = webMappingMeasurement.areas(featureForArea);
