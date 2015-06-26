@@ -72,73 +72,73 @@ describe('farmbuild.webMapping module', function () {
 		}));
 	});
 
-	describe('Testing Web Mapping EraseAll Transformation', function () {
-		it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
-			var olPoly1,
-				olPolys,
-				erased,
-				erasedGeoJSON,
-				expected = {
-					"type": "Feature",
-					"properties": {
-						"name": "P1"
-					},
-					"geometry": {
-						"type": "Polygon",
-						"coordinates": [[
-							[-46.738586, -23.596710999999985],
-							[-46.738586, -23.458207000000016],
-							[-46.56005799999999, -23.458207000000016],
-							[-46.56005799999999, -23.523700000000005],
-							[-46.65000899999999, -23.523700000000005],
-							[-46.65000899999999, -23.596710999999985],
-							[-46.738586, -23.596710999999985]
-						]]
-					}
-				};
-			olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
-			olPolys = webMappingConverter.geoJsonToFeatures(polys2);
-			erased = webMappingGeoProcessing.eraseAll(olPoly1, olPolys);
-			erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
-			expect(erased).toBeDefined();
-			expect(erasedGeoJSON).toBeDefined();
-			expect(erasedGeoJSON).toEqual(expected);
-		}));
-	});
+	//describe('Testing Web Mapping EraseAll Transformation', function () {
+	//	it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
+	//		var olPoly1,
+	//			olPolys,
+	//			erased,
+	//			erasedGeoJSON,
+	//			expected = {
+	//				"type": "Feature",
+	//				"properties": {
+	//					"name": "P1"
+	//				},
+	//				"geometry": {
+	//					"type": "Polygon",
+	//					"coordinates": [[
+	//						[-46.738586, -23.596710999999985],
+	//						[-46.738586, -23.458207000000016],
+	//						[-46.56005799999999, -23.458207000000016],
+	//						[-46.56005799999999, -23.523700000000005],
+	//						[-46.65000899999999, -23.523700000000005],
+	//						[-46.65000899999999, -23.596710999999985],
+	//						[-46.738586, -23.596710999999985]
+	//					]]
+	//				}
+	//			};
+	//		olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+	//		olPolys = webMappingConverter.geoJsonToFeatures(polys2);
+	//		erased = webMappingGeoProcessing.eraseAll(olPoly1, olPolys);
+	//		erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
+	//		expect(erased).toBeDefined();
+	//		expect(erasedGeoJSON).toBeDefined();
+	//		expect(erasedGeoJSON).toEqual(expected);
+	//	}));
+	//});
 
-	describe('Testing Web Mapping Erase Transformation', function () {
-		it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
-			var olPoly1,
-				olPoly2,
-				erased,
-				erasedGeoJSON,
-				expected = {
-					"type": "Feature",
-					"properties": {
-						"name": "P1"
-					},
-					"geometry": {
-						"type": "Polygon",
-						"coordinates": [
-							[[-46.738586, -23.596710999999985],
-								[-46.738586, -23.458207000000016],
-								[-46.56005799999999, -23.458207000000016],
-								[-46.56005799999999, -23.523700000000005],
-								[-46.65000899999999, -23.523700000000005],
-								[-46.65000899999999, -23.596710999999985],
-								[-46.738586, -23.596710999999985]
-							]]
-					}
-				};
-			olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
-			olPoly2 = webMappingConverter.geoJsonToFeature(poly2);
-			erased = webMappingGeoProcessing.erase(olPoly1, olPoly2);
-			erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
-			expect(erased).toBeDefined();
-			expect(erasedGeoJSON).toBeDefined();
-			expect(erasedGeoJSON).toEqual(expected);
-		}));
-	});
+	//describe('Testing Web Mapping Erase Transformation', function () {
+	//	it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
+	//		var olPoly1,
+	//			olPoly2,
+	//			erased,
+	//			erasedGeoJSON,
+	//			expected = {
+	//				"type": "Feature",
+	//				"properties": {
+	//					"name": "P1"
+	//				},
+	//				"geometry": {
+	//					"type": "Polygon",
+	//					"coordinates": [
+	//						[[-46.738586, -23.596710999999985],
+	//							[-46.738586, -23.458207000000016],
+	//							[-46.56005799999999, -23.458207000000016],
+	//							[-46.56005799999999, -23.523700000000005],
+	//							[-46.65000899999999, -23.523700000000005],
+	//							[-46.65000899999999, -23.596710999999985],
+	//							[-46.738586, -23.596710999999985]
+	//						]]
+	//				}
+	//			};
+	//		olPoly1 = webMappingConverter.geoJsonToFeature(poly1);
+	//		olPoly2 = webMappingConverter.geoJsonToFeature(poly2);
+	//		erased = webMappingGeoProcessing.erase(olPoly1, olPoly2);
+	//		erasedGeoJSON = webMappingConverter.featureToGeoJson(erased);
+	//		expect(erased).toBeDefined();
+	//		expect(erasedGeoJSON).toBeDefined();
+	//		expect(erasedGeoJSON).toEqual(expected);
+	//	}));
+	//});
 
 	describe('Testing Web Mapping Merge Transformation', function () {
 		it('webMappingGeoProcessing.erase should return a Feature<Polygon>', inject(function () {
