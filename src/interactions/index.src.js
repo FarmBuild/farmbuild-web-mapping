@@ -201,10 +201,10 @@ angular.module('farmbuild.webmapping')
 			clipped = _transform.eraseAll(featureToClip, paddocksFeatures);
 			clipped = _transform.intersect(clipped, farmFeatures[0]);
 
-			if (clipped.getGeometry().getType() === 'GeometryCollection') {
+			if (clipped && clipped.getGeometry().getType() === 'GeometryCollection') {
 				var temp = [];
 				clipped.getGeometry().getGeometries().forEach(function (f) {
-					if (f.getType() !== 'LineString') {
+					if (f.getType() !== 'LineString' && f.getType() !== 'Point') {
 						temp.push(new ol.Feature({
 							geometry: new ol.geom.Polygon(f.getCoordinates())
 						}))
