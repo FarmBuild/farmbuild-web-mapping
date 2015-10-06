@@ -1,7 +1,7 @@
 {
   "name": "farmbuild-web-mapping",
   "description": "This project is the web mapping module of farm build JavaScript library",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "homepage": "https://github.com/FarmBuild/farmbuild-web-mapping",
   "private": true,
   "dependencies": {
@@ -11,6 +11,6 @@
     "proj4": "2.2.1",
     "turf": "1.4.0",
     "ol3-layerswitcher": "1.0.1",
-    "farmbuild-farmdata": "git://github.com/FarmBuild/farmbuild-farmdata.git#paddock-customisation"
+    "farmbuild-farmdata": "git://github.com/FarmBuild/farmbuild-farmdata.git#master"
   }
 }

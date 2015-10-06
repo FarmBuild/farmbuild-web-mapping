@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>editing - Documentation</title>
+    <title>parcels - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">editing</h1>
+    <h1 class="page-title">parcels</h1>
     
 
     
@@ -41,9 +41,9 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a><a href="webmapping.actions.html">.actions</a>.</span>
+            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
         
-        editing
+        parcels
         </h2>
         
     
@@ -53,7 +53,7 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Editing namespace of webmapping.actions</p></div>
+            <div class="description"><p>webmapping rural parcels</p></div>
         
 
         
@@ -88,7 +88,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line451">line 451</a>
+        <a href="parcels_index.src.js.html">parcels/index.src.js</a>, <a href="parcels_index.src.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -124,14 +124,15 @@
 
     
 
-    <h4 class="name" id=".enable"><span class="type-signature">(static) </span>enable<span class="signature">()</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".load"><span class="type-signature">(static) </span>load<span class="signature">(serviceUrl<span class="signature-attributes">non-null</span>, extent<span class="signature-attributes">non-null</span>, extentDataProjection<span class="signature-attributes">non-null</span>, responseProjection<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; (non-null) {object}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Enables webmapping edit mode</p>
+    <p>loads rural parcels and add it as layer to ol.Map.
+This method uses JsonP to get information, make sure the projection definition matches your extent data, otherwise you will not get any data.</p>
 </div>
 
 
@@ -142,86 +143,122 @@
 
 
 
-
-
-
-
-<dl class="details">
-
+    <h5>Parameters:</h5>
     
 
-    
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
 
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line458">line 458</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+        <th>Type</th>
 
         
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>serviceUrl</code></td>
             
 
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>url of wfs parcels service to get data from</p></td>
+        </tr>
+
     
 
-    <h4 class="name" id=".isEditing"><span class="type-signature">(static) </span>isEditing<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+        <tr>
+            
+                <td class="name"><code>extent</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.Extent</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>extent of area to query for parcels</p></td>
+        </tr>
 
     
 
+        <tr>
+            
+                <td class="name"><code>extentDataProjection</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
 
 
-<div class="description">
-    <p>Whether editng is in progress</p>
-</div>
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>data projection of extent data</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>responseProjection</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
 
 
+            
+            </td>
 
+            
 
+            
 
+            <td class="description last"><p>desired data projection of the response</p></td>
+        </tr>
 
-
+    
+    </tbody>
+</table>
 
 
 
@@ -257,7 +294,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line464">line 464</a>
+        <a href="parcels_index.src.js.html">parcels/index.src.js</a>, <a href="parcels_index.src.js.html#line21">line 21</a>
     </li></ul></dd>
     
 
@@ -284,7 +321,7 @@
 
         
 <div class="param-desc">
-    <p>is editing is in progress</p>
+    <p>a promise object that represents http request made to get parcels</p>
 </div>
 
 
@@ -295,7 +332,7 @@
     </dt>
     <dd>
         
-<span class="param-type">boolean</span>
+<span class="param-type">object</span>
 
 
     </dd>
@@ -323,7 +360,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Oct 06 2015 18:05:50 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Wed Oct 07 2015 10:46:52 GMT+1100 (AEDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

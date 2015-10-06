@@ -1808,17 +1808,19 @@ angular.module("farmbuild.farmdata").factory("farmdata", function($log, farmdata
         var g = angular.copy(defaults.geometry);
         g.crs = !isEmpty(projectionName) ? projectionName : g.crs;
         return g;
-    }, create = function(name, id, projectionName, options) {
-        if (isDefined(options)) {
-            if (isDefined(options.paddocks)) {
-                if (isDefined(options.paddocks.groups)) {
-                    farmdataPaddockGroups.load(options.paddocks.groups);
-                }
-                if (isDefined(options.paddocks.types)) {
-                    farmdataPaddockTypes.load(options.paddocks.types);
-                }
-            }
+    }, populateOption = function(option, service) {
+        if (!isDefined(option) || !isDefined(service)) {
+            return;
         }
+        service.load(option);
+    }, populateOptions = function(options) {
+        if (!isDefined(options)) {
+            return;
+        }
+        populateOption(options.paddockGroups, farmdataPaddockGroups);
+        populateOption(options.paddockTypes, farmdataPaddockTypes);
+    }, create = function(name, id, projectionName, options) {
+        populateOptions(options);
         return {
             version: 1,
             dateCreated: new Date(),
@@ -2293,18 +2295,29 @@ angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, $
     farmdataSession.update = function(farmData) {
         $log.info("update farmData");
         farmData.dateLastUpdated = new Date();
-        farmData.paddockGroups = farmdataPaddockGroups.toArray();
-        farmData.paddockTypes = farmdataPaddockTypes.toArray();
+        saveOption(farmData, farmdataPaddockGroups, "paddockGroups");
+        saveOption(farmData, farmdataPaddockTypes, "paddockTypes");
         farmdataSession.save(farmData);
         return farmdataSession;
     };
-    function loadDefaults(farmdata) {
-        if (isDefined(farmdata.paddockGroups)) {
-            farmdataPaddockGroups.load(farmdata.paddockGroups);
+    function populateOption(option, service) {
+        if (!isDefined(option) || !isDefined(service)) {
+            return;
         }
-        if (isDefined(farmdata.paddockTypes)) {
-            farmdataPaddockTypes.load(farmdata.paddockTypes);
+        service.load(option);
+    }
+    function populateOptions(options) {
+        if (!isDefined(options)) {
+            return;
         }
+        populateOption(options.paddockGroups, farmdataPaddockGroups);
+        populateOption(options.paddockTypes, farmdataPaddockTypes);
+    }
+    function saveOption(farmData, service, optionKey) {
+        if (!isDefined(service) || !isDefined(farmData) || !isDefined(optionKey)) {
+            return;
+        }
+        farmData[optionKey] = service.toArray();
     }
     farmdataSession.find = function() {
         var json = sessionStorage.getItem("farmData"), farmdata;
@@ -2312,7 +2325,7 @@ angular.module("farmbuild.farmdata").factory("farmdataSession", function($log, $
             return undefined;
         }
         farmdata = angular.fromJson(json);
-        loadDefaults(farmdata);
+        populateOptions(farmdata);
         return farmdata;
     };
     farmdataSession.load = function(farmData) {

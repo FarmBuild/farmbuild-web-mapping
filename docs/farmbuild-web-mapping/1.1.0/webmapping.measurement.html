@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>paddocks/index.src.js - Documentation</title>
+    <title>measurement - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,166 +28,412 @@
 
 <div id="main">
     
-    <h1 class="page-title">paddocks/index.src.js</h1>
+    <h1 class="page-title">measurement</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
+        <h2>
+            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
+        
+        measurement
+        </h2>
+        
+    
+</header>
 
-/**
- * @since 0.0.1
- * @copyright 2015 State of Victoria.
- * @author State of Victoria
- * @version 1.0.0
- */
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>webmapping measurement</p></div>
+        
 
-/**
- * webmapping paddock
- * @type {object}
- * @namespace webmapping.paddocks
- */
-angular.module('farmbuild.webmapping')
-	.factory('webMappingPaddocks',
-	function ($log, validations, farmdata) {
-		var _isDefined = validations.isDefined;
-
-		/**
-		 * finds a paddock based on the coordinate
-		 * @method findByCoordinate
-		 * @param {!ol.Coordinate} coordinate openlayers map object
-		 * @param {!ol.layer.Vector} vectorLayer - paddock layer
-		 * @returns {ol.Feature} the first paddock found in that coordinate
-		 * @memberof webmapping.paddocks
-		 */
-		function _findByCoordinate(coordinate, vectorLayer) {
-			var found;
-			if (!_isDefined(coordinate) || !_isDefined(vectorLayer)) {
-				return;
-			}
-			var paddocks = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate);
-			if (paddocks &amp;&amp; paddocks.length > 0) {
-				found = vectorLayer.getSource().getFeaturesAtCoordinate(coordinate)[0];
-			}
-			$log.info('looking up for a paddock at ', coordinate, found);
-			return found;
-		}
-
-		return {
-			findByCoordinate: _findByCoordinate,
-
-			/**
-			 * webmapping paddocks/types
-			 * @type {object}
-			 * @namespace webmapping.paddocks/types
-			 * @memberof webmapping
-			 */
-
-			/**
-			 * Adds a new Paddock type for nutrient calculation
-			 * @method add
-			 * @param {!string} name - name of new type, can only contain alphanumeric values with space or underscore but no other special characters
-			 * @returns {object} types
-			 * @memberof webmapping.paddocks/types
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Returns the PaddockType at specified index
-			 * @method at
-			 * @returns {object} PaddockType
-			 * @memberof webmapping.paddocks/types
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Returns PaddockTypes collection as an array
-			 * @method toArray
-			 * @returns {Array} PaddockTypes
-			 * @memberof webmapping.paddocks/types
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Removes the Paddock type at specified index
-			 * @method removeAt
-			 * @returns {object} PaddockTypes collection
-			 * @memberof webmapping.paddocks/types
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Loads the types in PaddockTypes
-			 * @method load
-			 * @param PaddockTypes
-			 * @returns {object} fertilizersPurchased
-			 * @memberof webmapping.paddocks/types
-			 * @public
-			 * @static
-			 */
-			types: farmdata.paddockTypes,
+        
 
 
-			/**
-			 * webmapping paddocks/groups
-			 * @type {object}
-			 * @namespace webmapping.paddocks/groups
-			 * @memberof webmapping
-			 */
+<dl class="details">
 
-			/**
-			 * Adds a new Paddock group for nutrient calculation
-			 * @method add
-			 * @param {!string} name - name of new group, can only contain alphanumeric values with space, underscore or dash but no other special characters
-			 * @returns {object} groups
-			 * @memberof webmapping.paddocks/groups
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Returns the PaddockGroup at specified index
-			 * @method at
-			 * @returns {object} PaddockGroup
-			 * @memberof webmapping.paddocks/groups
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Returns PaddockGroups collection as an array
-			 * @method toArray
-			 * @returns {Array} PaddockGroups
-			 * @memberof webmapping.paddocks/groups
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Removes the Paddock group at specified index
-			 * @method removeAt
-			 * @returns {object} PaddockGroups collection
-			 * @memberof webmapping.paddocks/groups
-			 * @public
-			 * @static
-			 */
-			/**
-			 * Loads the groups in PaddockGroups
-			 * @method load
-			 * @param PaddockGroups
-			 * @returns {object} fertilizersPurchased
-			 * @memberof webmapping.paddocks/groups
-			 * @public
-			 * @static
-			 */
-			groups: farmdata.paddockGroups
-		};
+    
 
-	});</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line3">line 3</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".area"><span class="type-signature">(static) </span>area<span class="signature">(feature<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Calculates are of a feature</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>feature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.Feature</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line28">line 28</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>area in hectare</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".length"><span class="type-signature">(static) </span>length<span class="signature">(feature<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Calculates length of a line</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>feature</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.Feature</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line45">line 45</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>length in metre</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">number</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -197,7 +443,7 @@ angular.module('farmbuild.webmapping')
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Oct 06 2015 18:05:50 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Wed Oct 07 2015 10:46:52 GMT+1100 (AEDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

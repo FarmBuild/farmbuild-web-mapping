@@ -49,10 +49,10 @@ angular.module('farmbuild.webmapping')
 			 */
 
 			/**
-			 * Adds a new Paddock type for nutrient calculation
+			 * Adds a new Paddock type to farmdata PaddockTypes
 			 * @method add
-			 * @param {!string} name - name of new type, can only contain alphanumeric values with space or underscore but no other special characters
-			 * @returns {object} types
+			 * @param {!string} name - name of new type. it must be unique, can only contain alphanumeric values with space or underscore but no other special characters
+			 * @returns {object} PaddockTypes collection
 			 * @memberof webmapping.paddocks/types
 			 * @public
 			 * @static
@@ -82,10 +82,10 @@ angular.module('farmbuild.webmapping')
 			 * @static
 			 */
 			/**
-			 * Loads the types in PaddockTypes
+			 * Loads the types into the PaddockTypes
 			 * @method load
 			 * @param PaddockTypes
-			 * @returns {object} fertilizersPurchased
+			 * @returns {object} PaddockTypes collection
 			 * @memberof webmapping.paddocks/types
 			 * @public
 			 * @static
@@ -101,10 +101,10 @@ angular.module('farmbuild.webmapping')
 			 */
 
 			/**
-			 * Adds a new Paddock group for nutrient calculation
+			 * Adds a new Paddock group to farmdata paddockGroups
 			 * @method add
-			 * @param {!string} name - name of new group, can only contain alphanumeric values with space, underscore or dash but no other special characters
-			 * @returns {object} groups
+			 * @param {!string} name - name of new group. it must be unique, can only contain alphanumeric values with space, underscore or dash but no other special characters
+			 * @returns {object} paddockGroups collection
 			 * @memberof webmapping.paddocks/groups
 			 * @public
 			 * @static
@@ -134,10 +134,10 @@ angular.module('farmbuild.webmapping')
 			 * @static
 			 */
 			/**
-			 * Loads the groups in PaddockGroups
+			 * Loads the groups into PaddockGroups
 			 * @method load
 			 * @param PaddockGroups
-			 * @returns {object} fertilizersPurchased
+			 * @returns {object} PaddockGroups collection
 			 * @memberof webmapping.paddocks/groups
 			 * @public
 			 * @static

@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>parcels - Documentation</title>
+    <title>web-mapping.src.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,329 +28,181 @@
 
 <div id="main">
     
-    <h1 class="page-title">parcels</h1>
+    <h1 class="page-title">web-mapping.src.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
-        
-        parcels
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>webmapping rural parcels</p></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="parcels_index.src.js.html">parcels/index.src.js</a>, <a href="parcels_index.src.js.html#line10">line 10</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".load"><span class="type-signature">(static) </span>load<span class="signature">(serviceUrl<span class="signature-attributes">non-null</span>, extent<span class="signature-attributes">non-null</span>, extentDataProjection<span class="signature-attributes">non-null</span>, responseProjection<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; (non-null) {object}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>loads rural parcels and add it as layer to ol.Map.
-This method uses JsonP to get information, make sure the projection definition matches your extent data, otherwise you will not get any data.</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>serviceUrl</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>url of wfs parcels service to get data from</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>extent</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Extent</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of area to query for parcels</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>extentDataProjection</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>data projection of extent data</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>responseProjection</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>desired data projection of the response</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="parcels_index.src.js.html">parcels/index.src.js</a>, <a href="parcels_index.src.js.html#line21">line 21</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>a promise object that represents http request made to get parcels</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @since 0.0.1
+ * @copyright 2015 State of Victoria.
+
+ * @author State of Victoria
+ * @version 1.0.0
+ */
+
+'use strict';
+
+/**
+ * webmapping
+ * @type {object}
+ * @namespace webmapping
+ */
+angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
+	.factory('webmapping',
+	function (farmdata,
+	          validations,
+	          $log,
+              $rootScope,
+	          geoJsonValidator,
+	          farmdataConverter,
+	          webMappingSession,
+	          webMappingProjections,
+	          webMappingInteractions,
+	          webMappingMeasurement,
+	          webMappingPaddocks,
+	          webMappingOpenLayersHelper,
+	          webMappingGoogleAddressSearch,
+	          webMappingGoogleAnalytics,
+	          webMappingParcels) {
+		$log.info('Welcome to Web Mapping...');
+
+		var _isDefined = validations.isDefined,
+			session = webMappingSession,
+			webMapping = {
+				session: session,
+				farmdata: farmdata,
+				validator: geoJsonValidator,
+				toGeoJsons: farmdataConverter.toGeoJsons,
+
+				/**
+				 * converts farmData geometry to KML
+				 * @method toKml
+				 * @param {object} farmData - farmData to convert
+				 * @returns {string} KML string
+				 * @memberof webmapping
+				 */
+				toKml: farmdataConverter.toKml,
+
+				/**
+				 * converts farmData geometry to geoJSON
+				 * @method toGeoJson
+				 * @param {object} farmData - farmData to convert
+				 * @returns {object} geoJSON object
+				 * @memberof webmapping
+				 */
+				toGeoJson: farmdataConverter.toGeoJson,
+
+				/**
+				 * converts farmData geometry to geoJSON and exports the file
+				 * @method exportGeoJson
+				 * @param {object} farmData - farmData to convert
+				 * @memberof webmapping
+				 */
+				exportGeoJson: farmdataConverter.exportGeoJson,
+
+				/**
+				 * converts farmData geometry to KML and exports the file
+				 * @method exportKml
+				 * @param {object} farmData - farmData to convert
+				 * @memberof webmapping
+				 */
+				exportKml: farmdataConverter.exportKml,
+				actions: webMappingInteractions,
+				paddocks: webMappingPaddocks,
+				olHelper: webMappingOpenLayersHelper,
+				ga: webMappingGoogleAnalytics,
+				parcels: webMappingParcels,
+				measurement: webMappingMeasurement,
+
+				/**
+				 * Loads the specified farmData into session
+				 * @method load
+				 * @returns {object} the farmData stored in session
+				 * geoJsons.farm: represents the farm
+				 * geoJsonspaddocks: represents the paddocks
+				 * @memberof webmapping
+				 */
+				load: session.load,
+
+				/**
+				 * Finds the farmData from the session.
+				 * @method find
+				 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+				 * @memberof webmapping
+				 */
+				find: session.find,
+
+				/**
+				 * Saves the specified geoJson into the farmData in the session.
+				 * @method save
+				 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+				 * @memberof webmapping
+				 */
+				save: function (geoJsons) {
+					var farmData = session.find();
+					return session.save(farmData, geoJsons);
+				},
+
+				/**
+				 * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json
+				 * It creates HTML link element with 'download' attribute, the data is attached to href
+				 * and invoke click() function so the user gets the file save dialogue or something equivalent.
+				 * @method export
+				 * @param {object} document - browser document object reference
+				 * @param {object} farmData - farmData to export
+				 * @memberof webmapping
+				 */
+				export: session.export,
+				/**
+				 * Creates a new farmdata block as Javascript object with the specified name.
+				 * @method create
+				 * @param {!string} name - The name of the farm
+				 * @param {string} id - The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
+				 * @param {!string} projectionName - The projection name
+				 * with the external system
+				 * @returns {Object} the farmdata object, undefined if the required fields are not provided
+				 * @memberof webmapping
+				 */
+				create: farmdata.create,
+
+        /**
+         * Listens on events of a given type.
+         * @method on
+         * @param {!string} name Event name to listen on.
+         * @param {!function(event, ...args)} listener - Function to call when the event is emitted.
+         * @returns {function()} Returns a deregistration function for this listener.
+         * @memberof webmapping
+         */
+        on: function(name, listener){
+          return $rootScope.$on(name, listener);
+        },
+
+				update: session.update
+			};
+
+		// Provide a shortcut for modules
+		webMapping.version = '1.0.0';
+
+		if (typeof window.farmbuild === 'undefined') {
+			window.farmbuild = {
+				webmapping: webMapping
+			};
+		} else {
+			window.farmbuild.webmapping = webMapping;
+		}
+
+		return webMapping;
+
+	});
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -360,7 +212,7 @@ This method uses JsonP to get information, make sure the projection definition m
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Tue Oct 06 2015 18:05:50 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Wed Oct 07 2015 10:46:52 GMT+1100 (AEDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

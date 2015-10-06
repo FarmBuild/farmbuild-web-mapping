@@ -8,30 +8,39 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 	.controller('FarmCtrl', function ($scope, $log, webmapping) {
 
 		$scope.farmData = {},
-    $scope.crsSupported = webmapping.farmdata.crsSupported,
-    $scope.farmNew = {crs:$scope.crsSupported[0].name};
+			$scope.crsSupported = webmapping.farmdata.crsSupported,
+			$scope.farmNew = {crs: $scope.crsSupported[0].name};
 
-		$scope.createNew = function(farmNew) {
+		$scope.createNew = function (farmNew) {
 			$log.info('$scope.createNew %j', farmNew);
 			/**
 			 * You can construct the default values for paddock types and groups in your application and pass it to api on creation,
-			 * your default values will override api default values.
+			 * your default values will override api default values. ([{name: 'Business Default Type 1'}])
 			 * Defaults is optional and if omitted api default values will apply.
+			 * If you like to extend api default values you can get it and add your own values (webmapping.paddocks.types.toArray())
 			 */
-      var defaults = {
-		      paddocks: {
-			      groups: [{name: 'Business Default Group 1', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}],
-			      types: [{name: 'Business Default Type 1'}]
-		      }
-	      },
-	      created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs, defaults);
+			var myPaddockGroups = [
+					{name: 'Business Default Group 1', paddocks: []},
+					{name: 'Business Default Group 2', paddocks: []}
+				],
+				apiPaddockTypes = webmapping.paddocks.types.toArray(),
+				myPaddockTypes = [{name: 'Business Default Type 1'}],
+				myOptions = {
+					paddockGroups: myPaddockGroups,
+					/**
+					 * Example of type containing api paddock types and custom types, concat is JavaScript method to concat two Arrays.
+					 * You may use any other library or function two concat these arrays.
+					 */
+					paddockTypes: apiPaddockTypes.concat(myPaddockTypes)
+				},
+				created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs, myOptions);
 
-      if(!created) {
-        $scope.noResult = true;
-        return;
-      }
-      webmapping.load(created);
-      directToSide();
+			if (!created) {
+				$scope.noResult = true;
+				return;
+			}
+			webmapping.load(created);
+			directToSide();
 		}
 
 		$scope.loadFarmData = function ($fileContent) {
@@ -52,9 +61,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.noResult = true;
 			}
 		};
-    function directToSide() {
-      location.href = 'map/index.html?load=true';
-    }
+		function directToSide() {
+			location.href = 'map/index.html?load=true';
+		}
 
 		if (webmapping.session.isLoadFlagSet(location)) {
 			var farmData = webmapping.find();
@@ -63,7 +72,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		}
 
 		function updateFarmData($scope, farmData) {
-			if(!farmData) {
+			if (!farmData) {
 				$log.error('Failed to load milkSold data...');
 				$scope.noResult = true;
 				return;
@@ -83,7 +92,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 				element.on('change', function (onChangeEvent) {
 					//var file =  (onChangeEvent.srcElement || onChangeEvent.target).files[0]
-					var file =  (onChangeEvent.target).files[0]
+					var file = (onChangeEvent.target).files[0]
 					$log.info('onReadFile.onChange... onChangeEvent.srcElement:%s, ' +
 						'onChangeEvent.target:%s, (onChangeEvent.srcElement || onChangeEvent.target).files[0]: %s',
 						onChangeEvent.srcElement, onChangeEvent.target,
