@@ -20,7 +20,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			 */
       var defaults = {
 		      paddocks: {
-			      groups: [{name: 'Business Default Group 1', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}],
+			      groups: [{name: 'Business Default Group 1', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}],
 			      types: [{name: 'Business Default Type 1'}]
 		      }
 	      },
