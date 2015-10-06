@@ -130,17 +130,19 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				 */
 				create: farmdata.create,
 
-                /**
-                 * Listens on events of a given type.
-                 * @method on
-                 * @param {!string} name Event name to listen on.
-                 * @param {!function(event, ...args)} listener - Function to call when the event is emitted.
-                 * @returns {function()} Returns a deregistration function for this listener.
-                 * @memberof webmapping
-                 */
-                on: function(name, listener){
-	                return $rootScope.$on(name, listener);
-                }
+        /**
+         * Listens on events of a given type.
+         * @method on
+         * @param {!string} name Event name to listen on.
+         * @param {!function(event, ...args)} listener - Function to call when the event is emitted.
+         * @returns {function()} Returns a deregistration function for this listener.
+         * @memberof webmapping
+         */
+        on: function(name, listener){
+          return $rootScope.$on(name, listener);
+        },
+
+				update: session.update
 			};
 
 		// Provide a shortcut for modules

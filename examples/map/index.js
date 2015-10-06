@@ -37,8 +37,6 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			group: ''
 		};
 		$scope.donutDrawing = false;
-		$scope.paddockTypes = paddocks.types();
-		$scope.paddockGroups = paddocks.groups();
 
 		function loadParcels() {
 			var parcelsServiceUrl = 'https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
@@ -166,6 +164,31 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.cancel();
 			}
 			$scope.selectedPaddock = selectedPaddock.getProperties();
+
+			if($scope.selectedPaddock.group) {
+				$scope.selectedPaddock.group = function () {
+					var result;
+					angular.forEach($scope.paddockGroups, function (group) {
+						if (group.name === $scope.selectedPaddock.group.name) {
+							result = group;
+						}
+					});
+					return result;
+				}();
+			}
+
+			if($scope.selectedPaddock.type) {
+				$scope.selectedPaddock.type = function () {
+					var result;
+					angular.forEach($scope.paddockTypes, function (group) {
+						if (group.name === $scope.selectedPaddock.type.name) {
+							result = group;
+						}
+					});
+					return result;
+				}();
+			}
+
 			$scope.selectedPaddock.area = measurement.area(selectedPaddock);
 			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
 			updateNgScope();
@@ -348,10 +371,27 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			farmbuild.webmapping.exportKml(document, $scope.farmData);
 		};
 
+		function addCustomPaddockTypes(farmData){
+			webmapping.paddocks.types.add('New Custom Type 1');
+			webmapping.paddocks.types.add('New Custom Type 2');
+			webmapping.update(farmData);
+		}
+
+		function addCustomPaddockGroups(farmData){
+			webmapping.paddocks.groups.add('New Custom Group 1');
+			webmapping.paddocks.groups.add('New Custom Group 2');
+			webmapping.paddocks.groups.add('New Custom Group 3');
+			webmapping.update(farmData);
+		}
+
 		$scope.loadFarmData = function () {
 			var geoJsons;
 
 			$scope.farmData = webmapping.find();
+			addCustomPaddockTypes($scope.farmData);
+			addCustomPaddockGroups($scope.farmData);
+			$scope.paddockTypes = webmapping.paddocks.types.toArray();
+			$scope.paddockGroups = webmapping.paddocks.groups.toArray();
 
 			/** Convert geometry data of farmData to valid geoJson */
 			geoJsons = webmapping.toGeoJsons($scope.farmData);

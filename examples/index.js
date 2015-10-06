@@ -13,13 +13,18 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.createNew = function(farmNew) {
 			$log.info('$scope.createNew %j', farmNew);
-      var created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs);
+      var created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs,
+	      {
+		      paddocks: {
+			      groups: [{name: 'Business Default Group 1', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}],
+			      types: [{name: 'Business Default Type 1'}]
+		      }
+	      });
 
       if(!created) {
         $scope.noResult = true;
         return;
       }
-
       webmapping.load(created);
       directToSide();
 		}

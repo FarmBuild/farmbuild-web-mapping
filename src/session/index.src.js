@@ -57,6 +57,8 @@ angular.module('farmbuild.webmapping')
 			return farmdata.session.export(document, save(farmData, geoJsons));
 		}
 
+		webMappingSession.update = farmdata.update;
+
 		return webMappingSession;
 
 	});

@@ -98,7 +98,7 @@
             <form-item class="form-group">
                 <label for="selectedPaddockType">Type:</label>
                 <select id="selectedPaddockType" class="form-control" ng-change="onPaddockDetailsChanged()"
-                        ng-model="selectedPaddock.type" ng-options="paddockType for paddockType in paddockTypes">
+                        ng-model="selectedPaddock.type" ng-options="paddockType.name for paddockType in paddockTypes">
                     <option value=""></option>
                 </select>
             </form-item>
@@ -106,7 +106,7 @@
                 <label for="selectedPaddockType">Group:</label>
                 <select name="edit_group_type" id="edit_group_type" style="margin-bottom:10px" class="form-control"
                         ng-change="onPaddockDetailsChanged()" ng-model="selectedPaddock.group"
-                        ng-options="paddockGroup for paddockGroup in paddockGroups">
+                        ng-options="paddockGroup.name for paddockGroup in paddockGroups">
                     <option value=""></option>
                 </select>
             </form-item>
