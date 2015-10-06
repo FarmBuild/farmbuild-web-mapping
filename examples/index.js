@@ -13,13 +13,18 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 		$scope.createNew = function(farmNew) {
 			$log.info('$scope.createNew %j', farmNew);
-      var created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs,
-	      {
+			/**
+			 * You can construct the default values for paddock types and groups in your application and pass it to api on creation,
+			 * your default values will override api default values.
+			 * Defaults is optional and if omitted api default values will apply.
+			 */
+      var defaults = {
 		      paddocks: {
 			      groups: [{name: 'Business Default Group 1', paddocks: []}, {name: 'Business Default Group 2', paddocks: []}],
 			      types: [{name: 'Business Default Type 1'}]
 		      }
-	      });
+	      },
+	      created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs, defaults);
 
       if(!created) {
         $scope.noResult = true;

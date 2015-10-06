@@ -124,6 +124,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				 * @method create
 				 * @param {!string} name - The name of the farm
 				 * @param {string} id - The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
+				 * @param {!string} projectionName - The projection name
 				 * with the external system
 				 * @returns {Object} the farmdata object, undefined if the required fields are not provided
 				 * @memberof webmapping

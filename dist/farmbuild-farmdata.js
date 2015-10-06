@@ -1938,7 +1938,20 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddockGroups", function($
             $log.error("Please specify a valid name for paddock group", _isString(name));
             return;
         }
+        if (_isDefined(paddockGroups.byName(name))) {
+            $log.error("There is a paddock group with the same name, please use another name");
+            return;
+        }
         return collections.add(_groups, _create(name));
+    }
+    function _validateGroups(paddockGroups) {
+        var isValid = true;
+        angular.forEach(paddockGroups, function(paddockGroup) {
+            if (!_isDefined(paddockGroup) || !_isDefined(paddockGroup.name) || !_isAlphanumeric(paddockGroup.name) || !_isArray(paddockGroup.paddocks)) {
+                isValid = false;
+            }
+        });
+        return isValid;
     }
     paddockGroups = {
         add: _add,
@@ -1964,6 +1977,10 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddockGroups", function($
             return collections.last(_groups);
         },
         load: function(PaddockGroups) {
+            if (!_validateGroups()) {
+                $log.error("There is a problem in custom paddock group passed, please check if all paddock groups have a valid name and an array of paddocks");
+                return;
+            }
             _groups = PaddockGroups;
         }
     };
@@ -2100,7 +2117,7 @@ angular.module("farmbuild.farmdata").constant("paddockTypeDefaults", {
 "use strict";
 
 angular.module("farmbuild.farmdata").factory("farmdataPaddockTypes", function(collections, validations, paddockTypeDefaults, $log) {
-    var paddockTypes, _types = angular.copy(paddockTypeDefaults.types), _isDefined = validations.isDefined, _isAlphanumeric = validations.isAlphanumeric;
+    var paddockTypes, _types = angular.copy(paddockTypeDefaults.types), _isDefined = validations.isDefined, _isAlphanumeric = validations.isAlphanumeric, _isArray = validations.isArray;
     function _create(name) {
         return {
             name: name
@@ -2111,7 +2128,20 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddockTypes", function(co
             $log.error("Please specify a valid name for paddock type");
             return;
         }
+        if (_isDefined(paddockTypes.byName(name))) {
+            $log.error("There is a paddock type with the same name, please use another name");
+            return;
+        }
         return collections.add(_types, _create(name));
+    }
+    function _validateTypes(paddockTypes) {
+        var isValid = true;
+        angular.forEach(paddockTypes, function(paddockType) {
+            if (!_isDefined(paddockType) || !_isDefined(paddockType.name) || !_isAlphanumeric(paddockType.name)) {
+                isValid = false;
+            }
+        });
+        return isValid;
     }
     paddockTypes = {
         add: _add,
@@ -2137,6 +2167,10 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddockTypes", function(co
             return collections.last(_types);
         },
         load: function(PaddockTypes) {
+            if (!_validateTypes()) {
+                $log.error("There is a problem in custom paddock type passed, please check if all paddock types have a valid name");
+                return;
+            }
             _types = PaddockTypes;
         }
     };

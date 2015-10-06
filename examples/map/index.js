@@ -371,12 +371,18 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			farmbuild.webmapping.exportKml(document, $scope.farmData);
 		};
 
+		/**
+		* If you want to use api to add custom paddock types this the way to to so
+		*/
 		function addCustomPaddockTypes(farmData){
 			webmapping.paddocks.types.add('New Custom Type 1');
 			webmapping.paddocks.types.add('New Custom Type 2');
 			webmapping.update(farmData);
 		}
 
+		/**
+		 * If you want to use api to add custom paddock groups this the way to to so
+		 */
 		function addCustomPaddockGroups(farmData){
 			webmapping.paddocks.groups.add('New Custom Group 1');
 			webmapping.paddocks.groups.add('New Custom Group 2');
