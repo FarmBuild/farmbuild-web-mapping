@@ -3,6 +3,9 @@
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 	.run(function ($rootScope) {
+		/**
+		 * Optional version number for sake of this example (not part of the webmapping api)
+		 */
 		$rootScope.appVersion = farmbuild.examples.webmapping.version;
 	})
 
@@ -376,6 +379,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		*/
 		function addCustomPaddockTypes(farmData){
 			var name = 'New Custom Type using api';
+
+			/**
+			 * if there is type with the same name in farmdata, you would receive an error message
+			 * You can check existence of a type by its unique name, using "webmapping.paddocks.types.byName" method
+			 * add the types using paddock api and update
+			 * unless you do an update the new type data would not be persisted on farmdata
+			*/
 			if(!webmapping.paddocks.types.byName(name)) {
 				webmapping.paddocks.types.add(name);
 				webmapping.update(farmData);
@@ -387,6 +397,13 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		 */
 		function addCustomPaddockGroups(farmData){
 			var name = 'New Custom Group using api';
+
+			/**
+			 * if there is group with the same name in farmdata, you would receive an error message
+			 * You can check existence of a group by its unique name, using "webmapping.paddocks.types.byName" method
+			 * add the groups using paddock api and update
+			 * unless you do an update the new group data would not be persisted on farmdata
+			 */
 			if(!webmapping.paddocks.groups.byName(name)) {
 				webmapping.paddocks.groups.add(name);
 				webmapping.update(farmData);

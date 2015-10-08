@@ -1,13 +1,24 @@
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 	.run(function ($rootScope) {
+		/**
+	  * Optional version number for sake of this example (not part of the webmapping api)
+		*/
 		$rootScope.appVersion = farmbuild.examples.webmapping.version;
+
+		/**
+		 * normalising the way we round numbers, this variable is used in html template
+		 */
 		$rootScope.decimalPrecision = farmbuild.examples.webmapping.decimalPrecision;
 	})
 
 	.controller('FarmCtrl', function ($scope, $log, webmapping) {
 
 		$scope.farmData = {},
+			/**
+			 * Array of farmdata's supported crs
+			 * Get first item in the Array
+			*/
 			$scope.crsSupported = webmapping.farmdata.crsSupported,
 			$scope.farmNew = {crs: $scope.crsSupported[0].name};
 
@@ -15,9 +26,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			$log.info('$scope.createNew %j', farmNew);
 			/**
 			 * You can construct the default values for paddock types and groups in your application and pass it to api on creation,
-			 * your default values will override api default values. ([{name: 'Business Default Type 1'}])
+			 * your default values will override api default values. (eg: [{name: 'Business Default Type 1'}])
 			 * Defaults is optional and if omitted api default values will apply.
-			 * If you like to extend api default values you can get it and add your own values (webmapping.paddocks.types.toArray())
+			 * If you like to extend api default values you can get api ones and add your own values (eg: webmapping.paddocks.types.toArray())
 			 */
 			var myPaddockGroups = [
 					{name: 'Business Default Group 1', paddocks: []},
@@ -28,21 +39,35 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				myOptions = {
 					paddockGroups: myPaddockGroups,
 					/**
-					 * Example of type containing api paddock types and custom types, concat is JavaScript method to concat two Arrays.
-					 * You may use any other library or function two concat these arrays.
+					 * Example of type containing api paddock types and custom types, concat is a JavaScript method to concat two Arrays.
+					 * You may use any other library or function to concat these arrays.
 					 */
 					paddockTypes: apiPaddockTypes.concat(myPaddockTypes)
 				},
+
+				/**
+				 * Create farmdata with this configurations, ,look at the api docs for more description.
+				 */
 				created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs, myOptions);
 
 			if (!created) {
 				$scope.noResult = true;
 				return;
 			}
+
+			/**
+			 * Loading farmdata into session storage, webmapping utilises browser session storage to persist data while you change things.
+			 * Later you can use export function to download the updated farmdata as a json file.
+			 */
 			webmapping.load(created);
 			directToSide();
 		}
 
+
+		/**
+		 * Load farmdata if you already have valid one.
+		 * This function is called using the onReadFile directive.
+		 */
 		$scope.loadFarmData = function ($fileContent) {
 			$log.info('$scope.loadFarmData $fileContent..');
 
@@ -61,16 +86,26 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				$scope.noResult = true;
 			}
 		};
+
+		/**
+		 * redirect to the webmapping page
+		 */
 		function directToSide() {
 			location.href = 'map/index.html?load=true';
 		}
 
+		/**
+		 * utility method to detect whether to force load or not
+		 */
 		if (webmapping.session.isLoadFlagSet(location)) {
 			var farmData = webmapping.find();
 
 			updateFarmData($scope, farmData);
 		}
 
+		/**
+		 * update farmdata on controller $scope
+		 */
 		function updateFarmData($scope, farmData) {
 			if (!farmData) {
 				$log.error('Failed to load milkSold data...');
@@ -83,6 +118,12 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 	})
 
+	/**
+	 * directives are markers on a DOM element (such as an attribute,
+	 * element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM element (e.g. via event listeners),
+	 * or even to transform the DOM element and its children
+	 * visit https://docs.angularjs.org/guide/directive for more information
+	*/
 	.directive('onReadFile', function ($parse, $log) {
 		return {
 			restrict: 'A',
