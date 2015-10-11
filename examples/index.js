@@ -1,3 +1,13 @@
+'use strict';
+
+/**
+ * AngularJS is popular JavaScript MVC framework which is developed by google.
+ * In this example we use AngularJS to construct the structure of the client side application.
+ * You can find out more about AngularJS at https://angularjs.org
+ * In farmbuild project we have used AngularJS as an internal dependency to provide modular structure, but to use FarmBuild JavaScript libraries you are forced to use AngularJS.
+ * All the api function are available via "farmbuild" namespace (eg: farmbuild.webmapping, farmbuild.nutrientcalculator).
+ * If you are using AngularJS in your application you can consume farmbuild component as AngularJS modules, similar to this example.
+ */
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 	.run(function ($rootScope) {
