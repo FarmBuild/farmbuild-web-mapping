@@ -339,7 +339,7 @@ angular.module('farmbuild.webmapping')
 
         /**
          * Updates the extent of ZoomToExtent control, call this method after a change to farm boundaries.
-         * @method updateZoomToExtent
+         * @method updateExtent
          * @memberof webmapping.olHelper
          */
         function _updateZoomToExtent() {

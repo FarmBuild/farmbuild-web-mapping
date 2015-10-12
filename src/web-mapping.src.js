@@ -144,6 +144,13 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
           return $rootScope.$on(name, listener);
         },
 
+				/**
+				 * Updates currently loaded farmdata block.
+				 * @method update
+				 * @param {!update} new farmdata object
+				 * @returns {Object} the farmdata object
+				 * @memberof webmapping
+				 */
 				update: session.update
 			};
 

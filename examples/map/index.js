@@ -277,7 +277,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
 
 		/**
-		 * Each time we do in webmapping like changing values of a paddock(name, type, group) or farm it self,
+		 * Each time we do a change in webmapping like changing values of a paddock(name, type, group) or farm it self,
 		 * defining new paddock or updating farm or paddock boundaries we need to apply changes on farmdata by calling save method.
 		 * Then we reload the latest farmdata into webmapping to update its reference in webmapping.
 		 * This whole workflow is done by apply function which makes sense in case of this example.
@@ -464,6 +464,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			 * You can check existence of a type by its unique name, using "webmapping.paddocks.types.byName" method
 			 * add the types using paddock api and update
 			 * unless you do an update the new type data would not be persisted on farmdata
+			 * "update" is a farmdata method exposed through webmapping api.
+			 * The main difference between save and update is that using update you are only updating farmdata component, so you do not need to pass geometries.
 			*/
 			if(!webmapping.paddocks.types.byName(name)) {
 				webmapping.paddocks.types.add(name);
@@ -482,6 +484,8 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			 * You can check existence of a group by its unique name, using "webmapping.paddocks.types.byName" method
 			 * add the groups using paddock api and update
 			 * unless you do an update the new group data would not be persisted on farmdata
+			 * "update" is a farmdata method exposed through webmapping api.
+			 * The main difference between save and update is that using update you are only updating farmdata component, so you do not need to pass geometries.
 			 */
 			if(!webmapping.paddocks.groups.byName(name)) {
 				webmapping.paddocks.groups.add(name);
