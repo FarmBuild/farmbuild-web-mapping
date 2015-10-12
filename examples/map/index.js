@@ -399,7 +399,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			paddockChanged();
 		};
 
-		webmapping.on('web-mapping-draw-end', function () {
+		webmapping.on('web-mapping-draw-end', function (feature) {
 			$scope.farmChanged = true;
 			farmChanged();
 		});

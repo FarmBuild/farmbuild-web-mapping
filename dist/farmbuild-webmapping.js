@@ -30,7 +30,7 @@ angular.module("farmbuild.webmapping", [ "farmbuild.core", "farmbuild.farmdata" 
         },
         update: session.update
     };
-    webMapping.version = "1.0.0";
+    webMapping.version = "1.1.0";
     if (typeof window.farmbuild === "undefined") {
         window.farmbuild = {
             webmapping: webMapping

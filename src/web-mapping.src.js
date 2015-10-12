@@ -144,6 +144,60 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
           return $rootScope.$on(name, listener);
         },
 
+
+
+				/**
+				 * webmapping events
+				 * @type {object}
+				 * @namespace webmapping.events
+				 */
+
+				/**
+				 * Fires once a active drawing is completed.
+				 * Passes the drawn feature to the listener function as the first parameter
+				 * @method web-mapping-draw-end
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires once donut drawing is enabled and drawing of the donut polygon is completed.
+				 * Passes the drawn feature to the listener function as the first parameter
+				 * @method web-mapping-donut-draw-end
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires once a feature(polygon) is selected.
+				 * Passes the selected feature to the listener function as the first parameter
+				 * @method web-mapping-feature-select
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires once a feature(polygon) is deselected.
+				 * Passes the deselected feature to the listener function as the first parameter
+				 * @method web-mapping-feature-deselect
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires after measuring is completed.
+				 * Passes an object containing value and unit of measurement to the listener function as the first parameter
+				 * @method web-mapping-measure-end
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires on base layer change
+				 * It passes the selected layer to the listener function as the first parameter
+				 * @method web-mapping-base-layer-change
+				 * @memberof webmapping.events
+				 */
+
+
+
+
+
 				/**
 				 * Updates currently loaded farmdata block.
 				 * @method update
@@ -155,7 +209,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 			};
 
 		// Provide a shortcut for modules
-		webMapping.version = '1.0.0';
+		webMapping.version = '1.1.0';
 
 		if (typeof window.farmbuild === 'undefined') {
 			window.farmbuild = {
