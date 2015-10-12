@@ -2,7 +2,7 @@
 
 This is the web mapping component of FarmBuild project.
 
-version 1.0.0
+version 1.1.0
 
 
 ## Getting Started
