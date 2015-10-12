@@ -399,6 +399,10 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			paddockChanged();
 		};
 
+
+		/**
+		 * webmapping.events provides list of events you can register for to understand certainn event in webmapping
+		*/
 		webmapping.on('web-mapping-draw-end', function (feature) {
 			$scope.farmChanged = true;
 			farmChanged();
