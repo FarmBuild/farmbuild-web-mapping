@@ -61,16 +61,29 @@ $scope.crsSupported = webmapping.farmdata.crsSupported;
 $scope.farmNew = {crs: $scope.crsSupported[0].name};
 </pre>
 
-Create a new farmdata from scratch
+#Create a new farmdata from scratch
+When creating a farmdata you can couple of parameters:
+- name: The name of the farm
+- id: The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
+- projectionName: The projection name
+- options: an object that describes configuration for different sections. Currently you can specify an array for paddockGroups and paddockTypes.<br>
+You can construct the default values for paddock types and groups in your application and pass it to api on creation,
+your default values will override api default values. (eg: [{name: 'Business Default Type 1'}]).
+
+Passing defaults values in this way is optional and if omitted api default values will be used.
+If you like to extend api default values you can get api ones and add your own values (eg: webmapping.paddocks.types.toArray()).
+
+Here I am defining `myPaddockTypes` and I am extending api defaults to add my custom types.<br>
+With the `paddockGroups` I am completely overriding api defaults with `myPaddockGroups`.
+After setting the desired configuration for farmdata, I create the farmdata, passing this configuration as myOptions to `webmapping.create` function.
+`create` function returns the farmdata and then I load it into webmapping using `webmapping.load(created)`.
+
+`directToSide()` function is simply redirecting browser to the web mapping example page.
+
 <pre>
 $scope.createNew = function (farmNew) {
     $log.info('$scope.createNew %j', farmNew);
-    /**
-     * You can construct the default values for paddock types and groups in your application and pass it to api on creation,
-     * your default values will override api default values. (eg: [{name: 'Business Default Type 1'}])
-     * Defaults is optional and if omitted api default values will apply.
-     * If you like to extend api default values you can get api ones and add your own values (eg: webmapping.paddocks.types.toArray())
-     */
+    
     var myPaddockGroups = [
             {name: 'Business Default Group 1', paddocks: []},
             {name: 'Business Default Group 2', paddocks: []}
@@ -103,4 +116,31 @@ $scope.createNew = function (farmNew) {
     webmapping.load(created);
     directToSide();
 }
+</pre>
+
+If you already have valid farmdata, you want to load it into Web Mapping. So instead of create, I want to have something like a load function.
+
+<pre>
+/**
+ * Load farmdata if you already have valid one.
+ * This function is called using the onReadFile directive.
+ */
+$scope.loadFarmData = function ($fileContent) {
+    $log.info('$scope.loadFarmData $fileContent..');
+
+    try {
+        $scope.farmData = {};
+        var farmData = webmapping.load(angular.fromJson($fileContent));
+
+        if (!angular.isDefined(farmData)) {
+            $scope.noResult = true;
+            return;
+        }
+
+        directToSide();
+    } catch (e) {
+        console.error('farmbuild.webmapping.examples > load: Your file should be in json format: ', e);
+        $scope.noResult = true;
+    }
+};
 </pre>
