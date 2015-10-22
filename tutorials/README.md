@@ -74,7 +74,7 @@ Passing defaults values in this way is optional and if omitted api default value
 If you like to extend api default values you can get api ones and add your own values (eg: webmapping.paddocks.types.toArray()).
 
 Here I am defining `myPaddockTypes` and I am extending api defaults to add my custom types.<br>
-With the `paddockGroups` I am completely overriding api defaults with `myPaddockGroups`.
+With the `paddockGroups` I am completely overriding api defaults with `myPaddockGroups`.<br>
 After setting the desired configuration for farmdata, I create the farmdata, passing this configuration as myOptions to `webmapping.create` function.
 `create` function returns the farmdata and then I load it into webmapping using `webmapping.load(created)`.
 
@@ -118,7 +118,9 @@ $scope.createNew = function (farmNew) {
 }
 </pre>
 
-If you already have valid farmdata, you want to load it into Web Mapping. So instead of create, I want to have something like a load function.
+#Load an existing farmdata
+If you already have valid farmdata, you want to load it into Web Mapping. So instead of create, I want to have something like a load function.<br>
+`load` function receives farmdata as json string value, and I use angular to convert it to JavaScript object.
 
 <pre>
 /**
