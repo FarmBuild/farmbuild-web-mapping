@@ -32,3 +32,75 @@ You can customise based on you application need and you can eventually persist t
 
 We will have a closer look at most of these APIs through this tutorial.
 
+#Getting Started ...
+
+In this example I wil be using AngularJS to create the client-side application and that is all we need for now.
+
+#First things first
+
+First of all we need to define our application in AngularJS terms.
+The "index.js" file in the root of examples contains the application definition.
+
+`angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])`
+
+"farmbuild.webmapping.examples" is the application's name and we are defining "farmbuild.webmapping" as a dependency.
+
+If you look at the first page in your browser you can see there are two separate ways you start with.<br/>
+First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
+Second one is to load an existing farmdata which uses `webmapping.load`
+
+To provide load and create functions, I neet to create an controller. I will call it "FarmCtrl"<br/>
+`angular.module('farmbuild.webmapping.examples').controller('FarmCtrl', function ($scope, $log, webmapping) {})`
+<pre>
+$scope.farmData = {};
+/**
+ * Array of farmdata's supported crs
+ * Get first item in the Array
+*/
+$scope.crsSupported = webmapping.farmdata.crsSupported;
+$scope.farmNew = {crs: $scope.crsSupported[0].name};
+</pre>
+
+Create a new farmdata from scratch
+<pre>
+$scope.createNew = function (farmNew) {
+    $log.info('$scope.createNew %j', farmNew);
+    /**
+     * You can construct the default values for paddock types and groups in your application and pass it to api on creation,
+     * your default values will override api default values. (eg: [{name: 'Business Default Type 1'}])
+     * Defaults is optional and if omitted api default values will apply.
+     * If you like to extend api default values you can get api ones and add your own values (eg: webmapping.paddocks.types.toArray())
+     */
+    var myPaddockGroups = [
+            {name: 'Business Default Group 1', paddocks: []},
+            {name: 'Business Default Group 2', paddocks: []}
+        ],
+        apiPaddockTypes = webmapping.paddocks.types.toArray(),
+        myPaddockTypes = [{name: 'Business Default Type 1'}],
+        myOptions = {
+            paddockGroups: myPaddockGroups,
+            /**
+             * Example of type containing api paddock types and custom types, concat is a JavaScript method to concat two Arrays.
+             * You may use any other library or function to concat these arrays.
+             */
+            paddockTypes: apiPaddockTypes.concat(myPaddockTypes)
+        },
+
+        /**
+         * Create farmdata with this configurations, ,look at the api docs for more description.
+         */
+        created = webmapping.create(farmNew.name, farmNew.id, farmNew.crs, myOptions);
+
+    if (!created) {
+        $scope.noResult = true;
+        return;
+    }
+
+    /**
+     * Loading farmdata into session storage, webmapping utilises browser session storage to persist data while you change things.
+     * Later you can use export function to download the updated farmdata as a json file.
+     */
+    webmapping.load(created);
+    directToSide();
+}
+</pre>
