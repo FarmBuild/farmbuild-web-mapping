@@ -192,7 +192,19 @@ angular.module('farmbuild.webmapping.examples').directive('onReadFile', function
 })
 </pre>
 
-There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form component for load and create.
+#First HTML page
+
+There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form components for load and create.
+
+You need to add couple JavaScript files here:<br>
+FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
+FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
+FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
+
+I am also using bootstrap as css framework.<br>
+`<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
+
+AngularJS is part of FarmBuildCore library
 
 The only noticable thing here is I am adding two element to attach my maps to them:
 
