@@ -191,3 +191,28 @@ angular.module('farmbuild.webmapping.examples').directive('onReadFile', function
 	};
 })
 </pre>
+
+There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form component for load and create.
+
+The only noticable thing here is I am adding two element to attach my maps to them:
+
+`<div id="gmap" class="fill"></div>`<br>
+`<div id="olmap" class="fill"></div>`
+
+Because Google doesn't allow us to directly access their tiles, we need to show google map as a separate layer.<br>
+See Paul Spencer's post on the OL3 mailing list for a more complete explanation.<br>
+https://groups.google.com/d/msgid/ol3-dev/e35d8f2a-9cd7-4109-b812-c4401c11dd31%40googlegroups.com?utm_medium=email&utm_source=footer
+
+Example of a GMaps map with an ol3 map as control, to give users a Google base map with ol3 content on top.
+http://openlayers.org/en/v3.0.0/examples/google-map.html
+
+Google does not permit the use of their tiles outside of their API.
+OL2 integrated Google in a way that did not directly contravene this limitation but which was in a grey area.
+The Google integration in OL2 was broken several times by changes in the Google API.
+In particular, synchronization of animated movement of the Google Map with other OL content became impossible.
+The technical burden of supporting direct integration with Google Maps was considered too high for OL3.
+Therefore, it is not possible to seamlessly integrate it with OL3 nor will this likely be supported in the future unless Google allows direct access to their tiles (which seems unlikely).
+The example you quoted shows one possible way of integrating with Google Maps by injecting OL content into the Google Maps API.
+There are some limitations, particularly the problem of synchronizing animations.
+Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
+You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you are using them at the level you indicate you will exceed the free use.
