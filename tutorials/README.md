@@ -45,6 +45,9 @@ The "index.js" file in the root of examples contains the application definition.
 
 "farmbuild.webmapping.examples" is the application's name and we are defining "farmbuild.webmapping" as a dependency.
 
+Reading through first page you will find that some of the functions are defined on `$scope` variable. In AngularJS `$scope` is kind of the glue between your HTML templates and your JS controllers.
+Read more about `$scope`: <a href="https://docs.angularjs.org/guide/scope">https://docs.angularjs.org/guide/scope</a>
+
 If you look at the first page in your browser you can see there are two separate ways you start with.<br/>
 First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
 Second one is to load an existing farmdata which uses `webmapping.load`
@@ -145,4 +148,46 @@ $scope.loadFarmData = function ($fileContent) {
         $scope.noResult = true;
     }
 };
+</pre>
+
+To load farmdata from a local file I am wrinting an AngularJS directives.
+
+Directives are markers on a DOM element (such as an attribute,
+element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM element (e.g. via event listeners),
+or even to transform the DOM element and its children<br>
+visit https://docs.angularjs.org/guide/directive for more information
+
+<pre>
+angular.module('farmbuild.webmapping.examples').directive('onReadFile', function ($parse, $log) {
+	return {
+		restrict: 'A',
+		scope: false,
+		link: function (scope, element, attrs) {
+			var fn = $parse(attrs.onReadFile);
+
+			element.on('change', function (onChangeEvent) {
+				//var file =  (onChangeEvent.srcElement || onChangeEvent.target).files[0]
+				var file = (onChangeEvent.target).files[0]
+				$log.info('onReadFile.onChange... onChangeEvent.srcElement:%s, ' +
+					'onChangeEvent.target:%s, (onChangeEvent.srcElement || onChangeEvent.target).files[0]: %s',
+					onChangeEvent.srcElement, onChangeEvent.target,
+					angular.toJson(file))
+
+				var reader = new FileReader();
+
+				reader.onload = function (onLoadEvent) {
+					//console.log('reader.onload', angular.toJson(onLoadEvent));
+					scope.$apply(function () {
+						fn(scope, {$fileContent: onLoadEvent.target.result});
+					});
+				};
+				reader.onerror = function (onLoadEvent) {
+					//console.log('reader.onload', angular.toJson(onLoadEvent));
+				};
+
+				reader.readAsText((onChangeEvent.srcElement || onChangeEvent.target).files[0]);
+			});
+		}
+	};
+})
 </pre>
