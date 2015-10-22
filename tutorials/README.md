@@ -36,7 +36,7 @@ We will have a closer look at most of these APIs through this tutorial.
 
 In this example I wil be using AngularJS to create the client-side application and that is all we need for now.
 
-#First things first
+#Defining our application in AngularJS world
 
 First of all we need to define our application in AngularJS terms.
 The "index.js" file in the root of examples contains the application definition.
