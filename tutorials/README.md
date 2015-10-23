@@ -200,12 +200,16 @@ You need to add couple JavaScript files here:<br>
 FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
 FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
 FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
+AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
 
 I am also using bootstrap as css framework.<br>
 `<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
 
-AngularJS is part of FarmBuildCore library
 
+#Web Maping page
+This is the second page of this example where we show the actual map and we will provide some function to do vector editing on map.
+
+#Second HTML page
 The only noticable thing here is I am adding two element to attach my maps to them:
 
 `<div id="gmap" class="fill"></div>`<br>
@@ -228,3 +232,26 @@ The example you quoted shows one possible way of integrating with Google Maps by
 There are some limitations, particularly the problem of synchronizing animations.
 Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
 You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you are using them at the level you indicate you will exceed the free use.
+
+Rest of the page is quite ordinary. We have couple of more css files to describe the look of the map controls.
+We have made these available so you can customise the controls look based on youer application.
+
+In this example I am using a bootstarp grid css to create a two column layout.<br>
+On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: export, apply and clearing session.<br>
+I am putting the map on the right side:
+```
+<div class="col-md-8 col-lg-9">
+	<div id="map" class="map">
+	    <input type="text" id="locationAutoComplete" class="address-search addon">
+	    <wrapper>
+	        <select id="layers" class="farm-layers addon" ng-model="selectedLayer" ng-change="selectLayer()">
+	            <option value="">Select Edit Layer</option>
+	            <option value="farm">Farm</option>
+	            <option value="paddocks">Paddocks</option>
+	        </select>
+	    </wrapper>
+	</div>
+	<div id="gmap" class="fill"></div>
+	<div id="olmap" class="fill"></div>
+</div>
+```
