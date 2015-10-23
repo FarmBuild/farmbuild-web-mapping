@@ -238,6 +238,13 @@ We have made these available so you can customise the controls look based on you
 
 In this example I am using a bootstarp grid css to create a two column layout.<br>
 On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: export, apply and clearing session.<br>
+```
+<div class="col-md-4 col-lg-3"
+ style="overflow: auto;display: block;height: 100%;padding-top: 10px;padding-bottom: 10px;">
+	<paddock-details ng-include="'paddock-details.tpl.html'"></paddock-details>
+	<farm-details ng-include="'farm-details.tpl.html'"></farm-details>
+</div>
+```
 I am putting the map on the right side:
 ```
 <div class="col-md-8 col-lg-9">
