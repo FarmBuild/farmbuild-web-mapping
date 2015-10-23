@@ -36,6 +36,18 @@ We will have a closer look at most of these APIs through this tutorial.
 
 In this example I wil be using AngularJS to create the client-side application and that is all we need for now.
 
+#First HTML page
+There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form components for load and create.
+
+You need to add couple JavaScript files here:<br>
+FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
+FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
+FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
+AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
+
+I am also using bootstrap as css framework.<br>
+`<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
+
 #Defining our application in AngularJS world
 
 First of all we need to define our application in AngularJS terms.
@@ -192,26 +204,22 @@ angular.module('farmbuild.webmapping.examples').directive('onReadFile', function
 })
 </pre>
 
-#First HTML page
-
-There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form components for load and create.
-
-You need to add couple JavaScript files here:<br>
-FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
-FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
-FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
-AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
-
-I am also using bootstrap as css framework.<br>
-`<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
-
-
 #Web Maping page
 This is the second page of this example where we show the actual map and we will provide some function to do vector editing on map.
 
 #Second HTML page
 This page is quite simple. We have couple of more css files to describe the look of the map controls.
 We have made these available so you can customise the controls look based on youer application.
+
+Here you need to add couple of more JavaScript files:<br>
+OpenLayers JS library: `<script src="../../lib/ol/ol.js" type="text/javascript"></script>`<br>
+Proj4 JS library(we are using this to convert between projections): `<script src="../../dist/proj4/proj4.js"></script>`<br>
+Turf.js(we are using this to do geoprocessing): `<script src="../../dist/turf/turf.min.js"></script>`<br>
+Google map api: <script src="https://maps.google.com/maps/api/js?v=3&amp;sensor=false&libraries=places"></script><br>
+FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
+FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
+FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
+AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
 
 In this example I am using a bootstarp grid css to create a two column layout.<br>
 On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: export, apply and clearing session.<br>
