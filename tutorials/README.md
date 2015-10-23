@@ -7,7 +7,7 @@ The example is part of farmbuild-web-mapping github repository.<br/>
 
 Web Mapping is using OpenLayers library. so you need to have a good understanding of OpenLayers to use these APIs.
 
-#Understanding API
+##Understanding API
 
 You will find an API folder in the root of github repository which contains all the API docs.<br/>
 Please visit <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/1.1.0/index.html">API docs</a> to learn more about APIs.
@@ -32,11 +32,11 @@ You can customise based on you application need and you can eventually persist t
 
 We will have a closer look at most of these APIs through this tutorial.
 
-#Getting Started ...
+##Getting Started ...
 
 In this example I wil be using AngularJS to create the client-side application and that is all we need for now.
 
-#First HTML page
+###First HTML page
 There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form components for load and create.
 
 You need to add couple JavaScript files here:<br>
@@ -48,7 +48,7 @@ AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
 I am also using bootstrap as css framework.<br>
 `<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
 
-#Defining our application in AngularJS world
+###Defining our application in AngularJS world
 
 First of all we need to define our application in AngularJS terms.
 The "index.js" file in the root of examples contains the application definition.
@@ -76,7 +76,7 @@ $scope.crsSupported = webmapping.farmdata.crsSupported;
 $scope.farmNew = {crs: $scope.crsSupported[0].name};
 </pre>
 
-#Create a new farmdata from scratch
+###Create a new farmdata from scratch
 When creating a farmdata you can couple of parameters:
 - name: The name of the farm
 - id: The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
@@ -133,7 +133,7 @@ $scope.createNew = function (farmNew) {
 }
 </pre>
 
-#Load an existing farmdata
+###Load an existing farmdata
 If you already have valid farmdata, you want to load it into Web Mapping. So instead of create, I want to have something like a load function.<br>
 `load` function receives farmdata as json string value, and I use angular to convert it to JavaScript object.
 
@@ -204,10 +204,10 @@ angular.module('farmbuild.webmapping.examples').directive('onReadFile', function
 })
 </pre>
 
-#Web Maping page
+##Web Maping page
 This is the second page of this example where we show the actual map and we will provide some function to do vector editing on map.
 
-#Second HTML page
+###Second HTML page
 This page is quite simple. We have couple of more css files to describe the look of the map controls.
 We have made these available so you can customise the controls look based on youer application.
 
