@@ -209,7 +209,7 @@ This is the second page of this example where we show the actual map and we will
 
 ###Second HTML page
 This page is quite simple. We have couple of more css files to describe the look of the map controls.
-We have made these available so you can customise the controls look based on youer application.
+We have made these available so you can customise the controls look based on your application.
 
 Here you need to add couple of more JavaScript files:<br>
 OpenLayers JS library: `<script src="../../lib/ol/ol.js" type="text/javascript"></script>`<br>
