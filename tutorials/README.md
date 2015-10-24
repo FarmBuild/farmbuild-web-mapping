@@ -215,7 +215,7 @@ Here you need to add couple of more JavaScript files:<br>
 OpenLayers JS library: `<script src="../../lib/ol/ol.js" type="text/javascript"></script>`<br>
 Proj4 JS library(we are using this to convert between projections): `<script src="../../dist/proj4/proj4.js"></script>`<br>
 Turf.js(we are using this to do geoprocessing): `<script src="../../dist/turf/turf.min.js"></script>`<br>
-Google map api: <script src="https://maps.google.com/maps/api/js?v=3&amp;sensor=false&libraries=places"></script><br>
+Google map api: `<script src="https://maps.google.com/maps/api/js?v=3&amp;sensor=false&libraries=places"></script>`<br>
 FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
 FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
 FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
