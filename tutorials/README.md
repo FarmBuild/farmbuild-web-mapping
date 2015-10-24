@@ -221,7 +221,7 @@ FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></scrip
 FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
 AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
 
-In this example I am using a bootstarp grid css to create a two column layout.<br>
+In this example I am using a bootstarp css grid to create a two column layout.<br>
 On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: export, apply and clearing session.<br>
 ```
 <div class="col-md-4 col-lg-3"
@@ -230,7 +230,7 @@ On the left side I will be showing selected feature and farm attributes and also
 	<farm-details ng-include="'farm-details.tpl.html'"></farm-details>
 </div>
 ```
-I am putting the map on the right side:
+I am putting the map on the right side, and give it more space:
 ```
 <div class="col-md-8 col-lg-9">
 	<div id="map" class="map">
