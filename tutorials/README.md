@@ -270,3 +270,54 @@ The example you quoted shows one possible way of integrating with Google Maps by
 There are some limitations, particularly the problem of synchronizing animations.
 Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
 You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you are using them at the level you indicate you will exceed the free use.
+
+###Web Mapping JavaScript
+I create another AngularJS controller to contain web mapping functions. I will call it "MapCtrl".<br>
+The controller's dependencies are passed as parameters to controller function:<br>
+```
+.controller('MapCtrl',
+		function ($scope, $log, $location, $rootScope, $filter, webmapping) {}))
+```
+
+First I will define all required variable. It is a good practice to define all your variables at the top of function block.
+```
+var dataProjection,
+
+/**  This example is using Web Mercator: EPSG:3857 to display data on google map */
+featureProjection = 'EPSG:3857',
+
+/**
+ * This is passed to ol.Map on creation to adjust maximum zoom level
+ */
+maxZoom = 19,
+
+/**
+ * In order to create google map we need to pass the container element in DOM
+ */
+googleMapElement = document.getElementById('gmap'),
+googleMap,
+olMap,
+
+/**
+ * putting different webmapping namespaces in local variables for easier access
+ */
+actions = webmapping.actions,
+measurement = webmapping.measurement,
+parcels = webmapping.parcels,
+olHelper = webmapping.olHelper,
+paddocks = webmapping.paddocks;
+
+$scope.measuredValue = 0;
+$scope.farmData = {};
+$scope.farmChanged = false;
+$scope.paddockChanged = false;
+$scope.noResult = $scope.farmLoaded = false;
+$scope.selectedLayer = '';
+$scope.selectedPaddock = {
+name: '',
+type: '',
+comment: '',
+group: ''
+};
+$scope.donutDrawing = false;
+```
