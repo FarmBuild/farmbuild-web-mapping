@@ -775,4 +775,4 @@ $scope.loadFarmData = function () {
 	olMap.getView().on('change:center', loadParcels);
 	$scope.farmLoaded = true;
 };
-		```
+```
