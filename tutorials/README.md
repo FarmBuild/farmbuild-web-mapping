@@ -279,7 +279,7 @@ The controller's dependencies are passed as parameters to controller function:<b
 		function ($scope, $log, $location, $rootScope, $filter, webmapping) {}))
 ```
 
-First I will define all required variable. It is a good practice to define all your variables at the top of function block.
+First I will define all required variable. It is a good practice to define all your variables at the top of function block. I am also assigning different webmapping namespaces to local variables to have shorter names when I use them.
 ```
 var dataProjection,
 
@@ -321,3 +321,79 @@ $scope.selectedPaddock = {
 };
 $scope.donutDrawing = false;
 ```
+
+Functions that are not defined on `$scope` variable are internal and therefore only accessed inside this controller.<br>
+
+`createGoogleMap`: Here I create a google map object. Notice that creation of map objects for google map and openLayers map are deliberately outside of api so you can pass customise and pass it to webmapping api.
+
+```
+/**  Create google map object, customise the map object as you like. */
+function createGoogleMap(type) {
+	return new google.maps.Map(googleMapElement, {
+		disableDefaultUI: true,
+		keyboardShortcuts: false,
+		draggable: false,
+		disableDoubleClickZoom: true,
+		scrollwheel: false,
+		streetViewControl: false,
+		mapTypeId: type
+	})
+}
+```
+
+`createOpenLayerMap`: Next step is to create OpenLayers map. You can create map object and pass it to api. Here you can use a couple api helper functions to help you create correct base layers for farm and paddocks and also to do the integration with google map.
+
+```
+/** Create openlayers map object, customise the map object as you like. */
+function createOpenLayerMap(geoJsons) {
+
+	/** it is recommended to use these helper functions to create your farm and paddocks layers
+	 If you are using olHelper.createBaseLayers(), use olHelper.init() to initialise webmapping
+	 If you are using olHelper.createBaseLayersWithGoogleMaps(), use olHelper.initWithGoogleMap() to initialise webmapping
+	 */
+	var farmLayers = olHelper.createFarmLayers(geoJsons, dataProjection),
+	//baseLayers = olHelper.createBaseLayers();
+		baseLayers = olHelper.createBaseLayersWithGoogleMaps();
+
+	return new ol.Map({
+		layers: [baseLayers, farmLayers],
+		target: 'olmap',
+		keyboardEventTarget: googleMapElement,
+		view: new ol.View({
+			rotation: 0,
+			maxZoom: maxZoom
+		}),
+		interactions: ol.interaction.defaults({
+			altShiftDragRotate: false,
+			dragPan: false,
+			rotate: false,
+			mouseWheelZoom: true
+		}).extend([new ol.interaction.DragPan()])
+	})
+}
+```
+
+
+
+`loadParcels`: this function uses `webmapping.parcels.load()` to show parcels on map. You need to pass 4 parameter.<br>
+In this example I only call loadParcels if the zoom level is more than 14. This is because loaing parcels layer on a big extent can exhaust browser resources.
+```
+function loadParcels() {
+	var parcelsServiceUrl = 'https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
+		parcelsExtent, extentProjection, responseProjection;
+
+	/**
+	 * in this example we use the same projection for extent data and response,
+	 * but they can be different based on your application setting.
+	 */
+	extentProjection = responseProjection = featureProjection;
+
+	if ($scope.selectedLayer === '' || olMap.getView().getZoom() < 14) {
+		return;
+	}
+	parcelsExtent = olMap.getView().calculateExtent(olMap.getSize());
+	parcels.load(parcelsServiceUrl, parcelsExtent, extentProjection, responseProjection);
+}
+```
+
+
