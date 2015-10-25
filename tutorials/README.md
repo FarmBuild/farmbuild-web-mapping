@@ -341,7 +341,7 @@ function createGoogleMap(type) {
 }
 ```
 
-`createOpenLayerMap`: Next step is to create OpenLayers map. You can create map object and pass it to api. Here you can use a couple api helper functions to help you create correct base layers for farm and paddocks and also to do the integration with google map.
+`createOpenLayerMap`: Next step is to create OpenLayers map. You can create map object and pass it to api. Here you can use a couple of api helper functions to help you create correct base layers for farm and paddocks and also to do the integration with google map.
 
 ```
 /** Create openlayers map object, customise the map object as you like. */
