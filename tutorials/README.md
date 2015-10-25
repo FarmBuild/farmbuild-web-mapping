@@ -626,4 +626,41 @@ $scope.apply = function () {
 	$scope.paddockChanged = false;
 	$scope.selectedPaddock = {};
 };
+```	
+
+`webmapping.events` provides list of events you can register for, to understand certainn event in webmapping.<br>
+Here I want to know about things like when an active drawing is finished or when I can disable donut drawing mode.<br>
+I am using `web-mapping-measure-end` to show the value of measured length or area.
+```
+webmapping.on('web-mapping-draw-end', function (feature) {
+	$scope.farmChanged = true;
+	farmChanged();
+});
+
+webmapping.on('web-mapping-donut-draw-end', function () {
+	$scope.disableDonutDrawing();
+});
+
+webmapping.on('web-mapping-measure-end', function (event, data) {
+	$scope.measuredValue = data.value;
+	$scope.measuredUnit = data.unit;
+	updateNgScope();
+});
+
+webmapping.on('web-mapping-base-layer-change', function (event, data) {
+	if (data.layer.getProperties().title === 'Google Street') {
+		googleMapElement.firstChild.firstChild.style.display = 'block';
+		googleMap.setMapTypeId(google.maps.MapTypeId.ROADMAP);
+		return;
+	}
+	if (data.layer.getProperties().title === 'Google Imagery') {
+		googleMapElement.firstChild.firstChild.style.display = 'block';
+		googleMap.setMapTypeId(google.maps.MapTypeId.SATELLITE);
+		return;
+	}
+	if (data.layer.getProperties().title.indexOf('VicMAP') > -1) {
+		googleMapElement.firstChild.firstChild.style.display = 'none';
+		return;
+	}
+});
 ```		
