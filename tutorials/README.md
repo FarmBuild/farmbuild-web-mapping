@@ -476,3 +476,29 @@ $scope.onFarmNameChanged = function () {
 };
 ```		
 
+In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a select list on the map, this way I can understand what is the layer(farm or paddocks) that user wants to work with.
+```
+$scope.selectLayer = function () {
+	var activateSnapping = true,
+		activateKeyboardInteractions = true,
+		farmLayerGroup = olHelper.farmLayerGroup(olMap),
+		farmLayer = olHelper.farmLayer(olMap),
+		paddocksLayer = olHelper.paddocksLayer(olMap),
+		selectedLayer = $scope.selectedLayer;
+	if (angular.isDefined(actions.snapping.active())) {
+		activateSnapping = actions.snapping.active();
+	}
+	$scope.cancel();
+	actions.destroy(olMap);
+	$scope.selectedPaddock = {};
+	if ($scope.selectedLayer === '') {
+		olMap.un('pointermove', mapOnPointerMove);
+		return;
+	}
+	actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
+	olMap.on('pointermove', mapOnPointerMove);
+	farmLayer.getSource().on('changefeature', farmChanged);
+	paddocksLayer.getSource().on('changefeature', paddockChanged);
+	loadParcels();
+};
+```		
