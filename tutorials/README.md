@@ -663,4 +663,18 @@ webmapping.on('web-mapping-base-layer-change', function (event, data) {
 		return;
 	}
 });
+
+webmapping.on('web-mapping-feature-select', function (event, data) {
+	var selectedLayer = $scope.selectedLayer;
+	if (selectedLayer === 'paddocks') {
+		onPaddockSelect(event, data)
+	}
+});
+
+webmapping.on('web-mapping-feature-deselect', function (event, data) {
+	var selectedLayer = $scope.selectedLayer;
+	if (selectedLayer === 'paddocks') {
+		onPaddockDeselect(event, data)
+	}
+});
 ```		
