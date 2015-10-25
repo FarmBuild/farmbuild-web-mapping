@@ -501,4 +501,84 @@ $scope.selectLayer = function () {
 	paddocksLayer.getSource().on('changefeature', paddockChanged);
 	loadParcels();
 };
+```
+
+Each time we do a change in webmapping like changing values of a paddock(name, type, group) or farm it self,
+defining new paddock or updating farm or paddock boundaries we need to apply changes on farmdata by calling save method.
+Then we reload the latest farmdata into webmapping to update its reference in webmapping.
+This whole workflow is done by apply function which makes sense in case of this example.
+You may separate these tasks and use different events or triggers to do it.
+
+```
+$scope.apply = function () {
+	$log.info('apply changes to farm data ...');
+	
+	/**
+	 * If we are in the middle of drawing try to finish it.
+	*/
+	if (actions.drawing.isDrawing()) {
+		/**
+		 * If you are in the middle of drawing a polygon,
+		 * tries finish drawing and if it is not possible just removes it.
+		 */
+		actions.drawing.finish();
+	} else {
+		clipSelectedFeature();
+	}
+	
+	/**
+	 * Get farm and paddocks source from webmapping
+	 */
+	var farmSource = olHelper.farmLayer(olMap).getSource(),
+		paddocksSource = olHelper.paddocksLayer(olMap).getSource(),
+	
+		/**
+		 * Convert geometries into farmdata compatible format to be saved
+		 */
+		paddocksGeometry = olHelper.exportGeometry(paddocksSource, dataProjection),
+		farmGeometry = olHelper.exportGeometry(farmSource, dataProjection);
+	
+	/**
+	 * It is invalid to have a farmdata without farm boundaries,
+	 * here we are checking to raise an error if there is no farm boundary information.
+	 */
+	if (farmGeometry.features.length === 0) {
+		$scope.noResult = 'Farm boundary is invalid, farm boundary should contain all paddocks';
+		return;
+	}
+	
+	/**
+	 * It is invalid to have a farmdata without farm boundaries,
+	 * here we are checking to raise an error if there is no farm boundary information.
+	 */
+	webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
+	
+	/**
+	 * Get recent saved farmdata from session, and update $scope.farmdata reference.
+	 */
+	$scope.farmData = webmapping.find();
+	
+	/**
+	 * Update zoom to extent control's extent
+	 */
+	olHelper.updateExtent(olMap);
+	
+	/**
+	 * Convert new farmdata to GeoJson format to pass to webmapping
+	 */
+	var geoJsons = webmapping.toGeoJsons($scope.farmData);
+	if (!angular.isDefined(geoJsons)) {
+		$scope.noResult = 'Farm data is invalid';
+		return;
+	}
+	
+	/**
+	 * Reload the map with new data
+	 */
+	olHelper.reload(olMap, geoJsons, dataProjection);
+	
+	$scope.farmChanged = false;
+	$scope.paddockChanged = false;
+	$scope.selectedPaddock = {};
+};
 ```		
