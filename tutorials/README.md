@@ -396,4 +396,47 @@ function loadParcels() {
 }
 ```
 
+`mapOnPointerMove`: This is how I am deciding to enable drawing or editing.
+If mouse cursor is on top of the one of existing polygons and user does a single click it means edit.<br>
+If mouse cursor is not top of any of existing polygons and user does a single click it means drawing a new polygon.<br>
+ This is a exhaustive way to handle map events,
+ but it make your application smarter in the way it would understand user's intention.<br>
+ If your application is targeting touch devices like tablet or smart phones, you may use other logic and events that fits you need.
+
+```	
+function mapOnPointerMove(event) {
+
+	/** avoid to do anything if user is dragging */
+	if (event.dragging) {
+		return;
+	}
+
+	var selectedLayer = $scope.selectedLayer, coordinate = event.coordinate,
+		featureAtCoordinate;
+	if (selectedLayer === "paddocks") {
+		selectedLayer = olHelper.paddocksLayer(olMap);
+	}
+	if (selectedLayer === "farm") {
+		selectedLayer = olHelper.farmLayer(olMap);
+	}
+	featureAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, selectedLayer);
+	if (featureAtCoordinate && !actions.drawing.isDrawing()) {
+		actions.editing.enable();
+	}
+	if (!featureAtCoordinate && !actions.editing.isEditing()) {
+		actions.drawing.enable();
+	}
+}
+```
+
+ I need to update angular $scope to update data binding,
+ Since some of the updates are happening out of angular world, I need to notify the angular manually.
+		 
+```
+function updateNgScope() {
+	if (!$scope.$$phase) {
+		$scope.$apply();
+	}
+}
+```		
 
