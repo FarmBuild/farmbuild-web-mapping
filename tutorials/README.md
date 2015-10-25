@@ -723,4 +723,56 @@ function addCustomPaddockGroups(farmData){
 		webmapping.update(farmData);
 	}
 }
-```		
+```	
+
+And finally we need to load farmdata into webmapping to glue everything together.
+```
+$scope.loadFarmData = function () {
+	var geoJsons;
+	
+	$scope.farmData = webmapping.find();
+	addCustomPaddockTypes($scope.farmData);
+	addCustomPaddockGroups($scope.farmData);
+	$scope.paddockTypes = webmapping.paddocks.types.toArray();
+	$scope.paddockGroups = webmapping.paddocks.groups.toArray();
+	
+	/** Convert geometry data of farmData to valid geoJson */
+	geoJsons = webmapping.toGeoJsons($scope.farmData);
+	
+	if (!angular.isDefined(geoJsons)) {
+		$scope.noResult = 'Farm data is invalid';
+		return;
+	}
+	
+	dataProjection = $scope.farmData.geometry.crs;
+	
+	/** Create openlayers map object, customise the map object as you like. */
+	olMap = createOpenLayerMap(geoJsons);
+	var extent = olHelper.farmLayer(olMap).getSource().getExtent(),
+		openlayersMapEl = olMap.getTargetElement();
+	
+	
+	/**  Create google map object, customise the map object as you like. */
+	googleMap = createGoogleMap(google.maps.MapTypeId.SATELLITE);
+	
+	/** Openlayers 3 does not support google maps as a tile layer,
+	 so we need to keep openlayers map view and google maps in sync,
+	 this helper function does the job for you.
+	 If you want to init with google map, you need to use olHelper.createBaseLayersWithGoogleMaps()
+	 If you want to init without google map, you need to use olHelper.createBaseLayers()
+	 */
+	olHelper.initWithGoogleMap(olMap, extent, googleMap, openlayersMapEl);
+	//olHelper.init(olMap, extent);
+	
+	/** Enable address google search for your map */
+	olHelper.initGoogleAddressSearch('locationAutoComplete', olMap);
+	
+	/** track api usage by sending statistic to google analytics, this help us to improve service based on usage */
+	webmapping.ga.trackWebMapping('farmbuild-test-client');
+	
+	/** it is up to you when to load parcels, this example is using map view's change event to load parcels data. Parcels data is used for snapping */
+	olMap.getView().on('change:resolution', loadParcels);
+	olMap.getView().on('change:center', loadParcels);
+	$scope.farmLoaded = true;
+};
+		```
