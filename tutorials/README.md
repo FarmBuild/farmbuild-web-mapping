@@ -438,5 +438,41 @@ function updateNgScope() {
 		$scope.$apply();
 	}
 }
+```
+
+The following functions deal with paddock or farm attribute changes. After a change is triggered by user interface I am updating feature properties based on new values and reflecting that change on Angular side by updating the `$scope`.
+```
+function paddockChanged() {
+	$scope.paddockChanged = true;
+	updateNgScope();
+}
+
+$scope.onPaddockDetailsChanged = function () {
+	var sp = $scope.selectedPaddock;
+	actions.features.selections().item(0).setProperties({
+		type: sp.type,
+		name: sp.name,
+		comment: sp.comment,
+		area: sp.area,
+		group: sp.group
+	});
+	paddockChanged();
+};
+
+function farmChanged() {
+	$scope.farmChanged = true;
+	updateNgScope();
+}
+
+$scope.onFarmNameChanged = function () {
+	if($scope.selectedLayer !== 'farm'){
+		$scope.noResult = 'Select farm from edit layers drop down, to edit farm details!';
+		return;
+	}
+	olHelper.farmLayer(olMap).getSource().getFeatures()[0].setProperties({
+		name: $scope.farmData.name
+	});
+	farmChanged();
+};
 ```		
 
