@@ -503,6 +503,51 @@ $scope.selectLayer = function () {
 };
 ```
 
+In this example, if you start editing a paddock and click on another paddock before applying these changes, I will cancel all changes which means map goes back to last stored state.<br>
+Following functions deal with paddock selection and deselection.
+
+```
+function onPaddockSelect(event, selectedPaddock) {
+	if ($scope.paddockChanged) {
+		$scope.cancel();
+	}
+	$scope.selectedPaddock = selectedPaddock.getProperties();
+
+	if($scope.selectedPaddock.group) {
+		$scope.selectedPaddock.group = function () {
+			var result;
+			angular.forEach($scope.paddockGroups, function (group) {
+				if (group.name === $scope.selectedPaddock.group.name) {
+					result = group;
+				}
+			});
+			return result;
+		}();
+	}
+
+	if($scope.selectedPaddock.type) {
+		$scope.selectedPaddock.type = function () {
+			var result;
+			angular.forEach($scope.paddockTypes, function (group) {
+				if (group.name === $scope.selectedPaddock.type.name) {
+					result = group;
+				}
+			});
+			return result;
+		}();
+	}
+
+	$scope.selectedPaddock.area = measurement.area(selectedPaddock);
+	$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
+	updateNgScope();
+};
+
+function onPaddockDeselect(event) {
+	$scope.selectedPaddock = {};
+	updateNgScope();
+};
+```		
+
 Each time we do a change in webmapping like changing values of a paddock(name, type, group) or farm it self,
 defining new paddock or updating farm or paddock boundaries we need to apply changes on farmdata by calling save method.
 Then we reload the latest farmdata into webmapping to update its reference in webmapping.
