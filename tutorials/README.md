@@ -677,4 +677,50 @@ webmapping.on('web-mapping-feature-deselect', function (event, data) {
 		onPaddockDeselect(event, data)
 	}
 });
+```	
+
+You can export your valid farmdata at any time. `webmapping` provides couple of functions for you to export to "KML" and "GeoJSON".
+```
+$scope.toGeoJson = function () {
+	farmbuild.webmapping.exportGeoJson(document, $scope.farmData);
+};
+
+$scope.toKml = function () {
+	farmbuild.webmapping.exportKml(document, $scope.farmData);
+};
+```	
+If you want to use api to add custom paddock types this the way to to so.<br>
+if there is type with the same name in farmdata, you would receive an error message
+You can check existence of a type by its unique name, using "webmapping.paddocks.types.byName" method
+add the types using paddock api and update
+unless you do an update the new type data would not be persisted on farmdata
+"update" is a farmdata method exposed through webmapping api.
+The main difference between save and update is that using update you are only updating farmdata component, so you do not need to pass geometries
+
+```
+function addCustomPaddockTypes(farmData){
+	var name = 'New Custom Type using api';
+	if(!webmapping.paddocks.types.byName(name)) {
+		webmapping.paddocks.types.add(name);
+		webmapping.update(farmData);
+	}
+}
+```		
+
+If you want to use api to add custom paddock groups this the way to to so
+if there is group with the same name in farmdata, you would receive an error message
+You can check existence of a group by its unique name, using "webmapping.paddocks.types.byName" method
+add the groups using paddock api and update
+unless you do an update the new group data would not be persisted on farmdata
+"update" is a farmdata method exposed through webmapping api.
+The main difference between save and update is that using update you are only updating farmdata component, so you do not need to pass geometries
+
+```
+function addCustomPaddockGroups(farmData){
+	var name = 'New Custom Group using api';
+	if(!webmapping.paddocks.groups.byName(name)) {
+		webmapping.paddocks.groups.add(name);
+		webmapping.update(farmData);
+	}
+}
 ```		
