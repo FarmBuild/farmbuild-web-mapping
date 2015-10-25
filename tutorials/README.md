@@ -314,10 +314,10 @@ $scope.paddockChanged = false;
 $scope.noResult = $scope.farmLoaded = false;
 $scope.selectedLayer = '';
 $scope.selectedPaddock = {
-name: '',
-type: '',
-comment: '',
-group: ''
+	name: '',
+	type: '',
+	comment: '',
+	group: ''
 };
 $scope.donutDrawing = false;
 ```
