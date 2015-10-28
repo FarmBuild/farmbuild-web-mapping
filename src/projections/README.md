@@ -1,3 +1,18 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [FarmData supported projections](#farmdata-supported-projections)
+  - [GDA 94 geographics: EPSG:4283](#gda-94-geographics-epsg4283)
+  - [WGS 84 Geographics: EPSG:4326](#wgs-84-geographics-epsg4326)
+  - [Web Mercator: EPSG:3857](#web-mercator-epsg3857)
+  - [VicGrid 94: EPSG:3111](#vicgrid-94-epsg3111)
+  - [NSW Lamberts: EPSG:3308](#nsw-lamberts-epsg3308)
+  - [SA Lamberts: EPSG:3107](#sa-lamberts-epsg3107)
+  - [Australian Albers: EPSG:3577](#australian-albers-epsg3577)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 # FarmData supported projections
 
 FarmData supports the following projections and provide a set of APIs to convert between them (using proj4js).

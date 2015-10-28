@@ -1,3 +1,15 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [FarmBuild Web Mapping](#farmbuild-web-mapping)
+  - [Getting Started](#getting-started)
+  - [Units](#units)
+  - [Exception handling](#exception-handling)
+  - [Google Analytics for tracking API usage](#google-analytics-for-tracking-api-usage)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 #FarmBuild Web Mapping
 
 This is the web mapping component of FarmBuild project.
