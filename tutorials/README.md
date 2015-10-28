@@ -1,3 +1,20 @@
+<!-- START doctoc generated TOC please keep comment here to allow auto update -->
+<!-- DON'T EDIT THIS SECTION, INSTEAD RE-RUN doctoc TO UPDATE -->
+**Table of Contents**  *generated with [DocToc](https://github.com/thlorenz/doctoc)*
+
+- [Web Mapping with FarmBuild Web Mapping API (Tutorial)](#web-mapping-with-farmbuild-web-mapping-api-tutorial)
+  - [Understanding API](#understanding-api)
+  - [Getting Started ...](#getting-started-)
+    - [First HTML page](#first-html-page)
+    - [Defining our application in AngularJS world](#defining-our-application-in-angularjs-world)
+    - [Create a new farmdata from scratch](#create-a-new-farmdata-from-scratch)
+    - [Load an existing farmdata](#load-an-existing-farmdata)
+  - [Web Maping page](#web-maping-page)
+    - [Second HTML page](#second-html-page)
+    - [Web Mapping JavaScript](#web-mapping-javascript)
+
+<!-- END doctoc generated TOC please keep comment here to allow auto update -->
+
 #Web Mapping with FarmBuild Web Mapping API (Tutorial)
 
 In this tutorial I will walk you through FarmBuild Web Mapping API to give you some ideas on how you can utilise it in your applications.<br/>
