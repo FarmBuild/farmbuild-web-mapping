@@ -2,7 +2,7 @@
 
 In this tutorial I will walk you through FarmBuild Web Mapping API to give you some ideas on how you can utilise it in your applications.<br/>
 I start off by describing FarmBuild Web Mapping main components and I will continue with creating a complete web mapping example.<br/>
-The example is part of farmbuild-web-mapping github repository.<br/>
+The example is part of the "farmbuild-web-mapping" github repository.<br/>
 <a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/examples">https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/examples</a>
 
 Web Mapping is using OpenLayers library. so you need to have a good understanding of OpenLayers to use these APIs.
