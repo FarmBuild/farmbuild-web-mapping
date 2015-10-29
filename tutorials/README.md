@@ -24,7 +24,7 @@
       - [Webmapping Events](#webmapping-events)
       - [Add custom values for paddock groups and paddock types](#add-custom-values-for-paddock-groups-and-paddock-types)
       - [Exporting farmdata to KML and GeoJSON](#exporting-farmdata-to-kml-and-geojson)
-      - [Bootstarp Web Mapping Application](#bootstarp-web-mapping-application)
+      - [Bootstrap Web Mapping Application](#bootstrap-web-mapping-application)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
@@ -784,7 +784,7 @@ function addCustomPaddockGroups(farmData){
 }
 ```	
 
-####Bootstarp Web Mapping Application
+####Bootstrap Web Mapping Application
 And finally we need to load farmdata into webmapping to glue everything together.
 ```
 $scope.loadFarmData = function () {
