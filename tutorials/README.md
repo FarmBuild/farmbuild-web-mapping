@@ -648,8 +648,7 @@ $scope.apply = function () {
 	}
 	
 	/**
-	 * It is invalid to have a farmdata without farm boundaries,
-	 * here we are checking to raise an error if there is no farm boundary information.
+	 * If the farmdata is valid save it which will update the farmdata value in session.
 	 */
 	webmapping.save({paddocks: paddocksGeometry, farm: farmGeometry});
 	
@@ -659,7 +658,7 @@ $scope.apply = function () {
 	$scope.farmData = webmapping.find();
 	
 	/**
-	 * Update zoom to extent control's extent
+	 * Update zoom to extent control's extent to understand new farm's extent.
 	 */
 	olHelper.updateExtent(olMap);
 	
@@ -673,10 +672,13 @@ $scope.apply = function () {
 	}
 	
 	/**
-	 * Reload the map with new data
+	 * Reload the map with new data, this is necessary to update the web mapping view.
 	 */
 	olHelper.reload(olMap, geoJsons, dataProjection);
 	
+	/**
+	 * Resetting change flags and variables
+	 */
 	$scope.farmChanged = false;
 	$scope.paddockChanged = false;
 	$scope.selectedPaddock = {};
@@ -743,7 +745,8 @@ $scope.toGeoJson = function () {
 $scope.toKml = function () {
 	farmbuild.webmapping.exportKml(document, $scope.farmData);
 };
-```	
+```
+####Add custom values for paddock groups and paddock types 
 If you want to use api to add custom paddock types this the way to to so.<br>
 if there is type with the same name in farmdata, you would receive an error message
 You can check existence of a type by its unique name, using "webmapping.paddocks.types.byName" method
