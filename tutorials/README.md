@@ -12,6 +12,18 @@
   - [Web Maping page](#web-maping-page)
     - [Second HTML page](#second-html-page)
     - [Web Mapping JavaScript](#web-mapping-javascript)
+      - [Create Google Map Object](#create-google-map-object)
+      - [Create OpenLayer Map Object](#create-openlayer-map-object)
+      - [Load Parcels](#load-parcels)
+      - [Select Interaction Layer](#select-interaction-layer)
+      - [Enable darwing or editing on map](#enable-darwing-or-editing-on-map)
+      - [Applying feature changes on AngularJS side](#applying-feature-changes-on-angularjs-side)
+      - [Understanding paddock and farm attributes changes](#understanding-paddock-and-farm-attributes-changes)
+      - [Handling Paddock's selection/deselection](#handling-paddocks-selectiondeselection)
+      - [Applying changes to farmdata](#applying-changes-to-farmdata)
+      - [Webmapping Events](#webmapping-events)
+      - [Exporting farmdata to KML and GeoJSON](#exporting-farmdata-to-kml-and-geojson)
+      - [Bootstarp Web Mapping Application](#bootstarp-web-mapping-application)
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
