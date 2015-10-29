@@ -233,7 +233,7 @@ FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></sc
 AngularJS is embedded of FarmBuildCore library, so I dont need to add it separately.
 
 In this example I am using a bootstarp css grid to create a two column layout.<br>
-On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: export, apply and clearing session.<br>
+On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: `export`, `apply` and `clearing session`.
 ```
 <div class="col-md-4 col-lg-3"
  style="overflow: auto;display: block;height: 100%;padding-top: 10px;padding-bottom: 10px;">
@@ -258,29 +258,30 @@ I am putting the map on the right side, and give it more space:
 	<div id="olmap" class="fill"></div>
 </div>
 ```
-
-The only noticable thing here is I am adding two element to attach my maps to them:
+The `<input type="text" id="locationAutoComplete"` element is used to show an address search on map.
+The `<select id="layers"` provides layer selection options. In my web mapping example it is important for me to understand whether user wants to work on farm layer or paddock layer to enable vector editing capability on the right layer. 
+Another noticable thing here is I am adding two element to attach my maps to them:
 
 `<div id="gmap" class="fill"></div>`<br>
 `<div id="olmap" class="fill"></div>`
 
-Because Google doesn't allow us to directly access their tiles, we need to show google map as a separate layer.<br>
-See Paul Spencer's post on the OL3 mailing list for a more complete explanation.<br>
-https://groups.google.com/d/msgid/ol3-dev/e35d8f2a-9cd7-4109-b812-c4401c11dd31%40googlegroups.com?utm_medium=email&utm_source=footer
+> Because Google doesn't allow us to directly access their tiles, we need to show google map as a separate layer.<br>
+> See Paul Spencer's post on the OL3 mailing list for a more complete explanation.<br>
+> https://groups.google.com/d/msgid/ol3-dev/e35d8f2a-9cd7-4109-b812-c4401c11dd31%40googlegroups.com?utm_medium=email&utm_source> =footer
 
-Example of a GMaps map with an ol3 map as control, to give users a Google base map with ol3 content on top.
-http://openlayers.org/en/v3.0.0/examples/google-map.html
+> Example of a GMaps map with an ol3 map as control, to give users a Google base map with ol3 content on top.
+> http://openlayers.org/en/v3.0.0/examples/google-map.html
 
-Google does not permit the use of their tiles outside of their API.
-OL2 integrated Google in a way that did not directly contravene this limitation but which was in a grey area.
-The Google integration in OL2 was broken several times by changes in the Google API.
-In particular, synchronization of animated movement of the Google Map with other OL content became impossible.
-The technical burden of supporting direct integration with Google Maps was considered too high for OL3.
-Therefore, it is not possible to seamlessly integrate it with OL3 nor will this likely be supported in the future unless Google allows direct access to their tiles (which seems unlikely).
-The example you quoted shows one possible way of integrating with Google Maps by injecting OL content into the Google Maps API.
-There are some limitations, particularly the problem of synchronizing animations.
-Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
-You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you are using them at the level you indicate you will exceed the free use.
+> Google does not permit the use of their tiles outside of their API.
+> OL2 integrated Google in a way that did not directly contravene this limitation but which was in a grey area.
+> The Google integration in OL2 was broken several times by changes in the Google API.
+> In particular, synchronization of animated movement of the Google Map with other OL content became impossible.
+> The technical burden of supporting direct integration with Google Maps was considered too high for OL3.
+> Therefore, it is not possible to seamlessly integrate it with OL3 nor will this likely be supported in the future unless Google allows direct access to their tiles (which seems unlikely).
+> The example you quoted shows one possible way of integrating with Google Maps by injecting OL content into the Google Maps API.
+> There are some limitations, particularly the problem of synchronizing animations.
+> Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
+> You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you > are using them at the level you indicate you will exceed the free use.
 
 ###Web Mapping JavaScript
 I create another AngularJS controller to contain web mapping functions. I will call it "MapCtrl".<br>
