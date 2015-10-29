@@ -283,7 +283,7 @@ Another noticable thing here is I am adding two element to attach my maps to the
 > Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
 > You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you > are using them at the level you indicate you will exceed the free use.
 
-Although this is not an efficient way to have both Openlayers and google tiles at the time I am creating this tutorial this is the only way to integrate google map into OpenLayers3.<br>
+Although this is not an efficient way to have both Openlayers and google tiles, at the time I am creating this tutorial this is the only way to integrate google map into OpenLayers3.<br>
 Because of this I need to add both maps separately and then put OpenLayers controls on top of google map and manually sync them when we interact with map view on OpenLayers side to provide interaction like pan and zoom with google tiles.
 But don't worry there is a helper function under `olHelper` namespace that you can do this easily with just one function call.
 
