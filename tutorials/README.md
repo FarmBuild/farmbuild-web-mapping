@@ -34,18 +34,19 @@ By clicking on each namespace you are able to see its sub namespaces and methods
 For example if you click on webmapping which is the root namespace, you will see "actions, events, ga, measurement, olHelper, paddocks, paddocks/groups, paddocks/types and parcels".<br/>
 Scroll down and you will see there are methods such as: `create` and `export`, with a complete description about each one.
 
-"actions" contains a bunch of useful web mapping interactions. In OpenLayers there is concept called interaction that describes the way you can interact with the vectors on the map.<br/>
+`actions` contains a bunch of useful web mapping interactions. In OpenLayers there is concept called "interaction".<br>
+An interaction describes the way you can interact with the vectors on the map.<br/>
 Here we do use the same concept and provide some higher level interactions that is necessary for doing web mapping.
 Under this namespace you will find interactions such as: drawing, editing and snapping.
 
-"events" namespace provides some hooks for you to understand about certain events in web mapping.
-For example you can register for events to understand when drawing is finished, when a feature is selected/deselected or when map base layer is changed.
+`events` namespace provides some hooks for you to understand about certain events in web mapping.
+For example you can register for events to understand when drawing of a polygon is finished, when a feature is selected/deselected or when map base layer is changed.
 
-"olHelper" namespace provides functions to help you do common web mapping tasks easily.<br/>
+`olHelper` namespace provides functions to help you do common web mapping tasks easily.<br/>
 For example you can use it initialise farm/paddocks vector layer and initialise web mapping.
 
-paddocks/groups, paddocks/types namespaces are concerned with defining the references for types and groups of paddocks.<br/>
-You can customise based on you application need and you can eventually persist these values in your farmdata.
+`paddocks/groups`, `paddocks/types` namespaces are concerned with defining the references for types and groups of paddocks.<br/>
+You can customise based on you application's need and you can eventually persist these values in your farmdata.
 
 We will have a closer look at most of these APIs through this tutorial.
 
@@ -54,12 +55,13 @@ We will have a closer look at most of these APIs through this tutorial.
 In this example I wil be using AngularJS to create the client-side application and that is all we need for now.
 
 ###First HTML page
-There is a index.html file in the root of example folder. This is first page of this example. It contains all necessary form components for load and create.
+There is an "index.html" file in the root of example folder. This is the first page of this example. It contains all necessary form components for `load` and `create` functions.
 
-You need to add couple JavaScript files here:<br>
+You need to add a couple of JavaScript files here:<br>
 FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
 FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
 FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
+It is important that to add these scripts in the right order.<br>
 AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
 
 I am also using bootstrap as css framework.<br>
