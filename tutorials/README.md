@@ -340,7 +340,8 @@ $scope.donutDrawing = false;
 
 Functions that are not defined on `$scope` variable are internal and therefore only accessed inside this controller.<br>
 
-`createGoogleMap`: Here I create a google map object. Notice that creation of map objects for google map and openLayers map are deliberately outside of api so you can customise and pass it to webmapping api.<br>
+####Create Google Map Object
+Here I create a google map object. Notice that creation of map objects for google map and openLayers map are deliberately outside of api so you can customise and pass it to webmapping api.<br>
 **Note**: If you do not want google tiles in your web mapping you can ommit this part.
 
 ```
@@ -358,7 +359,8 @@ function createGoogleMap(type) {
 }
 ```
 
-`createOpenLayerMap`: Next step is to create OpenLayers map. You can create map object and pass it to api. Here you can use a couple of api helper functions to help you create correct base layers for farm and paddocks and also to do the integration with google map.
+####Create OpenLayer Map Object
+Next step is to create OpenLayers map. You can create map object and pass it to api. Here you can use a couple of api helper functions to help you create correct base layers for farm and paddocks and also to do the integration with google map.
 
 ```
 /** Create openlayers map object, customise the map object as you like. */
@@ -392,7 +394,8 @@ function createOpenLayerMap(geoJsons) {
 
 
 
-`loadParcels`: this function uses `webmapping.parcels.load()` to show parcels on map.<br>
+####Load Parcels
+This function uses `webmapping.parcels.load()` to show parcels on map.<br>
 Parcels layer is another vector layer which shows guidelines on the map for rural property boundaries in victoria.<br>
 This will help you to draw more accurate farm boundary and if snapping feature is enabled it helps you to snap boundary to these lines when you get close to the lines.<br>
 You need to pass 4 parameter to load parcels.<br>
@@ -416,7 +419,8 @@ function loadParcels() {
 }
 ```
 
-`$scope.selectLayer`:In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
+####Select Interaction Layer
+In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
 
 I will activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
 To initialise webmapping `actions` I need to pass `farmLayer` and `paddocksLayer` to `init` function.
@@ -450,7 +454,8 @@ $scope.selectLayer = function () {
 };
 ```
 
-`mapOnPointerMove`: This is how I am deciding to enable drawing or editing for the selected layer.
+####Enable darwing or editing on map
+This is how I am deciding to enable drawing or editing for the selected layer.
 If mouse cursor is on top of the one of existing polygons and user does a single click it means edit.<br>
 If mouse cursor is not on top of any of existing polygons and user does a single click it means he wants to draw a new polygon.<br>
  This works fine for desktop apps and it make your application smarter in a way that it would understand user's intention.<br>
@@ -491,7 +496,7 @@ function mapOnPointerMove(event) {
 	}
 }
 ```
-
+####Applying feature changes on AngularJS side
  AngularJS does a magic called "two-way binding" which basically means as soon as a value is changed on the model it updates the view to reflecat that change and vice versa. But this magic only happens when you do make changes in AngularJS world.<br>
  Because I am using OpenLayers api to do some of the updates I need to notify the AngularJS manually to update data bindings.
 		 
@@ -503,6 +508,7 @@ function updateNgScope() {
 }
 ```
 
+####Understanding paddock and farm attributes changes
 The following functions deal with paddock or farm attribute changes. After a change is triggered by user interface I am updating feature properties based on new values and reflecting that change on Angular side by updating the `$scope`.
 ```
 function paddockChanged() {
@@ -539,6 +545,7 @@ $scope.onFarmNameChanged = function () {
 };
 ```		
 
+####Handling Paddock's selection/deselection
 In this example, if you start editing a paddock and click on another paddock before applying these changes, I will cancel all changes which means map goes back to last stored state.<br>
 Following functions deal with paddock selection and deselection.
 
@@ -583,7 +590,7 @@ function onPaddockDeselect(event) {
 	updateNgScope();
 };
 ```		
-
+####Applying changes to farmdata
 Each time we do a change in webmapping like changing values of a paddock(name, type, group) or farm it self,
 defining new paddock or updating farm or paddock boundaries we need to apply changes on farmdata by calling save method.
 Then we reload the latest farmdata into webmapping to update its reference in webmapping.
@@ -663,7 +670,7 @@ $scope.apply = function () {
 	$scope.selectedPaddock = {};
 };
 ```	
-
+####Webmapping Events
 `webmapping.events` provides list of events you can register for, to understand certainn event in webmapping.<br>
 Here I want to know about things like when an active drawing is finished or when I can disable donut drawing mode.<br>
 I am using `web-mapping-measure-end` to show the value of measured length or area.
@@ -714,7 +721,7 @@ webmapping.on('web-mapping-feature-deselect', function (event, data) {
 	}
 });
 ```	
-
+####Exporting farmdata to KML and GeoJSON
 You can export your valid farmdata at any time. `webmapping` provides couple of functions for you to export to "KML" and "GeoJSON".
 ```
 $scope.toGeoJson = function () {
@@ -761,6 +768,7 @@ function addCustomPaddockGroups(farmData){
 }
 ```	
 
+####Bootstarp Web Mapping Application
 And finally we need to load farmdata into webmapping to glue everything together.
 ```
 $scope.loadFarmData = function () {
