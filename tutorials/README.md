@@ -80,9 +80,9 @@ The "index.js" file in the root of examples contains the application definition.
 Reading through first page you will find that some of the functions are defined on `$scope` variable. In AngularJS `$scope` is kind of the glue between your HTML templates and your JS controllers.
 Read more about `$scope`: <a href="https://docs.angularjs.org/guide/scope">https://docs.angularjs.org/guide/scope</a>
 
-If you look at the first page in your browser you can see there are two separate ways you can start with.<br/>
-First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
-Second one is to load an existing farmdata which uses `webmapping.load`
+If you look at the first page in your browser you can see there are two separate ways you can start with:
+* First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
+* Second one is to load an existing farmdata which uses `webmapping.load`
 
 To provide load and create functions, I neet to create an controller. I will call it "FarmCtrl"<br/>
 `angular.module('farmbuild.webmapping.examples').controller('FarmCtrl', function ($scope, $log, webmapping) {})`
