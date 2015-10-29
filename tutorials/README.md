@@ -686,7 +686,7 @@ $scope.apply = function () {
 };
 ```	
 ####Webmapping Events
-`webmapping.events` provides list of events you can register for, to understand certainn event in webmapping.<br>
+`webmapping.events` provides list of events you can register for, to understand certain events in webmapping.<br>
 Here I want to know about things like when an active drawing is finished or when I can disable donut drawing mode.<br>
 I am using `web-mapping-measure-end` to show the value of measured length or area.
 ```
