@@ -22,6 +22,7 @@
       - [Handling Paddock's selection/deselection](#handling-paddocks-selectiondeselection)
       - [Applying changes to farmdata](#applying-changes-to-farmdata)
       - [Webmapping Events](#webmapping-events)
+      - [Add custom values for paddock groups and paddock types](#add-custom-values-for-paddock-groups-and-paddock-types)
       - [Exporting farmdata to KML and GeoJSON](#exporting-farmdata-to-kml-and-geojson)
       - [Bootstarp Web Mapping Application](#bootstarp-web-mapping-application)
 
