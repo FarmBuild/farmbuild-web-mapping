@@ -101,7 +101,7 @@ If you like to extend api default values you can get api ones and add your own v
 
 Here I am defining `myPaddockTypes` and I am extending api defaults to add my custom types.<br>
 With the `paddockGroups` I am completely overriding api defaults with `myPaddockGroups`.<br>
-After setting the desired configuration for farmdata, I create the farmdata, passing this configuration as myOptions to `webmapping.create` function.
+After setting the desired configuration for farmdata, I create the farmdata, passing this configuration as myOptions to `webmapping.create` function.<br>
 `create` function returns the farmdata which I am assining to a local variable called `created` then I load it into webmapping using `webmapping.load(created)`.
 
 `directToSide()` function is simply redirecting browser to the web mapping example page.
@@ -175,10 +175,10 @@ $scope.loadFarmData = function ($fileContent) {
 
 To load farmdata from a local file I am wrinting an AngularJS directives.
 
-Directives are markers on a DOM element (such as an attribute,
-element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM element (e.g. via event listeners),
-or even to transform the DOM element and its children<br>
-visit https://docs.angularjs.org/guide/directive for more information
+> Directives are markers on a DOM element (such as an attribute,
+> element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM > element (e.g. via event listeners),
+> or even to transform the DOM element and its children<br>
+> visit https://docs.angularjs.org/guide/directive for more information
 
 <pre>
 angular.module('farmbuild.webmapping.examples').directive('onReadFile', function ($parse, $log) {
