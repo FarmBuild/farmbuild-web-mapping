@@ -84,26 +84,17 @@ If you look at the first page in your browser you can see there are two separate
 * First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
 * Second one is to load an existing farmdata which uses `webmapping.load`
 
-To provide load and create functions, I neet to create an controller. I will call it "FarmCtrl"<br/>
+To provide load and create functions I need to create a controller. I will call it "FarmCtrl"<br/>
 `angular.module('farmbuild.webmapping.examples').controller('FarmCtrl', function ($scope, $log, webmapping) {})`
-<pre>
-$scope.farmData = {};
-/**
- * Array of farmdata's supported crs
- * Get first item in the Array
-*/
-$scope.crsSupported = webmapping.farmdata.crsSupported;
-$scope.farmNew = {crs: $scope.crsSupported[0].name};
-</pre>
 
 ###Create a new farmdata from scratch
-When creating a farmdata you can couple of parameters:
+When creating a farmdata you can define its attributes as follow:
 - name: The name of the farm
 - id: The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
 - projectionName: The projection name
 - options: an object that describes configuration for different sections. Currently you can specify an array for paddockGroups and paddockTypes.<br>
 You can construct the default values for paddock types and groups in your application and pass it to api on creation,
-your default values will override api default values. (eg: [{name: 'Business Default Type 1'}]).
+your default values will override api default values. (eg: `[{name: 'Business Default Type 1'}]`).
 
 Passing defaults values in this way is optional and if omitted api default values will be used.
 If you like to extend api default values you can get api ones and add your own values (eg: webmapping.paddocks.types.toArray()).
