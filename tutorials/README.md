@@ -418,10 +418,12 @@ function loadParcels() {
 
 `$scope.selectLayer`:In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
 
-I like to activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
-Then I need to pass `farmLayer` and `paddocksLayer` when I want to initialise webmapping `actions`.
+I will activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
+To initialise webmapping `actions` I need to pass `farmLayer` and `paddocksLayer` to `init` function.
 
 I need to decide on active interaction before changing the selected layer. `$scope.cancel()` tries to finish any ongoing interaction and if it is not possible to finish it will be canceled.
+Then I will destroy old interactions `actions.destroy(olMap);`, reser `$scope.selectedPaddock` variable state and unbind all `pointermove` callback and finally initialise actions with new configs.
+At the end of this function I am registering for events to listen to `pointermove` and `changefeature` of farm layer and paddocks layer.
 ```
 $scope.selectLayer = function () {
 	var activateSnapping = true,
