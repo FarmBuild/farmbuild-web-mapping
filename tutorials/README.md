@@ -258,7 +258,7 @@ I am putting the map on the right side, and give it more space:
 	<div id="olmap" class="fill"></div>
 </div>
 ```
-The `<input type="text" id="locationAutoComplete"` element is used to show an address search on map.
+The `<input type="text" id="locationAutoComplete"` element is used to show an address search on map.<br>
 The `<select id="layers"` provides layer selection options. In my web mapping example it is important for me to understand whether user wants to work on farm layer or paddock layer to enable vector editing capability on the right layer. 
 Another noticable thing here is I am adding two element to attach my maps to them:
 
