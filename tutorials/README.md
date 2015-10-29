@@ -416,6 +416,38 @@ function loadParcels() {
 }
 ```
 
+`$scope.selectLayer`:In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
+
+I like to activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
+Then I need to pass `farmLayer` and `paddocksLayer` when I want to initialise webmapping `actions`.
+
+I need to decide on active interaction before changing the selected layer. `$scope.cancel()` tries to finish any ongoing interaction and if it is not possible to finish it will be canceled.
+```
+$scope.selectLayer = function () {
+	var activateSnapping = true,
+		activateKeyboardInteractions = true,
+		farmLayerGroup = olHelper.farmLayerGroup(olMap),
+		farmLayer = olHelper.farmLayer(olMap),
+		paddocksLayer = olHelper.paddocksLayer(olMap),
+		selectedLayer = $scope.selectedLayer;
+	if (angular.isDefined(actions.snapping.active())) {
+		activateSnapping = actions.snapping.active();
+	}
+	$scope.cancel();
+	actions.destroy(olMap);
+	$scope.selectedPaddock = {};
+	if ($scope.selectedLayer === '') {
+		olMap.un('pointermove', mapOnPointerMove);
+		return;
+	}
+	actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
+	olMap.on('pointermove', mapOnPointerMove);
+	farmLayer.getSource().on('changefeature', farmChanged);
+	paddocksLayer.getSource().on('changefeature', paddockChanged);
+	loadParcels();
+};
+```
+
 `mapOnPointerMove`: This is how I am deciding to enable drawing or editing for the selected layer.
 If mouse cursor is on top of the one of existing polygons and user does a single click it means edit.<br>
 If mouse cursor is not on top of any of existing polygons and user does a single click it means he wants to draw a new polygon.<br>
@@ -504,37 +536,6 @@ $scope.onFarmNameChanged = function () {
 	farmChanged();
 };
 ```		
-
-I like to activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
-Then I need to pass `farmLayer` and `paddocksLayer` when I want to initialise webmapping `actions`.
-
-As I described earlier in webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
-I need to decide on active interaction before changing the selected layer. `$scope.cancel()` tries to finish any ongoing interaction and if it is not possible to finish it will be canceled.
-```
-$scope.selectLayer = function () {
-	var activateSnapping = true,
-		activateKeyboardInteractions = true,
-		farmLayerGroup = olHelper.farmLayerGroup(olMap),
-		farmLayer = olHelper.farmLayer(olMap),
-		paddocksLayer = olHelper.paddocksLayer(olMap),
-		selectedLayer = $scope.selectedLayer;
-	if (angular.isDefined(actions.snapping.active())) {
-		activateSnapping = actions.snapping.active();
-	}
-	$scope.cancel();
-	actions.destroy(olMap);
-	$scope.selectedPaddock = {};
-	if ($scope.selectedLayer === '') {
-		olMap.un('pointermove', mapOnPointerMove);
-		return;
-	}
-	actions.init(olMap, farmLayerGroup, selectedLayer, activateSnapping, activateKeyboardInteractions);
-	olMap.on('pointermove', mapOnPointerMove);
-	farmLayer.getSource().on('changefeature', farmChanged);
-	paddocksLayer.getSource().on('changefeature', paddockChanged);
-	loadParcels();
-};
-```
 
 In this example, if you start editing a paddock and click on another paddock before applying these changes, I will cancel all changes which means map goes back to last stored state.<br>
 Following functions deal with paddock selection and deselection.
