@@ -259,7 +259,7 @@ I am putting the map on the right side, and give it more space:
 </div>
 ```
 The `<input type="text" id="locationAutoComplete"` element is used to show an address search on map.<br>
-The `<select id="layers"` provides layer selection options. In my web mapping example it is important for me to understand whether user wants to work on farm layer or paddock layer to enable vector editing capability on the right layer. 
+The `<select id="layers"` provides layer selection options. In my web mapping example it is important for me to understand whether user wants to work on farm layer or paddock layer to enable vector editing capability on the right layer. <br>
 Another noticable thing here is I am adding two element to attach my maps to them:
 
 `<div id="gmap" class="fill"></div>`<br>
@@ -283,6 +283,7 @@ Another noticable thing here is I am adding two element to attach my maps to the
 > Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
 > You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you > are using them at the level you indicate you will exceed the free use.
 
+Although this is not an efficient way to have both Openlayers and google tiles at the time I am creating this tutorial this is the only way to integrate google map into OpenLayers3.<br>
 Because of this I need to add both maps separately and then put OpenLayers controls on top of google map and manually sync them when we interact with map view on OpenLayers side to provide interaction like pan and zoom with google tiles.
 But don't worry there is a helper function under `olHelper` namespace that you can do this easily with just one function call.
 
@@ -339,7 +340,8 @@ $scope.donutDrawing = false;
 
 Functions that are not defined on `$scope` variable are internal and therefore only accessed inside this controller.<br>
 
-`createGoogleMap`: Here I create a google map object. Notice that creation of map objects for google map and openLayers map are deliberately outside of api so you can pass customise and pass it to webmapping api.
+`createGoogleMap`: Here I create a google map object. Notice that creation of map objects for google map and openLayers map are deliberately outside of api so you can customise and pass it to webmapping api.<br>
+**Note**: If you do not want google tiles in your web mapping you can ommit this part.
 
 ```
 /**  Create google map object, customise the map object as you like. */
