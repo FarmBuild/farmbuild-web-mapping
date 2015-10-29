@@ -9,7 +9,7 @@
     - [Defining our application in AngularJS world](#defining-our-application-in-angularjs-world)
     - [Create a new farmdata from scratch](#create-a-new-farmdata-from-scratch)
     - [Load an existing farmdata](#load-an-existing-farmdata)
-  - [Web Maping page](#web-maping-page)
+  - [Web Mapping page](#web-mapping-page)
     - [Second HTML page](#second-html-page)
     - [Web Mapping JavaScript](#web-mapping-javascript)
       - [Create Google Map Object](#create-google-map-object)
@@ -228,7 +228,7 @@ angular.module('farmbuild.webmapping.examples').directive('onReadFile', function
 })
 </pre>
 
-##Web Maping page
+##Web Mapping page
 This is the second page of this example where we show the actual map and we will provide some function to do vector editing on map.
 
 ###Second HTML page
