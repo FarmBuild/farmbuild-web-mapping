@@ -21,6 +21,7 @@ In this tutorial I will walk you through FarmBuild Web Mapping API to give you s
 I start off by describing FarmBuild Web Mapping main components and I will continue with creating a complete web mapping example.<br/>
 The example is part of the "farmbuild-web-mapping" github repository.<br/>
 <a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/examples">https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/examples</a>
+If you download the "farmbuild-web-mapping" project from the repository, you will be able to open the example files in your browser and take a look at how it works.
 
 Web Mapping is using OpenLayers library. so you need to have a good understanding of OpenLayers to use these APIs.
 
@@ -79,7 +80,7 @@ The "index.js" file in the root of examples contains the application definition.
 Reading through first page you will find that some of the functions are defined on `$scope` variable. In AngularJS `$scope` is kind of the glue between your HTML templates and your JS controllers.
 Read more about `$scope`: <a href="https://docs.angularjs.org/guide/scope">https://docs.angularjs.org/guide/scope</a>
 
-If you look at the first page in your browser you can see there are two separate ways you start with.<br/>
+If you look at the first page in your browser you can see there are two separate ways you can start with.<br/>
 First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
 Second one is to load an existing farmdata which uses `webmapping.load`
 
