@@ -416,7 +416,7 @@ function loadParcels() {
 }
 ```
 
-`mapOnPointerMove`: This is how I am deciding to enable drawing or editing.
+`mapOnPointerMove`: This is how I am deciding to enable drawing or editing for the selected layer.
 If mouse cursor is on top of the one of existing polygons and user does a single click it means edit.<br>
 If mouse cursor is not on top of any of existing polygons and user does a single click it means he wants to draw a new polygon.<br>
  This works fine for desktop apps and it make your application smarter in a way that it would understand user's intention.<br>
@@ -458,8 +458,8 @@ function mapOnPointerMove(event) {
 }
 ```
 
- I need to update angular $scope to update data binding,
- Since some of the updates are happening out of angular world, I need to notify the angular manually.
+ AngularJS does a magic called "two-way binding" which basically means as soon as a value is changed on the model it updates the view to reflecat that change and vice versa. But this magic only happens when you do make changes in AngularJS world.<br>
+ Because I am using OpenLayers api to do some of the updates I need to notify the AngularJS manually to update data bindings.
 		 
 ```
 function updateNgScope() {
@@ -505,7 +505,11 @@ $scope.onFarmNameChanged = function () {
 };
 ```		
 
-In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a select list on the map, this way I can understand what is the layer(farm or paddocks) that user wants to work with.
+I like to activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
+Then I need to pass `farmLayer` and `paddocksLayer` when I want to initialise webmapping `actions`.
+
+As I described earlier in webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
+I need to decide on active interaction before changing the selected layer. `$scope.cancel()` tries to finish any ongoing interaction and if it is not possible to finish it will be canceled.
 ```
 $scope.selectLayer = function () {
 	var activateSnapping = true,
