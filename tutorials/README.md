@@ -392,7 +392,10 @@ function createOpenLayerMap(geoJsons) {
 
 
 
-`loadParcels`: this function uses `webmapping.parcels.load()` to show parcels on map. You need to pass 4 parameter.<br>
+`loadParcels`: this function uses `webmapping.parcels.load()` to show parcels on map.<br>
+Parcels layer is another vector layer which shows guidelines on the map for rural property boundaries in victoria.<br>
+This will help you to draw more accurate farm boundary and if snapping feature is enabled it helps you to snap boundary to these lines when you get close to the lines.<br>
+You need to pass 4 parameter to load parcels.<br>
 In this example I only call loadParcels if the zoom level is more than 14. This is because loaing parcels layer on a big extent can exhaust browser resources.
 ```
 function loadParcels() {
