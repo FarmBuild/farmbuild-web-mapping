@@ -27,12 +27,12 @@ Web Mapping is using OpenLayers library. so you need to have a good understandin
 ##Understanding API
 
 You will find an API folder in the root of github repository which contains all the API docs.<br/>
-Please visit <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/1.1.0/index.html">API docs</a> to learn more about APIs.
+(Please visit <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/1.1.0/index.html">API docs</a> to learn more about APIs.)
 
 By looking at the API doc you can see that there are different name spaces available through the left side menu.<br/>
 By clicking on each namespace you are able to see its sub namespaces and methods.
-For example if you click on webmapping which is the root namespace, you will see "actions, events, ga, measurement, olHelper, paddocks, paddocks/groups, paddocks/types, parcels".<br/>
-Scroll down and you will see there are methods such as: create and export, with a complete description about each one.
+For example if you click on webmapping which is the root namespace, you will see "actions, events, ga, measurement, olHelper, paddocks, paddocks/groups, paddocks/types and parcels".<br/>
+Scroll down and you will see there are methods such as: `create` and `export`, with a complete description about each one.
 
 "actions" contains a bunch of useful web mapping interactions. In OpenLayers there is concept called interaction that describes the way you can interact with the vectors on the map.<br/>
 Here we do use the same concept and provide some higher level interactions that is necessary for doing web mapping.
