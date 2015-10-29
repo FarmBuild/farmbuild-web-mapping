@@ -418,10 +418,12 @@ function loadParcels() {
 
 `mapOnPointerMove`: This is how I am deciding to enable drawing or editing.
 If mouse cursor is on top of the one of existing polygons and user does a single click it means edit.<br>
-If mouse cursor is not top of any of existing polygons and user does a single click it means drawing a new polygon.<br>
- This is a exhaustive way to handle map events,
- but it make your application smarter in the way it would understand user's intention.<br>
- If your application is targeting touch devices like tablet or smart phones, you may use other logic and events that fits you need.
+If mouse cursor is not on top of any of existing polygons and user does a single click it means he wants to draw a new polygon.<br>
+ This works fine for desktop apps and it make your application smarter in a way that it would understand user's intention.<br>
+ But if your application is targeting touch devices like tablet or smart phones, you may use other logic and events that fits you need.<br>
+**Note**: To enable `edit` or `draw` interaction user must choose one of the farm or paddock layer to interact with.
+
+When user start one of these interaction he must finish it before going for starting a new `edit` or `draw`.
 
 ```	
 function mapOnPointerMove(event) {
@@ -434,15 +436,22 @@ function mapOnPointerMove(event) {
 	var selectedLayer = $scope.selectedLayer, coordinate = event.coordinate,
 		featureAtCoordinate;
 	if (selectedLayer === "paddocks") {
+	/** returns paddocksLayer */
 		selectedLayer = olHelper.paddocksLayer(olMap);
 	}
 	if (selectedLayer === "farm") {
+	/** returns farmLayer */
 		selectedLayer = olHelper.farmLayer(olMap);
 	}
+	/** Find the feature at the clicked position */
 	featureAtCoordinate = webmapping.paddocks.findByCoordinate(coordinate, selectedLayer);
+	
+	/** If you can find the feature at that coordinate and user is not already darwing a polygon*/
 	if (featureAtCoordinate && !actions.drawing.isDrawing()) {
 		actions.editing.enable();
 	}
+	
+	/** If you can find the feature at that coordinate and user is not already editing a polygon*/
 	if (!featureAtCoordinate && !actions.editing.isEditing()) {
 		actions.drawing.enable();
 	}
