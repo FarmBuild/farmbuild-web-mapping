@@ -62,7 +62,7 @@ FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br>
 FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
 FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
 It is important to add these scripts in the right order.<br>
-AngularJS is embedded of FarmBuildCore library, so I dont need to add it.
+AngularJS is embedded of FarmBuildCore library, so I dont need to add it separately.
 
 I am also using bootstrap as css framework.<br>
 `<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
