@@ -158,7 +158,7 @@ $scope.createNew = function (farmNew) {
 </pre>
 
 ###Load an existing farmdata
-If you already have valid farmdata, you want to load it into Web Mapping. So instead of create, I want to have something like a load function.<br>
+If you already have valid farmdata, you want to load it into Web Mapping. Instead of create, I want to have something like a load function.<br>
 `load` function receives farmdata as json string value, and I use AngularJS to convert it to JavaScript object.
 
 <pre>
@@ -186,7 +186,7 @@ $scope.loadFarmData = function ($fileContent) {
 };
 </pre>
 
-To load farmdata from a local file I am writing an AngularJS directives.
+To load farmdata from a local file I am writing an AngularJS directive.
 
 > Directives are markers on a DOM element (such as an attribute,
 > element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM > element (e.g. via event listeners),
@@ -238,15 +238,15 @@ We have deliberately made these css files available so you can customise the map
 Here you need to add a couple of more JavaScript files:<br>
 OpenLayers JS library: `<script src="../../lib/ol/ol.js" type="text/javascript"></script>`<br>
 Proj4 JS library( it is used to convert between supported projections ): `<script src="../../dist/proj4/proj4.js"></script>`<br>
-Turf.js( it is used for geoprocessing ): `<script src="../../dist/turf/turf.min.js"></script>`<br>
+Turf.js(used for geoprocessing ): `<script src="../../dist/turf/turf.min.js"></script>`<br>
 Google map api: `<script src="https://maps.google.com/maps/api/js?v=3&amp;sensor=false&libraries=places"></script>`<br>
 FarmBuild core library: `<script src="../dist/farmbuild-core.js"></script>`<br> 
 FarmBuild farmdata library: `<script src="../dist/farmbuild-farmdata.js"></script>`<br>
 FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></script>`<br>
 AngularJS is embedded of FarmBuildCore library, so I dont need to add it separately.
 
-In this example I am using a bootstarp css grid to create a two column layout.<br>
-On the left side I will be showing selected feature and farm attributes and also I am providing buttons for different actions such as: `export`, `apply` and `clearing session`.
+In this example I am using a bootstrap css grid to create a two column layout.<br>
+On the left side I will be showing selected feature and farm attributes and I am also providing buttons for different actions such as: `export`, `apply` and `clearing session`.
 ```
 <div class="col-md-4 col-lg-3"
  style="overflow: auto;display: block;height: 100%;padding-top: 10px;padding-bottom: 10px;">
@@ -254,7 +254,7 @@ On the left side I will be showing selected feature and farm attributes and also
 	<farm-details ng-include="'farm-details.tpl.html'"></farm-details>
 </div>
 ```
-I am putting the map on the right side, and give it more space:
+I am putting the map on the right side, and giving it more space:
 ```
 <div class="col-md-8 col-lg-9">
 	<div id="map" class="map">
@@ -271,14 +271,14 @@ I am putting the map on the right side, and give it more space:
 	<div id="olmap" class="fill"></div>
 </div>
 ```
-The `<input type="text" id="locationAutoComplete"` element is used to show an address search on map.<br>
-The `<select id="layers"` provides layer selection options. In my web mapping example it is important for me to understand whether user wants to work on farm layer or paddock layer to enable vector editing capability on the right layer. <br>
-Another noticable thing here is I am adding two element to attach my maps to them:
+The `<input type="text" id="locationAutoComplete"` element is used to show an address search on the map.<br>
+The `<select id="layers"` provides layer selection options. In my web mapping example it is important for me to understand whether the user wants to work on the farm layer or the paddock layer so I can enable the vector editing capability on the correct layer. <br>
+Another thing to notice here is that I am adding two elements to attach my maps to:
 
 `<div id="gmap" class="fill"></div>`<br>
 `<div id="olmap" class="fill"></div>`
 
-> Because Google doesn't allow us to directly access their tiles, we need to show google map as a separate layer.<br>
+> Because Google doesn't allow us to directly access their tiles, we need to show the Google map as a separate layer.<br>
 > See Paul Spencer's post on the OL3 mailing list for a more complete explanation.<br>
 > https://groups.google.com/d/msgid/ol3-dev/e35d8f2a-9cd7-4109-b812-c4401c11dd31%40googlegroups.com?utm_medium=email&utm_source> =footer
 
@@ -296,8 +296,8 @@ Another noticable thing here is I am adding two element to attach my maps to the
 > Bing, on the other hand, does allow direct access to their tiles and so the Bing content can be integrated directly into OL3.
 > You'll need to research what the limitations are on Bing tiles - there is some level of free use but it is likely that if you > are using them at the level you indicate you will exceed the free use.
 
-Although this is not an efficient way to have both Openlayers and google tiles, at the time I am creating this tutorial this is the only way to integrate google map into OpenLayers3.<br>
-Because of this I need to add both maps separately and then put OpenLayers controls on top of google map and manually sync them when we interact with map view on OpenLayers side to provide interaction like pan and zoom with google tiles.
+Although this is not an efficient way to have both Openlayers and Google tiles, at the time I am creating this tutorial this is the only way to integrate a Google map into OpenLayers3.<br>
+Because of this I need to add both maps separately and then put OpenLayers controls on top of the Google map and manually sync them when we interact with the map view on the OpenLayers side, to provide interaction like pan and zoom with Google tiles.
 But don't worry there is a helper function under `olHelper` namespace that you can do this easily with just one function call.
 
 ###Web Mapping JavaScript
@@ -308,7 +308,7 @@ The controller's dependencies are passed as parameters to controller function:<b
 		function ($scope, $log, $location, $rootScope, $filter, webmapping) {}))
 ```
 
-First I will define all required variable. It is a good practice to define all your variables at the top of function block. I am also assigning different webmapping namespaces to local variables to have shorter names when I use them.
+First I will define all required variables. It is a good practice to define all your variables at the top of function block. I am also assigning different webmapping namespaces to local variables to have shorter names when I use them.
 ```
 var dataProjection,
 
@@ -354,8 +354,8 @@ $scope.donutDrawing = false;
 Functions that are not defined on `$scope` variable are internal and therefore only accessed inside this controller.<br>
 
 ####Create Google Map Object
-Here I create a google map object. Notice that creation of map objects for google map and openLayers map are deliberately outside of api so you can customise and pass it to webmapping api.<br>
-**Note**: If you do not want google tiles in your web mapping you can ommit this part.
+Here I create a Google map object. Notice that creation of map objects for the Google map and OpenLayers map are deliberately outside of the api so you can customise and pass it to the webmapping api.<br>
+**Note**: If you do not want Google tiles in your web mapping you can omit this part.  Note also that you are responsible for ensuring that any use of Google Maps is within their license conditions.  In some cases this may mean you would need a Google Enterprise license.
 
 ```
 /**  Create google map object, customise the map object as you like. */
@@ -373,7 +373,7 @@ function createGoogleMap(type) {
 ```
 
 ####Create OpenLayer Map Object
-Next step is to create OpenLayers map. You can create map object and pass it to api. Here you can use a couple of api helper functions to help you create correct base layers for farm and paddocks and also to do the integration with google map.
+Next step is to create the OpenLayers map. You can create the map object and pass it to the api. Here you can use a couple of api helper functions to help you create correct base layers for the farm and paddocks and also to do the integration with the Google map.
 
 ```
 /** Create openlayers map object, customise the map object as you like. */
@@ -408,11 +408,11 @@ function createOpenLayerMap(geoJsons) {
 
 
 ####Load Parcels
-This function uses `webmapping.parcels.load()` to show parcels on map.<br>
-Parcels layer is another vector layer which shows guidelines on the map for rural property boundaries in victoria.<br>
-This will help you to draw more accurate farm boundary and if snapping feature is enabled it helps you to snap boundary to these lines when you get close to the lines.<br>
-You need to pass 4 parameter to load parcels.<br>
-In this example I only call loadParcels if the zoom level is more than 14. This is because loaing parcels layer on a big extent can exhaust browser resources.
+This function uses `webmapping.parcels.load()` to show parcels on the map.<br>
+The Parcels layer is vector layer which shows rural property boundaries in Victoria.<br>
+This layer assist the user to draw a more accurate farm boundary and if snapping feature is enabled it helps you to snap the  boundary to these lines when you get close to the lines.<br>
+You need to pass 4 parameters to load parcels.<br>
+In this example I only call loadParcels if the zoom level is more than 14. This is because loading the parcels layer on a large extent can take a long to to load and can exhaust browser resources.
 ```
 function loadParcels() {
 	var parcelsServiceUrl = 'https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
@@ -433,13 +433,13 @@ function loadParcels() {
 ```
 
 ####Select Interaction Layer
-In webmapping to enable map interaction you must tell api the layer that you want to work with. Here I am usig a dropdown list on the map to get user selection.<br>
+In web mapping to enable map interaction you must tell the api the layer that you want to work with. Here I am using a dropdown list on the map to get the user's selection.<br>
 
 I will activate `Snapping` and `Keyboard Interactions` by default when you select a layer.<br>
-To initialise webmapping `actions` I need to pass `farmLayer` and `paddocksLayer` to `init` function.
+To initialise webmapping `actions` I need to pass `farmLayer` and `paddocksLayer` to the `init` function.
 
-I need to decide on active interaction before changing the selected layer. `$scope.cancel()` tries to finish any ongoing interaction and if it is not possible to finish it will be canceled.
-Then I will destroy old interactions `actions.destroy(olMap);`, reser `$scope.selectedPaddock` variable state and unbind all `pointermove` callback and finally initialise actions with new configs.
+I need to decide on the active interaction before changing the selected layer. `$scope.cancel()` tries to finish any ongoing interaction and if it is not possible to finish it will be cancelled.
+Then I will destroy old interactions `actions.destroy(olMap);`, reset the `$scope.selectedPaddock` variable state and unbind all `pointermove` callbacks and finally initialise actions with new configs.
 At the end of this function I am registering for events to listen to `pointermove` and `changefeature` of farm layer and paddocks layer.
 ```
 $scope.selectLayer = function () {
@@ -467,15 +467,14 @@ $scope.selectLayer = function () {
 };
 ```
 
-####Enable darwing or editing on map
+####Enable drawing or editing on map
 This is how I am deciding to enable drawing or editing for the selected layer.
 If mouse cursor is on top of the one of existing polygons and user does a single click it means edit.<br>
-If mouse cursor is not on top of any of existing polygons and user does a single click it means he wants to draw a new polygon.<br>
- This works fine for desktop apps and it make your application smarter in a way that it would understand user's intention.<br>
- But if your application is targeting touch devices like tablet or smart phones, you may use other logic and events that fits you need.<br>
-**Note**: To enable `edit` or `draw` interaction user must choose one of the farm or paddock layer to interact with.
+If mouse cursor is not on top of any of existing polygons and user does a single click it means they want to draw a new polygon.<br>
+ This works fine for desktop apps (ie where the user is using a mouse) however if your application is targeting touch devices like tablets or smart phones, you may use wish to use different logic and events which better suit a touch device.<br>
+**Note**: To enable the `edit` or `draw` interaction, the user must first choose one of the farm or paddock layers to interact with.
 
-When user start one of these interaction he must finish it before going for starting a new `edit` or `draw`.
+When the user starts one of these interactions, they must finish it before starting a new `edit` or `draw`.
 
 ```	
 function mapOnPointerMove(event) {
@@ -509,9 +508,9 @@ function mapOnPointerMove(event) {
 	}
 }
 ```
-####Applying feature changes on AngularJS side
- AngularJS does a magic called "two-way binding" which basically means as soon as a value is changed on the model it updates the view to reflecat that change and vice versa. But this magic only happens when you do make changes in AngularJS world.<br>
- Because I am using OpenLayers api to do some of the updates I need to notify the AngularJS manually to update data bindings.
+####Applying feature changes on the AngularJS side
+ AngularJS does some magic called "two-way binding" which basically means as soon as a value is changed on the model it updates the view to reflect that change and vice versa. But this magic only happens when you make the changes in the AngularJS world.<br>
+ Because I am using the OpenLayers api to do some of the updates I need to notify AngularJS manually to update the data bindings.
 		 
 ```
 function updateNgScope() {
@@ -521,8 +520,8 @@ function updateNgScope() {
 }
 ```
 
-####Understanding paddock and farm attributes changes
-The following functions deal with paddock or farm attribute changes. After a change is triggered by user interface I am updating feature properties based on new values and reflecting that change on Angular side by updating the `$scope`.
+####Understanding paddock and farm attribute changes
+The following functions deal with paddock or farm attribute changes. After a change is triggered from the user interface, I am updating feature properties based on new values and reflecting that change in the AngularJS side by updating the `$scope`.
 ```
 function paddockChanged() {
 	$scope.paddockChanged = true;
@@ -559,8 +558,8 @@ $scope.onFarmNameChanged = function () {
 ```		
 
 ####Handling Paddock's selection/deselection
-In this example, if you start editing a paddock and click on another paddock before applying these changes, I will cancel all changes which means map goes back to last stored state.<br>
-Following functions deal with paddock selection and deselection.
+In this example, if you start editing a paddock and click on another paddock before applying these changes, I will cancel all changes which means the map goes back to the last stored state.<br>
+The following functions deal with paddock selection and deselection.
 
 ```
 function onPaddockSelect(event, selectedPaddock) {
@@ -604,11 +603,11 @@ function onPaddockDeselect(event) {
 };
 ```		
 ####Applying changes to farmdata
-Each time we do a change in webmapping like changing values of a paddock(name, type, group) or farm it self,
-defining new paddock or updating farm or paddock boundaries we need to apply changes on farmdata by calling save method.
-Then we reload the latest farmdata into webmapping to update its reference in webmapping.
-This whole workflow is done by apply function which makes sense in case of this example.
-You may separate these tasks and use different events or triggers to do it.
+Each time we make a change in the web mapping such as changing values of a paddock(name, type, group) or the farm itself,
+defining a new paddock or updating farm or paddock boundaries we need to apply the changes on farmdata by calling the save method.
+We then reload the latest farmdata into webmapping to update its reference.
+This whole workflow is done by the apply function which makes sense in the case of this example.
+You may also separate these tasks and use different events or triggers to do them if required.
 
 ```
 $scope.apply = function () {
@@ -686,8 +685,8 @@ $scope.apply = function () {
 };
 ```	
 ####Webmapping Events
-`webmapping.events` provides list of events you can register for, to understand certain events in webmapping.<br>
-Here I want to know about things like when an active drawing is finished or when I can disable donut drawing mode.<br>
+`webmapping.events` provides list of events you can register for, to understand when certain events are fired in webmapping.<br>
+Here I want to know about things like when an active drawing is finished or when I can disable the donut drawing mode.<br>
 I am using `web-mapping-measure-end` to show the value of measured length or area.
 ```
 webmapping.on('web-mapping-draw-end', function (feature) {
@@ -737,7 +736,7 @@ webmapping.on('web-mapping-feature-deselect', function (event, data) {
 });
 ```	
 ####Exporting farmdata to KML and GeoJSON
-You can export your valid farmdata at any time. `webmapping` provides couple of functions for you to export to "KML" and "GeoJSON".
+You can export your valid farmdata at any time. `webmapping` provides a couple of functions for you to export to "KML" and "GeoJSON".
 ```
 $scope.toGeoJson = function () {
 	farmbuild.webmapping.exportGeoJson(document, $scope.farmData);
@@ -748,13 +747,13 @@ $scope.toKml = function () {
 };
 ```
 ####Add custom values for paddock groups and paddock types 
-If you want to use api to add custom paddock types this the way to to so.<br>
-if there is type with the same name in farmdata, you would receive an error message
-You can check existence of a type by its unique name, using "webmapping.paddocks.types.byName" method
+If you want to use the api to add custom paddock types, this is the way to do it.<br>
+If there is a type with the same name in farmdata, you would receive an error message. 
+You can check the existence of a type by its unique name, using the "webmapping.paddocks.types.byName" method
 add the types using paddock api and update
 unless you do an update the new type data would not be persisted on farmdata
-"update" is a farmdata method exposed through webmapping api.
-The main difference between save and update is that using update you are only updating farmdata component, so you do not need to pass geometries
+"update" is a farmdata method exposed through the webmapping api.
+The main difference between save and update is that using update you are only updating the farmdata component, so you do not need to pass geometries
 
 ```
 function addCustomPaddockTypes(farmData){
@@ -766,13 +765,13 @@ function addCustomPaddockTypes(farmData){
 }
 ```		
 
-If you want to use api to add custom paddock groups this the way to to so
-if there is group with the same name in farmdata, you would receive an error message
+If you want to use the api to add custom paddock groups this is the way to do it. 
+If there is group with the same name in farmdata, you would receive an error message. 
 You can check existence of a group by its unique name, using "webmapping.paddocks.types.byName" method
 add the groups using paddock api and update
 unless you do an update the new group data would not be persisted on farmdata
 "update" is a farmdata method exposed through webmapping api.
-The main difference between save and update is that using update you are only updating farmdata component, so you do not need to pass geometries
+The main difference between save and update is that using update you are only updating the farmdata component, so you do not need to pass geometries
 
 ```
 function addCustomPaddockGroups(farmData){
@@ -785,7 +784,7 @@ function addCustomPaddockGroups(farmData){
 ```	
 
 ####Bootstrap Web Mapping Application
-And finally we need to load farmdata into webmapping to glue everything together.
+And finally we need to load the farmdata into webmapping to glue everything together.
 ```
 $scope.loadFarmData = function () {
 	var geoJsons;
