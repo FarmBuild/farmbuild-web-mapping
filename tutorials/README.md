@@ -28,45 +28,45 @@
 
 <!-- END doctoc generated TOC please keep comment here to allow auto update -->
 
-#Web Mapping with FarmBuild Web Mapping API (Tutorial)
+#Implementing Web Mapping with the FarmBuild Web Mapping API (Tutorial)
 
-In this tutorial I will walk you through FarmBuild Web Mapping API to give you some ideas on how you can utilise it in your applications.<br/>
-I start off by describing FarmBuild Web Mapping main components and I will continue with creating a complete web mapping example.<br/>
+This tutorial will walk you through the FarmBuild Web Mapping API to give you some ideas on how you can use it in your applications.<br/>
+It starts off by describing FarmBuild Web Mapping main components and continues with creating a complete web mapping example.<br/>
 The example is part of the "farmbuild-web-mapping" github repository.<br/>
 <a href="https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/examples">https://github.com/FarmBuild/farmbuild-web-mapping/tree/master/examples</a>
 If you download the "farmbuild-web-mapping" project from the repository, you will be able to open the example files in your browser and take a look at how it works.
 
-Web Mapping is using OpenLayers library. so you need to have a good understanding of OpenLayers to use these APIs.
+The Web Mapping API uses the open source OpenLayers library. so you will need to have a good understanding of OpenLayers to use these APIs effectively.
 
-##Understanding API
+##Understanding the API
 
 You will find an API folder in the root of github repository which contains all the API docs.<br/>
 (Please visit <a href="https://rawgit.com/FarmBuild/farmbuild-web-mapping/master/docs/farmbuild-web-mapping/1.1.0/index.html">API docs</a> to learn more about APIs.)
 
-By looking at the API doc you can see that there are different name spaces available through the left side menu.<br/>
+By looking at the API documentation you can see that there are different name spaces available through the left side menu.<br/>
 By clicking on each namespace you are able to see its sub namespaces and methods.
-For example if you click on webmapping which is the root namespace, you will see "actions, events, ga, measurement, olHelper, paddocks, paddocks/groups, paddocks/types and parcels".<br/>
+For example if you click on webmapping, which is the root namespace, you will see "actions, events, ga, measurement, olHelper, paddocks, paddocks/groups, paddocks/types and parcels".<br/>
 Scroll down and you will see there are methods such as: `create` and `export`, with a complete description about each one.
 
 `actions` contains a bunch of useful web mapping interactions. In OpenLayers there is concept called "interaction".<br>
 An interaction describes the way you can interact with the vectors on the map.<br/>
-Here we do use the same concept and provide some higher level interactions that is necessary for doing web mapping.
-Under this namespace you will find interactions such as: drawing, editing and snapping.
+Here we do use the same concept and provide some higher level interactions that are necessary for doing web mapping.
+Under this namespace you will find interactions such as drawing, editing and snapping.
 
 `events` namespace provides some hooks for you to understand about certain events in web mapping.
 For example you can register for events to understand when drawing of a polygon is finished, when a feature is selected/deselected or when map base layer is changed.
 
 `olHelper` namespace provides functions to help you do common web mapping tasks easily.<br/>
-For example you can use it initialise farm/paddocks vector layer and initialise web mapping.
+For example you can use it initialise the farm/paddocks vector layer and initialise web mapping.
 
 `paddocks/groups`, `paddocks/types` namespaces are concerned with defining the references for types and groups of paddocks.<br/>
-You can customise based on you application's need and you can eventually persist these values in your farmdata.
+You can customise this based on your application's needs and you can eventually persist these values in your farmdata.
 
 We will have a closer look at most of these APIs through this tutorial.
 
 ##Getting Started ...
 
-In this example I wil be using AngularJS to create the client-side application and that is all we need for now.
+In this example I will be using AngularJS to create the client-side application and that is all we need for now.
 
 ###First HTML page
 There is an "index.html" file in the root of example folder. This is the first page of this example. It contains all necessary form components for `load` and `create` functions.
@@ -78,10 +78,10 @@ FarmBuild webmapping library `<script src="../dist/farmbuild-webmapping.js"></sc
 It is important to add these scripts in the right order.<br>
 AngularJS is embedded of FarmBuildCore library, so I dont need to add it separately.
 
-I am also using bootstrap as css framework.<br>
+I am also using Bootstrap as the CSS framework.<br>
 `<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.4/css/bootstrap.min.css">`
 
-###Defining our application in AngularJS world
+###Defining our application in the AngularJS world
 
 First of all we need to define our application in AngularJS terms.
 The "index.js" file in the root of examples contains the application definition.
@@ -93,9 +93,9 @@ The "index.js" file in the root of examples contains the application definition.
 Reading through first page you will find that some of the functions are defined on `$scope` variable. In AngularJS `$scope` is kind of the glue between your HTML templates and your JS controllers.
 Read more about `$scope`: <a href="https://docs.angularjs.org/guide/scope">https://docs.angularjs.org/guide/scope</a>
 
-If you look at the first page in your browser you can see there are two separate ways you can start with:
-* First one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
-* Second one is to load an existing farmdata which uses `webmapping.load`
+If you look at the first page in your browser you can see there are two separate ways you can start:
+* The first one is to create a farmdata from scratch which utilises `webmapping.create`<br/>
+* The second one is to load an existing farmdata which uses `webmapping.load`
 
 To provide load and create functions I need to create a controller. I will call it "FarmCtrl"<br/>
 `angular.module('farmbuild.webmapping.examples').controller('FarmCtrl', function ($scope, $log, webmapping) {})`
@@ -110,14 +110,14 @@ You can construct the default values for paddock types and groups in your applic
 your default values will override api default values. (eg: `[{name: 'Business Default Type 1'}]`).
 
 Passing defaults values in this way is optional and if omitted api default values will be used.
-If you like to extend api default values you can get api ones and add your own values (eg: `webmapping.paddocks.types.toArray()`).
+If you would like to extend the api default values you can get the api ones and add your own values (eg: `webmapping.paddocks.types.toArray()`).
 
-Here I am defining `myPaddockTypes` and I am extending api defaults to add my custom types.<br>
+Here I am defining `myPaddockTypes` and I am extending the api defaults to add my custom types.<br>
 With the `paddockGroups` I am completely overriding api defaults with `myPaddockGroups`.<br>
 After setting the desired configuration for farmdata, I create the farmdata, passing this configuration as myOptions to `webmapping.create` function.<br>
-`create` function returns the farmdata which I am assining to a local variable called `created` then I load it into webmapping using `webmapping.load(created)`.
+`create` function returns the farmdata which I am assigning to a local variable called `created` then I load it into webmapping using `webmapping.load(created)`.
 
-`directToSide()` function is simply redirecting browser to the web mapping example page.
+`directToSide()` function is simply redirecting the browser to the web mapping example page.
 
 <pre>
 $scope.createNew = function (farmNew) {
@@ -159,7 +159,7 @@ $scope.createNew = function (farmNew) {
 
 ###Load an existing farmdata
 If you already have valid farmdata, you want to load it into Web Mapping. So instead of create, I want to have something like a load function.<br>
-`load` function receives farmdata as json string value, and I use angular to convert it to JavaScript object.
+`load` function receives farmdata as json string value, and I use AngularJS to convert it to JavaScript object.
 
 <pre>
 /**
@@ -186,7 +186,7 @@ $scope.loadFarmData = function ($fileContent) {
 };
 </pre>
 
-To load farmdata from a local file I am wrinting an AngularJS directives.
+To load farmdata from a local file I am writing an AngularJS directives.
 
 > Directives are markers on a DOM element (such as an attribute,
 > element name, comment or CSS class) that tell AngularJS's HTML compiler ($compile) to attach a specified behavior to that DOM > element (e.g. via event listeners),
@@ -229,7 +229,7 @@ angular.module('farmbuild.webmapping.examples').directive('onReadFile', function
 </pre>
 
 ##Web Mapping page
-This is the second page of this example where we show the actual map and we will provide some function to do vector editing on map.
+This is the second page of this example where we show the actual map and we will provide functions to do vector editing on map.
 
 ###Second HTML page
 This page is quite simple. We have couple of more css files to describe the look of the map controls.
