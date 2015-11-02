@@ -8,8 +8,15 @@
  * All the api function are available via "farmbuild" namespace (eg: farmbuild.webmapping, farmbuild.nutrientcalculator).
  * If you are using AngularJS in your application you can consume farmbuild component as AngularJS modules, similar to this example.
  */
+
+/**
+ * Defining my application and passing 'farmbuild.webmapping' as a dependency to be injected.
+ */
 angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 
+	/**
+	 * "run" method is executed before any other function in application, so I am putting my initial configs here.
+	 */
 	.run(function ($rootScope) {
 		/**
 	  * Optional version number for sake of this example (not part of the webmapping api)
