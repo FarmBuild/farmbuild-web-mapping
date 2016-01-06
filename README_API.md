@@ -37,5 +37,5 @@ Example
 ```
 var organisationName = 'your organisation name';
 //Calling the track API for the usage
-farmbuild.webmapping.ga.trackCalculate(organisationName);
+farmbuild.webmapping.ga.trackWebMapping(organisationName);
 ```
