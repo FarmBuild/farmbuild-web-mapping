@@ -61,7 +61,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.donutDrawing = false;
 
 		function loadParcels() {
-			var parcelsServiceUrl = 'https://farmbuild-wfs-stg.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
+			var parcelsServiceUrl = 'https://farmbuild-wfs.agriculture.vic.gov.au/geoserver/farmbuild/wfs',
 				parcelsExtent, extentProjection, responseProjection;
 
 			/**
