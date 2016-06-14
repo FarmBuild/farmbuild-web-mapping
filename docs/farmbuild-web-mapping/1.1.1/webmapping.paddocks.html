@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>parcels/index.src.js - Documentation</title>
+    <title>paddocks - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,89 +28,282 @@
 
 <div id="main">
     
-    <h1 class="page-title">parcels/index.src.js</h1>
+    <h1 class="page-title">paddocks</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
+        <h2>
+            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
+        
+        paddocks
+        </h2>
+        
+    
+</header>
 
-/**
- * @since 0.0.1
- * @copyright 2015 State of Victoria.
- * @author State of Victoria
- * @version 1.0.0
- */
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>webmapping paddock</p></div>
+        
 
-/**
- * webmapping rural parcels
- * @type {object}
- * @namespace webmapping.parcels
- */
-angular.module('farmbuild.webmapping')
-	.factory('webMappingParcels',
-	function ($log, $http, validations, webMappingInteractions, webMappingConverter) {
-		var _isDefined = validations.isDefined,
-			converter = webMappingConverter;
+        
 
-		/**
-		 * loads rural parcels and add it as layer to ol.Map.
-		 * This method uses JsonP to get information, make sure the projection definition matches your extent data, otherwise you will not get any data.
-		 * @method load
-		 * @param {!String} serviceUrl url of wfs parcels service to get data from
-		 * @param {!ol.Extent} extent extent of area to query for parcels
-		 * @param {!String} extentDataProjection data projection of extent data
-		 * @param {!String} responseProjection desired data projection of the response
-		 * @returns {!object} a promise object that represents http request made to get parcels
-		 * @memberof webmapping.parcels
-		 */
-		function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
-			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3857', 'EPSG:3857');
-			var config = {
-				params: {
-					service: 'WFS',
-					version: '1.0.0',
-					request: 'GetFeature',
-					typeName: 'farmbuild:ruralparcels',
-					outputFormat: 'text/javascript',
-					format_options: 'callback:JSON_CALLBACK',
-					srsname: responseProjection,
-					bbox: extent.join(',') + ',' + extentDataProjection
-				}
-			};
 
-			if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(extentDataProjection) || !_isDefined(responseProjection)) {
-				$log.error('There is a problem with input parameters, please refer to api for more information');
-				return;
-			}
-			$log.info('Loading parcels information for the extent: ', extent);
-			return $http({method: 'JSONP', url: serviceUrl, params: config.params}).
-				success(function (data, status) {
-					$log.info('loaded parcels successfully.', status, data);
-					var olFeatures = converter.geoJsonToFeatures({
-						"type": "FeatureCollection",
-						"features": data.features
-					});
-					webMappingInteractions.parcels.snap(olFeatures);
-				})
-				.error(function (data, status) {
-					$log.error('loading parcels failed!!', status, data);
-				});
-		}
+<dl class="details">
 
-		return {
-			load: _load
-		};
+    
 
-	});
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line10">line 10</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".findByCoordinate"><span class="type-signature">(static) </span>findByCoordinate<span class="signature">(coordinate<span class="signature-attributes">non-null</span>, vectorLayer<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {ol.Feature}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>finds a paddock based on the coordinate</p>
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>coordinate</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.Coordinate</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>openlayers map object</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vectorLayer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.layer.Vector</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>paddock layer</p></td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line20">line 20</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>the first paddock found in that coordinate</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">ol.Feature</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -120,7 +313,7 @@ angular.module('farmbuild.webmapping')
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Thu Jan 07 2016 09:07:58 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:04:19 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
