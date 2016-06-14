@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>parcels/index.src.js - Documentation</title>
+    <title>web-mapping.src.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">parcels/index.src.js</h1>
+    <h1 class="page-title">web-mapping.src.js</h1>
     
 
     
@@ -38,74 +38,228 @@
     
     <section>
         <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
-
-/**
+            <pre class="prettyprint source linenums"><code>/**
  * @since 0.0.1
  * @copyright 2015 State of Victoria.
+
  * @author State of Victoria
  * @version 1.0.0
  */
 
-/**
- * webmapping rural parcels
- * @type {object}
- * @namespace webmapping.parcels
- */
-angular.module('farmbuild.webmapping')
-	.factory('webMappingParcels',
-	function ($log, $http, validations, webMappingInteractions, webMappingConverter) {
-		var _isDefined = validations.isDefined,
-			converter = webMappingConverter;
+'use strict';
 
-		/**
-		 * loads rural parcels and add it as layer to ol.Map.
-		 * This method uses JsonP to get information, make sure the projection definition matches your extent data, otherwise you will not get any data.
-		 * @method load
-		 * @param {!String} serviceUrl url of wfs parcels service to get data from
-		 * @param {!ol.Extent} extent extent of area to query for parcels
-		 * @param {!String} extentDataProjection data projection of extent data
-		 * @param {!String} responseProjection desired data projection of the response
-		 * @returns {!object} a promise object that represents http request made to get parcels
-		 * @memberof webmapping.parcels
-		 */
-		function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
-			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3857', 'EPSG:3857');
-			var config = {
-				params: {
-					service: 'WFS',
-					version: '1.0.0',
-					request: 'GetFeature',
-					typeName: 'farmbuild:ruralparcels',
-					outputFormat: 'text/javascript',
-					format_options: 'callback:JSON_CALLBACK',
-					srsname: responseProjection,
-					bbox: extent.join(',') + ',' + extentDataProjection
-				}
+/**
+ * webmapping
+ * @type {object}
+ * @namespace webmapping
+ */
+angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
+	.factory('webmapping',
+	function (farmdata,
+	          validations,
+	          $log,
+              $rootScope,
+	          geoJsonValidator,
+	          farmdataConverter,
+	          webMappingSession,
+	          webMappingProjections,
+	          webMappingInteractions,
+	          webMappingMeasurement,
+	          webMappingPaddocks,
+	          webMappingOpenLayersHelper,
+	          webMappingGoogleAddressSearch,
+	          webMappingGoogleAnalytics,
+	          webMappingParcels) {
+		$log.info('Welcome to Web Mapping...');
+
+		var _isDefined = validations.isDefined,
+			session = webMappingSession,
+			webMapping = {
+				session: session,
+				farmdata: farmdata,
+				validator: geoJsonValidator,
+				toGeoJsons: farmdataConverter.toGeoJsons,
+
+				/**
+				 * converts farmData geometry to KML
+				 * @method toKml
+				 * @param {object} farmData - farmData to convert
+				 * @returns {string} KML string
+				 * @memberof webmapping
+				 */
+				toKml: farmdataConverter.toKml,
+
+				/**
+				 * converts farmData geometry to geoJSON
+				 * @method toGeoJson
+				 * @param {object} farmData - farmData to convert
+				 * @returns {object} geoJSON object
+				 * @memberof webmapping
+				 */
+				toGeoJson: farmdataConverter.toGeoJson,
+
+				/**
+				 * converts farmData geometry to geoJSON and exports the file
+				 * @method exportGeoJson
+				 * @param {object} farmData - farmData to convert
+				 * @memberof webmapping
+				 */
+				exportGeoJson: farmdataConverter.exportGeoJson,
+
+				/**
+				 * converts farmData geometry to KML and exports the file
+				 * @method exportKml
+				 * @param {object} farmData - farmData to convert
+				 * @memberof webmapping
+				 */
+				exportKml: farmdataConverter.exportKml,
+				actions: webMappingInteractions,
+				paddocks: webMappingPaddocks,
+				olHelper: webMappingOpenLayersHelper,
+				ga: webMappingGoogleAnalytics,
+				parcels: webMappingParcels,
+				measurement: webMappingMeasurement,
+
+				/**
+				 * Loads the specified farmData into session
+				 * @method load
+				 * @returns {object} the farmData stored in session
+				 * geoJsons.farm: represents the farm
+				 * geoJsonspaddocks: represents the paddocks
+				 * @memberof webmapping
+				 */
+				load: session.load,
+
+				/**
+				 * Finds the farmData from the session.
+				 * @method find
+				 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+				 * @memberof webmapping
+				 */
+				find: session.find,
+
+				/**
+				 * Saves the specified geoJson into the farmData in the session.
+				 * @method save
+				 * @returns {object} the farmData stored in session, undefined if the farmData is found in session
+				 * @memberof webmapping
+				 */
+				save: function (geoJsons) {
+					var farmData = session.find();
+					return session.save(farmData, geoJsons);
+				},
+
+				/**
+				 * Saves and exports the farmData.json with a file name: farmdata-NAME_OF_FILE-yyyyMMddHHmmss.json
+				 * It creates HTML link element with 'download' attribute, the data is attached to href
+				 * and invoke click() function so the user gets the file save dialogue or something equivalent.
+				 * @method export
+				 * @param {object} document - browser document object reference
+				 * @param {object} farmData - farmData to export
+				 * @memberof webmapping
+				 */
+				export: session.export,
+				/**
+				 * Creates a new farmdata block as Javascript object with the specified name.
+				 * @method create
+				 * @param {!string} name - The name of the farm
+				 * @param {string} id - The ID of this farm in case if you manage this farm in an external system, so you can map the farmData
+				 * @param {!string} projectionName - The projection name
+				 * @param {!Object} options - an object that describes configuration for different sections. Currently you can specify an array for paddockGroups and paddockTypes
+				 * with the external system
+				 * @returns {Object} the farmdata object, undefined if the required fields are not provided
+				 * @memberof webmapping
+				 */
+				create: farmdata.create,
+
+        /**
+         * Listens on events of a given type.
+         * @method on
+         * @param {!string} name Event name to listen on.
+         * @param {!function(event, ...args)} listener - Function to call when the event is emitted.
+         * @returns {function()} Returns a deregistration function for this listener.
+         * @memberof webmapping
+         */
+        on: function(name, listener){
+          return $rootScope.$on(name, listener);
+        },
+
+
+
+				/**
+				 * webmapping events
+				 * @type {object}
+				 * @namespace webmapping.events
+				 */
+
+				/**
+				 * Fires once a active drawing is completed.
+				 * Passes the drawn feature to the listener function as the first parameter
+				 * @method web-mapping-draw-end
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires once donut drawing is enabled and drawing of the donut polygon is completed.
+				 * Passes the drawn feature to the listener function as the first parameter
+				 * @method web-mapping-donut-draw-end
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires once a feature(polygon) is selected.
+				 * Passes the selected feature to the listener function as the first parameter
+				 * @method web-mapping-feature-select
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires once a feature(polygon) is deselected.
+				 * Passes the deselected feature to the listener function as the first parameter
+				 * @method web-mapping-feature-deselect
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires after measuring is completed.
+				 * Passes an object containing value and unit of measurement to the listener function as the first parameter
+				 * @method web-mapping-measure-end
+				 * @memberof webmapping.events
+				 */
+
+				/**
+				 * Fires on base layer change
+				 * It passes the selected layer to the listener function as the first parameter
+				 * @method web-mapping-base-layer-change
+				 * @memberof webmapping.events
+				 */
+
+
+
+
+
+				/**
+				 * Updates currently loaded farmdata block.
+				 * @method update
+				 * @param {!update} new farmdata object
+				 * @returns {Object} the farmdata object
+				 * @memberof webmapping
+				 */
+				update: session.update
 			};
 
-			if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(extentDataProjection) || !_isDefined(responseProjection)) {
-				$log.error('There is a problem with input parameters, please refer to api for more information');
-				return;
-			}
-			$log.info('Loading parcels information for the extent: ', extent);
-			return $http({method: 'JSONP', url: serviceUrl, params: config.params}).
-				success(function (data, status) {
-					$log.info('loaded parcels successfully.', status, data);
-					var olFeatures = converter.geoJsonToFeatures({
-						"type": "FeatureCollection",
-						"features": data.features
-					});
-					webMappingInteractions.parcels.snap(olFeatures);
-				})
-				.error(function (data, status) {
-					$log.error('loading parcels failed!!', status, data);
-				});
+		// Provide a shortcut for modules
+		webMapping.version = '1.1.0';
+
+		if (typeof window.farmbuild === 'undefined') {
+			window.farmbuild = {
+				webmapping: webMapping
+			};
+		} else {
+			window.farmbuild.webmapping = webMapping;
 		}
 
-		return {
-			load: _load
-		};
+		return webMapping;
 
 	});
 </code></pre>
@@ -120,7 +274,7 @@ angular.module('farmbuild.webmapping')
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:29:23 GMT+1000 (AEST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:30:19 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

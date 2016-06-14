@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>paddocks - Documentation</title>
+    <title>measurement/index.src.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,282 +28,87 @@
 
 <div id="main">
     
-    <h1 class="page-title">paddocks</h1>
+    <h1 class="page-title">measurement/index.src.js</h1>
     
 
     
 
 
 
-
-<section>
-
-<header>
     
-        <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
-        
-        paddocks
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>webmapping paddock</p></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line10">line 10</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".findByCoordinate"><span class="type-signature">(static) </span>findByCoordinate<span class="signature">(coordinate<span class="signature-attributes">non-null</span>, vectorLayer<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {ol.Feature}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>finds a paddock based on the coordinate</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>coordinate</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Coordinate</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>openlayers map object</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>vectorLayer</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.layer.Vector</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>paddock layer</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line20">line 20</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>the first paddock found in that coordinate</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">ol.Feature</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * webmapping measurement
+ * @type {object}
+ * @namespace webmapping.measurement
+ */
+
+angular.module('farmbuild.webmapping')
+	.factory('webMappingMeasurement',
+	function (validations,
+	          webMappingConverter,
+	          $log) {
+		var _isDefined = validations.isDefined,
+            _googleProjection = 'EPSG:3857',
+            _openlayersDefaultProjection = 'EPSG:4326',
+			_converter = webMappingConverter;
+
+		function _areas(features) {
+			$log.info('calculating area of features ...', features);
+			try {
+				return turf.area(features) * 0.0001;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		/**
+		 * Calculates are of a feature
+		 * @method area
+		 * @returns {number} area in hectare
+		 * @param {!ol.Feature} feature
+		 * @memberof webmapping.measurement
+		 */
+		function _area(feature) {
+			$log.info('calculating area of polygon ...', feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
+			try {
+				return turf.area(feature) * 0.0001;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		/**
+		 * Calculates length of a line
+		 * @method length
+		 * @returns {number} length in metre
+		 * @param {!ol.Feature} feature
+		 * @memberof webmapping.measurement
+		 */
+		function _length(feature) {
+			$log.info('calculating length of line ...', feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
+			try {
+				return turf.lineDistance(feature, 'kilometers') * 1000;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		return {
+			area: _area,
+			areas: _areas,
+			length: _length
+		}
+
+	});
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -313,7 +118,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:29:23 GMT+1000 (AEST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:30:19 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

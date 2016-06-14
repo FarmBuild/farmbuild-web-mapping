@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>measurement/index.src.js - Documentation</title>
+    <title>snapping - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,87 +28,374 @@
 
 <div id="main">
     
-    <h1 class="page-title">measurement/index.src.js</h1>
+    <h1 class="page-title">snapping</h1>
     
 
     
 
 
 
+
+<section>
+
+<header>
     
-    <section>
-        <article>
-            <pre class="prettyprint source linenums"><code>'use strict';
+        <h2>
+            <span class="ancestors"><a href="webmapping.html">webmapping</a><a href="webmapping.actions.html">.actions</a>.</span>
+        
+        snapping
+        </h2>
+        
+    
+</header>
 
-/**
- * webmapping measurement
- * @type {object}
- * @namespace webmapping.measurement
- */
+<article>
+    <div class="container-overview">
+    
+        
+            <div class="description"><p>Snapping namespace of webmapping.actions</p></div>
+        
 
-angular.module('farmbuild.webmapping')
-	.factory('webMappingMeasurement',
-	function (validations,
-	          webMappingConverter,
-	          $log) {
-		var _isDefined = validations.isDefined,
-            _googleProjection = 'EPSG:3857',
-            _openlayersDefaultProjection = 'EPSG:4326',
-			_converter = webMappingConverter;
+        
 
-		function _areas(features) {
-			$log.info('calculating area of features ...', features);
-			try {
-				return turf.area(features) * 0.0001;
-			} catch (e) {
-				$log.error(e);
-			}
-		};
 
-		/**
-		 * Calculates are of a feature
-		 * @method area
-		 * @returns {number} area in hectare
-		 * @param {!ol.Feature} feature
-		 * @memberof webmapping.measurement
-		 */
-		function _area(feature) {
-			$log.info('calculating area of polygon ...', feature);
-			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
-			try {
-				return turf.area(feature) * 0.0001;
-			} catch (e) {
-				$log.error(e);
-			}
-		};
+<dl class="details">
 
-		/**
-		 * Calculates length of a line
-		 * @method length
-		 * @returns {number} length in metre
-		 * @param {!ol.Feature} feature
-		 * @memberof webmapping.measurement
-		 */
-		function _length(feature) {
-			$log.info('calculating length of line ...', feature);
-			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
-			try {
-				return turf.lineDistance(feature, 'kilometers') * 1000;
-			} catch (e) {
-				$log.error(e);
-			}
-		};
+    
 
-		return {
-			area: _area,
-			areas: _areas,
-			length: _length
-		}
+    
 
-	});
-</code></pre>
-        </article>
-    </section>
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line519">line 519</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+        
+    
+    </div>
+
+    
+
+    
+
+    
+
+     
+
+    
+
+    
+
+    
+        <h3 class="subsection-title">Methods</h3>
+
+        
+            
+
+    
+
+    <h4 class="name" id=".active"><span class="type-signature">(static) </span>active<span class="signature">()</span><span class="type-signature"> &rarr; {boolean}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Is webmapping snap interaction active?</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line538">line 538</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>whether snap interaction is active</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">boolean</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".disable"><span class="type-signature">(static) </span>disable<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Disable webmapping snap interaction</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line532">line 532</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".enable"><span class="type-signature">(static) </span>enable<span class="signature">()</span><span class="type-signature"></span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Enables webmapping snap interaction</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line526">line 526</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+    
+
+    
+
+    
+</article>
+
+</section>
 
 
 
@@ -118,7 +405,7 @@ angular.module('farmbuild.webmapping')
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:29:23 GMT+1000 (AEST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:30:19 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

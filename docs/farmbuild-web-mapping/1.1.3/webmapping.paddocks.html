@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>measurement - Documentation</title>
+    <title>paddocks - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">measurement</h1>
+    <h1 class="page-title">paddocks</h1>
     
 
     
@@ -43,7 +43,7 @@
         <h2>
             <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
         
-        measurement
+        paddocks
         </h2>
         
     
@@ -53,7 +53,7 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>webmapping measurement</p></div>
+            <div class="description"><p>webmapping paddock</p></div>
         
 
         
@@ -88,7 +88,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line3">line 3</a>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line10">line 10</a>
     </li></ul></dd>
     
 
@@ -124,14 +124,14 @@
 
     
 
-    <h4 class="name" id=".area"><span class="type-signature">(static) </span>area<span class="signature">(feature<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
+    <h4 class="name" id=".findByCoordinate"><span class="type-signature">(static) </span>findByCoordinate<span class="signature">(coordinate<span class="signature-attributes">non-null</span>, vectorLayer<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {ol.Feature}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Calculates are of a feature</p>
+    <p>finds a paddock based on the coordinate</p>
 </div>
 
 
@@ -167,13 +167,13 @@
 
         <tr>
             
-                <td class="name"><code>feature</code></td>
+                <td class="name"><code>coordinate</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">ol.Feature</span>
+<span class="param-type">ol.Coordinate</span>
 
 
             
@@ -183,7 +183,30 @@
 
             
 
-            <td class="description last"></td>
+            <td class="description last"><p>openlayers map object</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>vectorLayer</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">ol.layer.Vector</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>paddock layer</p></td>
         </tr>
 
     
@@ -224,7 +247,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line28">line 28</a>
+        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line20">line 20</a>
     </li></ul></dd>
     
 
@@ -251,7 +274,7 @@
 
         
 <div class="param-desc">
-    <p>area in hectare</p>
+    <p>the first paddock found in that coordinate</p>
 </div>
 
 
@@ -262,160 +285,7 @@
     </dt>
     <dd>
         
-<span class="param-type">number</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".length"><span class="type-signature">(static) </span>length<span class="signature">(feature<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Calculates length of a line</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>feature</code></td>
-            
-
-            <td class="type">
-            
-                
 <span class="param-type">ol.Feature</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line45">line 45</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>length in metre</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">number</span>
 
 
     </dd>
@@ -443,7 +313,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:29:23 GMT+1000 (AEST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:30:19 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
