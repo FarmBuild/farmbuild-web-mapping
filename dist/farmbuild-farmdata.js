@@ -1993,8 +1993,11 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddockGroups", function($
 
 angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, collections, validations, farmdataPaddockValidator, farmdataPaddockGroups, farmdataConverter) {
     var farmdataPaddocks = {}, _isDefined = validations.isDefined;
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
     function createName() {
-        return "Paddock " + new Date().getTime();
+        return "Paddock " + new Date().getTime() + randomInt(1, 1e3);
     }
     function generateId() {
         return new Date().getTime();
@@ -2071,12 +2074,14 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, 
             }
             paddocksMerged.push(merged);
             if (paddockFeature.properties.group) {
-                var paddockGroup = farmdataPaddockGroups.byName(paddockFeature.properties.group.name);
+                var paddockGroup = farmdataPaddockGroups.byName(paddockFeature.properties.group.name), paddockName = paddockFeature.properties.name;
                 if (!_isDefined(paddockGroup)) {
                     paddockGroup = farmdataPaddockGroups.create(paddockFeature.properties.group.name);
                     paddockGroups.push(paddockGroup);
                 }
-                paddockGroup.paddocks.push(paddockFeature.properties.name);
+                if (paddockGroup.paddocks.indexOf(paddockName) < 0) {
+                    paddockGroup.paddocks.push(paddockFeature.properties.name);
+                }
             }
         });
         farmData.paddocks = paddocksMerged;
