@@ -52,8 +52,8 @@
     "uglify": "uglifyjs dist/farmbuild-webmapping.js --source-map dist/farmbuild-webmapping.min.js.map --source-map-url farmbuild-webmapping.min.js.map -o dist/farmbuild-webmapping.min.js -v -c",
     "copy-core": "ncp bower_components/farmbuild-core/dist/ dist/ && ncp bower_components/farmbuild-farmdata/dist/ dist/",
     "copy-ol": "ncp lib/ol/ dist/ol --filter='^((?!debug).)*$'",
-    "copy-turf": "ncp bower_components/turf/ dist/turf --filter=.min.js",
-    "copy-proj4js": "ncp bower_components/proj4/dist/ dist/proj4 --filter=proj4.js",
+    "copy-turf": "mkdir -p dist/turf && cp bower_components/turf/turf.min.js dist/turf",
+    "copy-proj4js": "mkdir -p dist/proj4 && cp bower_components/proj4/dist/proj4.js dist/proj4",
     "dist": "npm run clean && npm run generate-docs && npm run concat && npm run uglify && npm run copy-core && npm run copy-ol && npm run copy-turf && npm run copy-proj4js"
   }
 }
