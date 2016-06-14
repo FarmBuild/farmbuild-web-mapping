@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>actions - Documentation</title>
+    <title>parcels/index.src.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,479 +28,89 @@
 
 <div id="main">
     
-    <h1 class="page-title">actions</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
-        
-        actions
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>webmapping actions namespace</p></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line11">line 11</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-        <h3 class="subsection-title">Namespaces</h3>
-
-        <dl>
-            <dt><a href="webmapping.actions.donut.html">donut</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.drawing.html">drawing</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.editing.html">editing</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.features.html">features</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.snapping.html">snapping</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".destroy"><span class="type-signature">(static) </span>destroy<span class="signature">(map<span class="signature-attributes">non-null</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Remove all the webmapping interactions, this only remove the interactions which is added by webmapping to ol.Map</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>map</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Map</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>openlayers map object</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line36">line 36</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".init"><span class="type-signature">(static) </span>init<span class="signature">(map<span class="signature-attributes">non-null</span>, farmLayerGroup<span class="signature-attributes">non-null</span>, activeLayerName<span class="signature-attributes">non-null</span>, snappingDefaultStatus, initKeyboardInteraction)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Initialise mapping actions</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>map</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Map</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>openlayers map object</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>farmLayerGroup</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.layer.Group</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>farm LayerGroup, use olHelper class to get this object</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>activeLayerName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>can be &quot;paddocks&quot; or &quot;farm&quot;, the layer which you want to interact with</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>snappingDefaultStatus</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>whether to activate snapping, snapping is used between farm, paddocks and rural parcels</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>initKeyboardInteraction</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>whether to activate keyboard interaction</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line61">line 61</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">parcels/index.src.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * @since 0.0.1
+ * @copyright 2015 State of Victoria.
+ * @author State of Victoria
+ * @version 1.0.0
+ */
+
+/**
+ * webmapping rural parcels
+ * @type {object}
+ * @namespace webmapping.parcels
+ */
+angular.module('farmbuild.webmapping')
+	.factory('webMappingParcels',
+	function ($log, $http, validations, webMappingInteractions, webMappingConverter) {
+		var _isDefined = validations.isDefined,
+			converter = webMappingConverter;
+
+		/**
+		 * loads rural parcels and add it as layer to ol.Map.
+		 * This method uses JsonP to get information, make sure the projection definition matches your extent data, otherwise you will not get any data.
+		 * @method load
+		 * @param {!String} serviceUrl url of wfs parcels service to get data from
+		 * @param {!ol.Extent} extent extent of area to query for parcels
+		 * @param {!String} extentDataProjection data projection of extent data
+		 * @param {!String} responseProjection desired data projection of the response
+		 * @returns {!object} a promise object that represents http request made to get parcels
+		 * @memberof webmapping.parcels
+		 */
+		function _load(serviceUrl, extent, extentDataProjection, responseProjection) {
+			//load('http://sv079.sv.domain:8080/geoserver/farmbuild/ows', [16204823.698695935, -4332241.187057228, 16206541.143175218, -4331412.32303176], 'EPSG:3857', 'EPSG:3857');
+			var config = {
+				params: {
+					service: 'WFS',
+					version: '1.0.0',
+					request: 'GetFeature',
+					typeName: 'farmbuild:ruralparcels',
+					outputFormat: 'text/javascript',
+					format_options: 'callback:JSON_CALLBACK',
+					srsname: responseProjection,
+					bbox: extent.join(',') + ',' + extentDataProjection
+				}
+			};
+
+			if (!_isDefined(serviceUrl) || !_isDefined(extent) || !_isDefined(extentDataProjection) || !_isDefined(responseProjection)) {
+				$log.error('There is a problem with input parameters, please refer to api for more information');
+				return;
+			}
+			$log.info('Loading parcels information for the extent: ', extent);
+			return $http({method: 'JSONP', url: serviceUrl, params: config.params}).
+				success(function (data, status) {
+					$log.info('loaded parcels successfully.', status, data);
+					var olFeatures = converter.geoJsonToFeatures({
+						"type": "FeatureCollection",
+						"features": data.features
+					});
+					webMappingInteractions.parcels.snap(olFeatures);
+				})
+				.error(function (data, status) {
+					$log.error('loading parcels failed!!', status, data);
+				});
+		}
+
+		return {
+			load: _load
+		};
+
+	});
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -510,7 +120,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:51:57 GMT+1000 (AEST) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.4.0</a> on Tue Jun 14 2016 11:52:55 GMT+1000 (AEST) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
