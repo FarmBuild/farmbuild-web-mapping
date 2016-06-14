@@ -2071,12 +2071,14 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, 
             }
             paddocksMerged.push(merged);
             if (paddockFeature.properties.group) {
-                var paddockGroup = farmdataPaddockGroups.byName(paddockFeature.properties.group.name);
+                var paddockGroup = farmdataPaddockGroups.byName(paddockFeature.properties.group.name), paddockName = paddockFeature.properties.name;
                 if (!_isDefined(paddockGroup)) {
                     paddockGroup = farmdataPaddockGroups.create(paddockFeature.properties.group.name);
                     paddockGroups.push(paddockGroup);
                 }
-                paddockGroup.paddocks.push(paddockFeature.properties.name);
+                if (paddockGroup.paddocks.indexOf(paddockName) < 0) {
+                    paddockGroup.paddocks.push(paddockFeature.properties.name);
+                }
             }
         });
         farmData.paddocks = paddocksMerged;
