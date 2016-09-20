@@ -13,7 +13,16 @@ angular.module('farmbuild.webmapping')
 	function ($log, farmdata, validations, webMappingMeasurement, webMappingConverter) {
 
 		var webMappingSession = {},
+			_isEmpty = validations.isEmpty,
 			_isDefined = validations.isDefined;
+		
+		var defaultConfigs = {
+			printUrl: 'http://farmbuild-mapprint.spatialvision.com.au/getmap'
+		};
+		
+		if(_isEmpty(sessionStorage.webMappingConfigs)){
+			sessionStorage.webMappingConfigs = JSON.stringify(defaultConfigs);
+		}
 
 
 		function load(farmData) {
@@ -26,18 +35,30 @@ angular.module('farmbuild.webmapping')
 			return farmData;
 		};
 		webMappingSession.load = load;
-
-		function save(farmData, geoJsons) {
+		
+		function areas(farmData, geoJsons) {
 			var _googleProjection = 'EPSG:3857',
 				_openlayersDefaultProjection = 'EPSG:4326',
 				featureForArea;
+			featureForArea = webMappingConverter.geoJsonToFeatures(geoJsons.farm, farmData.geometry.crs, _googleProjection);
+			featureForArea = webMappingConverter.featuresToGeoJson(featureForArea, _openlayersDefaultProjection, _googleProjection);
+			farmData.area =  webMappingMeasurement.areas(featureForArea);
+			angular.forEach(geoJsons.paddocks.features, function (p, idx) {
+				var _featureForArea;
+				_featureForArea = webMappingConverter.geoJsonToFeatures(p, p.geometry.crs.properties.name, _googleProjection);
+				_featureForArea = webMappingConverter.featuresToGeoJson(_featureForArea, _openlayersDefaultProjection, _googleProjection);
+				p.properties.area = webMappingMeasurement.areas(_featureForArea);
+			});
+			return farmData;
+		}
+
+		function save(farmData, geoJsons) {
+			
 			if (!_isDefined(farmData)) {
 				$log.error('Unable to save the undefined farmData!');
 				return undefined;
 			}
-			featureForArea = webMappingConverter.geoJsonToFeatures(geoJsons.farm, farmData.geometry.crs, _googleProjection);
-			featureForArea = webMappingConverter.featuresToGeoJson(featureForArea, _openlayersDefaultProjection, _googleProjection);
-			farmData.area = webMappingMeasurement.areas(featureForArea);
+			farmData = areas(farmData, geoJsons);
 			farmData.name = geoJsons.farm.features[0].properties.name;
 			$log.info('new geoJson', geoJsons);
 			return farmdata.merge(farmData, geoJsons);

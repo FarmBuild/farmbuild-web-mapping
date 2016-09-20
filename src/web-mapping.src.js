@@ -18,7 +18,7 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	function (farmdata,
 	          validations,
 	          $log,
-              $rootScope,
+            $rootScope,
 	          geoJsonValidator,
 	          farmdataConverter,
 	          webMappingSession,
@@ -29,10 +29,12 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 	          webMappingOpenLayersHelper,
 	          webMappingGoogleAddressSearch,
 	          webMappingGoogleAnalytics,
+	          webMappingPrint,
 	          webMappingParcels) {
 		$log.info('Welcome to Web Mapping...');
 
 		var _isDefined = validations.isDefined,
+			_isEmpty = validations.isEmpty,
 			session = webMappingSession,
 			webMapping = {
 				session: session,
@@ -205,7 +207,61 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				 * @returns {Object} the farmdata object
 				 * @memberof webmapping
 				 */
-				update: session.update
+				update: session.update,
+
+				/**
+				 * Make a request for map print .
+				 * @method print
+				 * @param {!Object} farmdata - farmdata which includes farm and paddocks information
+				 * @param {!ol.Extent} extent - extent of the map to be printed
+				 * @param {!baseMap} baseMap - base map identifier (ie: 'GOOGLE_SATELLITE', 'VICMAP_SATELLITE'). <br/> Use "webmapping.printer.baseLayers" for reference values!
+				 * @param {!String} title - report title
+				 * @param {!Boolean} showPaddocksLabel -  extent of the map to be printed
+				 * @param {!Boolean} includePaddocksTable - extent of the map to be printed
+				 * @param {Number} width - extent of the map to be printed
+				 * @param {Number} height - extent of the map to be printed
+				 * @param {Number} dpi - extent of the map to be printed
+				 * @returns {extent} extent of the map to be printed
+				 * @memberof webmapping
+				 */
+				print: webMappingPrint.print,
+				
+				/**
+				 * webmapping printer
+				 * @type {object}
+				 * @namespace webmapping.printer
+				 */
+				printer: webMappingPrint,
+				
+				/**
+				 * Make a request for map print .
+				 * @method print
+				 * @param {!Object} farmdata - farmdata which includes farm and paddocks information
+				 * @param {!ol.Extent} extent - extent of the map to be printed
+				 * @param {!baseMap} baseMap - base map identifier (ie: 'GOOGLE_SATELLITE', 'VICMAP_SATELLITE'). <br/> Use "webmapping.printer.baseLayers" for reference values!
+				 * @param {!String} title - report title
+				 * @param {!Boolean} showPaddocksLabel -  extent of the map to be printed
+				 * @param {!Boolean} includePaddocksTable - extent of the map to be printed
+				 * @param {Number} width - extent of the map to be printed
+				 * @param {Number} height - extent of the map to be printed
+				 * @param {Number} dpi - extent of the map to be printed
+				 * @returns {extent} extent of the map to be printed
+				 * @memberof webmapping.printer
+				 */
+				
+				/**
+				 * Reference values for print base layers (ie: 'GOOGLE_SATELLITE', 'GOOGLE_STREET', 'VICMAP_SATELLITE', 'VICMAP_STREET)
+				 * @method baseLayers
+				 * @returns {object} Supported base layers for print
+				 * @memberof webmapping.printer
+				 */
+				
+				debug: function (configs) {
+					if(_isEmpty(configs)){
+						return;
+					}
+					sessionStorage.webMappingConfigs = JSON.stringify(configs);
+				}
 			};
 
 		// Provide a shortcut for modules

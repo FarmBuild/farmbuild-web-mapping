@@ -50,6 +50,14 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		$scope.farmData = {};
 		$scope.farmChanged = false;
 		$scope.paddockChanged = false;
+		$scope.printFormVisible = false;
+		$scope.printing = false;
+		$scope.printErrors = [];
+		$scope.printResponse = '';
+		$scope.printConfig = {
+			includePaddocksTable: false,
+			showPaddocksLabel: false
+		};
 		$scope.noResult = $scope.farmLoaded = false;
 		$scope.selectedLayer = '';
 		$scope.selectedPaddock = {
@@ -223,7 +231,9 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				}();
 			}
 
-			$scope.selectedPaddock.area = measurement.area(selectedPaddock);
+			if(!$scope.selectedPaddock.area) {
+				$scope.selectedPaddock.area = measurement.area(selectedPaddock);
+			}
 			$log.info('Paddock selected: ' + $scope.selectedPaddock.name);
 			updateNgScope();
 		};
@@ -403,7 +413,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 		/**
 		 * webmapping.events provides list of events you can register for to understand certainn event in webmapping
 		*/
-		webmapping.on('web-mapping-draw-end', function (feature) {
+		webmapping.on('web-mapping-draw-end', function () {
 			$scope.farmChanged = true;
 			farmChanged();
 		});
@@ -544,6 +554,39 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			olMap.getView().on('change:resolution', loadParcels);
 			olMap.getView().on('change:center', loadParcels);
 			$scope.farmLoaded = true;
+		};
+		
+		
+		$scope.printBaseLayers = webmapping.printer.baseLayers;
+
+		$scope.showPrintForm = function () {
+			$scope.printFormVisible = true;
+			$scope.printing = false;
+			$scope.printErrors = [];
+			$scope.printResponse = '';
+		};
+
+		$scope.hidePrintForm = function () {
+			$scope.printErrors = [];
+			$scope.printFormVisible = false;
+		};
+
+		$scope.printMap = function (farmData, printConfig) {
+
+			var extent = olMap.getView().calculateExtent(olMap.getSize());
+			$scope.printErrors = [];
+			$scope.printing = true;
+			webmapping.print(farmData, extent, printConfig.baseMap, printConfig.title, printConfig.showPaddocksLabel, printConfig.includePaddocksTable, 512, 512, 92).then(
+				function (printResponse) {
+					$scope.printing = false;
+					$scope.printResponse = printResponse;
+
+				}, function (errors) {
+					$log.error('$scope.printMap failed', errors);
+					$scope.printing = false;
+					$scope.printErrors = errors;
+				});
+
 		};
 
 		$scope.loadFarmData();

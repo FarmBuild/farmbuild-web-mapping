@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>paddocks - Documentation</title>
+    <title>printer - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">paddocks</h1>
+    <h1 class="page-title">printer</h1>
     
 
     
@@ -43,7 +43,7 @@
         <h2>
             <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
         
-        paddocks
+        printer
         </h2>
         
     
@@ -53,7 +53,7 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>webmapping paddock</p></div>
+            <div class="description"><p>webmapping printer</p></div>
         
 
         
@@ -88,7 +88,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line10">line 10</a>
+        <a href="web-mapping.src.js.html">web-mapping.src.js</a>, <a href="web-mapping.src.js.html#line229">line 229</a>
     </li></ul></dd>
     
 
@@ -124,14 +124,118 @@
 
     
 
-    <h4 class="name" id=".findByCoordinate"><span class="type-signature">(static) </span>findByCoordinate<span class="signature">(coordinate<span class="signature-attributes">non-null</span>, vectorLayer<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {ol.Feature}</span></h4>
+    <h4 class="name" id=".baseLayers"><span class="type-signature">(static) </span>baseLayers<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>finds a paddock based on the coordinate</p>
+    <p>Reference values for print base layers (ie: 'GOOGLE_SATELLITE', 'GOOGLE_STREET', 'VICMAP_SATELLITE', 'VICMAP_STREET)</p>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="web-mapping.src.js.html">web-mapping.src.js</a>, <a href="web-mapping.src.js.html#line252">line 252</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    <p>Supported base layers for print</p>
+</div>
+
+
+
+<dl class="param-type">
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">object</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+        
+            
+
+    
+
+    <h4 class="name" id=".print"><span class="type-signature">(static) </span>print<span class="signature">(farmdata<span class="signature-attributes">non-null</span>, extent<span class="signature-attributes">non-null</span>, baseMap<span class="signature-attributes">non-null</span>, title<span class="signature-attributes">non-null</span>, showPaddocksLabel<span class="signature-attributes">non-null</span>, includePaddocksTable<span class="signature-attributes">non-null</span>, width, height, dpi)</span><span class="type-signature"> &rarr; {extent}</span></h4>
+
+    
+
+
+
+<div class="description">
+    <p>Make a request for map print .</p>
 </div>
 
 
@@ -167,13 +271,13 @@
 
         <tr>
             
-                <td class="name"><code>coordinate</code></td>
+                <td class="name"><code>farmdata</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">ol.Coordinate</span>
+<span class="param-type">Object</span>
 
 
             
@@ -183,20 +287,20 @@
 
             
 
-            <td class="description last"><p>openlayers map object</p></td>
+            <td class="description last"><p>farmdata which includes farm and paddocks information</p></td>
         </tr>
 
     
 
         <tr>
             
-                <td class="name"><code>vectorLayer</code></td>
+                <td class="name"><code>extent</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">ol.layer.Vector</span>
+<span class="param-type">ol.Extent</span>
 
 
             
@@ -206,7 +310,168 @@
 
             
 
-            <td class="description last"><p>paddock layer</p></td>
+            <td class="description last"><p>extent of the map to be printed</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>baseMap</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">baseMap</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>base map identifier (ie: 'GOOGLE_SATELLITE', 'VICMAP_SATELLITE'). <br/> Use &quot;webmapping.printer.baseLayers&quot; for reference values!</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>title</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">String</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>report title</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>showPaddocksLabel</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>extent of the map to be printed</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>includePaddocksTable</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Boolean</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>extent of the map to be printed</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>width</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>extent of the map to be printed</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>height</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>extent of the map to be printed</p></td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>dpi</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last"><p>extent of the map to be printed</p></td>
         </tr>
 
     
@@ -247,7 +512,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="paddocks_index.src.js.html">paddocks/index.src.js</a>, <a href="paddocks_index.src.js.html#line20">line 20</a>
+        <a href="web-mapping.src.js.html">web-mapping.src.js</a>, <a href="web-mapping.src.js.html#line236">line 236</a>
     </li></ul></dd>
     
 
@@ -274,7 +539,7 @@
 
         
 <div class="param-desc">
-    <p>the first paddock found in that coordinate</p>
+    <p>extent of the map to be printed</p>
 </div>
 
 
@@ -285,7 +550,7 @@
     </dt>
     <dd>
         
-<span class="param-type">ol.Feature</span>
+<span class="param-type">extent</span>
 
 
     </dd>

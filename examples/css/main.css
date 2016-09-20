@@ -95,6 +95,21 @@ div.fill {
     transition: border-color ease-in-out .15s, box-shadow ease-in-out .15s;
 }
 
+.addon.print {
+    top: 93px;
+    right: 5px;
+    border: solid 3px rgba(255,255,255,.5);
+    padding: 5px 12px;
+}
+
+.addon.print:hover, .addon.print:active, .addon.print:focus {
+    border-color: rgba(255,255,255,.8);
+}
+
+input[type=checkbox].form-control{
+    box-shadow: inset 0 0px 0px rgba(0,0,0,.075);
+}
+
 .address-search {
     top: 6px;
     left: 40px;
@@ -121,4 +136,8 @@ div.fill {
 
 .btn {
     margin-top: 10px;
+}
+
+.errors {
+    color: darkred;
 }

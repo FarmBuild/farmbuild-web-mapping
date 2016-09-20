@@ -19,6 +19,7 @@
 <div ng-controller="MapCtrl">
 
     <modal ng-show="measuredValue > 0" ng-include="'modal-measure-info.tpl.html'"></modal>
+    <modal ng-show="printFormVisible" ng-include="'modal-print.tpl.html'"></modal>
     <modal ng-if="noResult"
            ng-include="'modal-validation-error.tpl.html'"></modal>
     <div class="col-md-4 col-lg-3"
@@ -36,6 +37,10 @@
                     <option value="farm">Farm</option>
                     <option value="paddocks">Paddocks</option>
                 </select>
+                <button class="btn btn-primary addon print" ng-click="showPrintForm()" title="Print this map">
+                    <i class="glyphicon glyphicon-print"></i>
+                    Print
+                </button>
             </wrapper>
         </div>
 
@@ -106,14 +111,14 @@
                        ng-model="selectedPaddock.name"
                        ng-change="onPaddockDetailsChanged()"
                        required
-                        />
+                />
             </form-item>
             <form-item class="form-group">
                 <label for="selectedPaddockArea">Area (hectares):</label>
 
                 <p type="text" id="selectedPaddockArea" class="form-control"
                    ng-bind="selectedPaddock.area | number : 2"
-                        ></p>
+                ></p>
             </form-item>
             <form-item class="form-group">
                 <label for="selectedPaddockType">Type:</label>
@@ -230,6 +235,70 @@
             </div>
             <div class="modal-footer">
                 <button class="btn btn-primary" ng-click="$parent.measuredValue=0">Ok</button>
+            </div>
+        </div>
+    </div>
+</script>
+<script type="text/ng-template" id="modal-print.tpl.html">
+    <div class="modal-dialog absolute">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h3 class="modal-title" ng-if="!printResponse">Printing preferences</h3>
+                <h3 class="modal-title" ng-if="printResponse">
+                    <i class="glyphicon glyphicon-ok"></i>
+                    Farm Report is ready</h3>
+            </div>
+            <div class="modal-body">
+                <div class="errors" ng-if="printErrors.length > 0">
+                    Please fix following errors:
+                    <ul style="padding-left: 16px;">
+                        <li ng-repeat="error in printErrors" ng-bind="error"></li>
+                    </ul>
+                </div>
+                <form ng-if="!printResponse">
+                    <form-item class="form-group">
+                        <label for="title">Title:</label>
+                        <input type="text" id="title" name="title" class="form-control"
+                               placeholder="Please enter a title for this map print"
+                               ng-model="printConfig.title"/>
+                    </form-item>
+                    <form-item class="form-group">
+                        <label for="baseMap">Base map:</label>
+                        <select id="baseMap" name="baseMap" class="form-control"
+                                ng-model="printConfig.baseMap" ng-options="baseLayer.value as baseLayer.name for baseLayer in printBaseLayers">
+                        </select>
+                    </form-item>
+                    <div class="row">
+                        <form-item class="form-group col-md-6">
+                            <label for="showPaddocksLabel">Show paddocks labels:</label>
+                            <input type="checkbox" id="showPaddocksLabel" name="showPaddocksLabel"
+                                   ng-model="printConfig.showPaddocksLabel"/>
+                        </form-item>
+                        <form-item class="form-group col-md-6">
+                            <label for="includePaddocksTable">Include paddocks table:</label>
+                            <input type="checkbox" id="includePaddocksTable" name="includePaddocksTable"
+                                   ng-model="printConfig.includePaddocksTable"/>
+                        </form-item>
+                    </div>
+                </form>
+                <div ng-if="printResponse">
+                    <p>Your farm report is ready. Please click on the link below to download your report.</p>
+                    <a ng-href="{{printResponse.url}}" target="_blank">Download Farm Report</a>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button ng-if="!printResponse" class="btn btn-link" ng-click="hidePrintForm()">
+                    Cancel
+                </button>
+                <button ng-if="!printResponse" class="btn btn-primary" ng-click="printMap(farmData, printConfig)">
+                    <i class="glyphicon glyphicon-print"></i>
+                    <span ng-if="!printing">Print</span>
+                    <span ng-if="printing">Printing ...</span>
+                </button>
+                <button ng-if="printResponse" class="btn btn-primary" ng-click="hidePrintForm()">
+                    <span>Close</span>
+                </button>
+
             </div>
         </div>
     </div>
