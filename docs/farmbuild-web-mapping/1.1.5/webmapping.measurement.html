@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>features - Documentation</title>
+    <title>measurement - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,7 +28,7 @@
 
 <div id="main">
     
-    <h1 class="page-title">features</h1>
+    <h1 class="page-title">measurement</h1>
     
 
     
@@ -41,9 +41,9 @@
 <header>
     
         <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a><a href="webmapping.actions.html">.actions</a>.</span>
+            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
         
-        features
+        measurement
         </h2>
         
     
@@ -53,7 +53,7 @@
     <div class="container-overview">
     
         
-            <div class="description"><p>Features namespace of webmapping.actions</p></div>
+            <div class="description"><p>webmapping measurement</p></div>
         
 
         
@@ -88,7 +88,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line546">line 546</a>
+        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line3">line 3</a>
     </li></ul></dd>
     
 
@@ -124,14 +124,14 @@
 
     
 
-    <h4 class="name" id=".clip"><span class="type-signature">(static) </span>clip<span class="signature">(featureToClip<span class="signature-attributes">non-null</span>, farmLayers<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {ol.Feature}</span></h4>
+    <h4 class="name" id=".area"><span class="type-signature">(static) </span>area<span class="signature">(feature<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Clips the selected feature, selected paddock is clipped by other paddocks and farm boundary.</p>
+    <p>Calculates are of a feature</p>
 </div>
 
 
@@ -167,7 +167,7 @@
 
         <tr>
             
-                <td class="name"><code>featureToClip</code></td>
+                <td class="name"><code>feature</code></td>
             
 
             <td class="type">
@@ -183,30 +183,7 @@
 
             
 
-            <td class="description last"><p>feature you want to clip</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>farmLayers</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.layer.Group</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>the groupLayer of farm, use olHelper class to get this</p></td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -247,7 +224,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line158">line 158</a>
+        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line28">line 28</a>
     </li></ul></dd>
     
 
@@ -274,7 +251,7 @@
 
         
 <div class="param-desc">
-    <p>Clipped feature</p>
+    <p>area in hectare</p>
 </div>
 
 
@@ -285,7 +262,7 @@
     </dt>
     <dd>
         
-<span class="param-type">ol.Feature</span>
+<span class="param-type">number</span>
 
 
     </dd>
@@ -300,14 +277,14 @@
 
     
 
-    <h4 class="name" id=".remove"><span class="type-signature">(static) </span>remove<span class="signature">(features, deselect)</span><span class="type-signature"></span></h4>
+    <h4 class="name" id=".length"><span class="type-signature">(static) </span>length<span class="signature">(feature<span class="signature-attributes">non-null</span>)</span><span class="type-signature"> &rarr; {number}</span></h4>
 
     
 
 
 
 <div class="description">
-    <p>Clips the selected feature, paddcoks are clipped by other paddocks and farm.</p>
+    <p>Calculates length of a line</p>
 </div>
 
 
@@ -343,13 +320,13 @@
 
         <tr>
             
-                <td class="name"><code>features</code></td>
+                <td class="name"><code>feature</code></td>
             
 
             <td class="type">
             
                 
-<span class="param-type">ol.Collection.&lt;ol.Feature></span>
+<span class="param-type">ol.Feature</span>
 
 
             
@@ -359,30 +336,7 @@
 
             
 
-            <td class="description last"><p>feature you want to remove</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>deselect</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>whether to clear selections after they are removed</p></td>
+            <td class="description last"></td>
         </tr>
 
     
@@ -423,89 +377,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line131">line 131</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".selections"><span class="type-signature">(static) </span>selections<span class="signature">()</span><span class="type-signature"> &rarr; {ol.Collection.&lt;ol.Feature>}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Selected features by select interaction</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line263">line 263</a>
+        <a href="measurement_index.src.js.html">measurement/index.src.js</a>, <a href="measurement_index.src.js.html#line45">line 45</a>
     </li></ul></dd>
     
 
@@ -532,7 +404,7 @@
 
         
 <div class="param-desc">
-    <p>Collection of ol.Features, represents selected features</p>
+    <p>length in metre</p>
 </div>
 
 
@@ -543,7 +415,7 @@
     </dt>
     <dd>
         
-<span class="param-type">ol.Collection.&lt;ol.Feature></span>
+<span class="param-type">number</span>
 
 
     </dd>
@@ -571,7 +443,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Oct 03 2016 10:17:39 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Oct 03 2016 10:21:28 GMT+1100 (AEDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>

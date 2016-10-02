@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>actions - Documentation</title>
+    <title>measurement/index.src.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,479 +28,87 @@
 
 <div id="main">
     
-    <h1 class="page-title">actions</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
-        
-        actions
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>webmapping actions namespace</p></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line11">line 11</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-        <h3 class="subsection-title">Namespaces</h3>
-
-        <dl>
-            <dt><a href="webmapping.actions.donut.html">donut</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.drawing.html">drawing</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.editing.html">editing</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.features.html">features</a></dt>
-            <dd></dd>
-        
-            <dt><a href="webmapping.actions.snapping.html">snapping</a></dt>
-            <dd></dd>
-        </dl>
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".destroy"><span class="type-signature">(static) </span>destroy<span class="signature">(map<span class="signature-attributes">non-null</span>)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Remove all the webmapping interactions, this only remove the interactions which is added by webmapping to ol.Map</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>map</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Map</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>openlayers map object</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line36">line 36</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".init"><span class="type-signature">(static) </span>init<span class="signature">(map<span class="signature-attributes">non-null</span>, farmLayerGroup<span class="signature-attributes">non-null</span>, activeLayerName<span class="signature-attributes">non-null</span>, snappingDefaultStatus, initKeyboardInteraction)</span><span class="type-signature"></span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Initialise mapping actions</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>map</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Map</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>openlayers map object</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>farmLayerGroup</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.layer.Group</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>farm LayerGroup, use olHelper class to get this object</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>activeLayerName</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>can be &quot;paddocks&quot; or &quot;farm&quot;, the layer which you want to interact with</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>snappingDefaultStatus</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>whether to activate snapping, snapping is used between farm, paddocks and rural parcels</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>initKeyboardInteraction</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>whether to activate keyboard interaction</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="interactions_index.src.js.html">interactions/index.src.js</a>, <a href="interactions_index.src.js.html#line61">line 61</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">measurement/index.src.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * webmapping measurement
+ * @type {object}
+ * @namespace webmapping.measurement
+ */
+
+angular.module('farmbuild.webmapping')
+	.factory('webMappingMeasurement',
+	function (validations,
+	          webMappingConverter,
+	          $log) {
+		var _isDefined = validations.isDefined,
+            _googleProjection = 'EPSG:3857',
+            _openlayersDefaultProjection = 'EPSG:4326',
+			_converter = webMappingConverter;
+
+		function _areas(features) {
+			$log.info('calculating area of features ...', features);
+			try {
+				return turf.area(features) * 0.0001;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		/**
+		 * Calculates are of a feature
+		 * @method area
+		 * @returns {number} area in hectare
+		 * @param {!ol.Feature} feature
+		 * @memberof webmapping.measurement
+		 */
+		function _area(feature) {
+			$log.info('calculating area of polygon ...', feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
+			try {
+				return turf.area(feature) * 0.0001;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		/**
+		 * Calculates length of a line
+		 * @method length
+		 * @returns {number} length in metre
+		 * @param {!ol.Feature} feature
+		 * @memberof webmapping.measurement
+		 */
+		function _length(feature) {
+			$log.info('calculating length of line ...', feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
+			try {
+				return turf.lineDistance(feature, 'kilometers') * 1000;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		return {
+			area: _area,
+			areas: _areas,
+			length: _length
+		}
+
+	});
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -510,7 +118,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Oct 03 2016 10:17:39 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Oct 03 2016 10:21:28 GMT+1100 (AEDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
