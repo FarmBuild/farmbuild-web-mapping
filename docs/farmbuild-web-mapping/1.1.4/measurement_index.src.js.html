@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
     <meta charset="utf-8">
-    <title>printer - Documentation</title>
+    <title>measurement/index.src.js - Documentation</title>
 
     <script src="scripts/prettify/prettify.js"></script>
     <script src="scripts/prettify/lang-css.js"></script>
@@ -28,547 +28,87 @@
 
 <div id="main">
     
-    <h1 class="page-title">printer</h1>
-    
-
-    
-
-
-
-
-<section>
-
-<header>
-    
-        <h2>
-            <span class="ancestors"><a href="webmapping.html">webmapping</a>.</span>
-        
-        printer
-        </h2>
-        
-    
-</header>
-
-<article>
-    <div class="container-overview">
-    
-        
-            <div class="description"><p>webmapping printer</p></div>
-        
-
-        
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="web-mapping.src.js.html">web-mapping.src.js</a>, <a href="web-mapping.src.js.html#line229">line 229</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-        
-    
-    </div>
-
-    
-
-    
-
-    
-
-     
-
-    
-
-    
-
-    
-        <h3 class="subsection-title">Methods</h3>
-
-        
-            
-
-    
-
-    <h4 class="name" id=".baseLayers"><span class="type-signature">(static) </span>baseLayers<span class="signature">()</span><span class="type-signature"> &rarr; {object}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Reference values for print base layers (ie: 'GOOGLE_SATELLITE', 'GOOGLE_STREET', 'VICMAP_SATELLITE', 'VICMAP_STREET)</p>
-</div>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="web-mapping.src.js.html">web-mapping.src.js</a>, <a href="web-mapping.src.js.html#line252">line 252</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>Supported base layers for print</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">object</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-            
-
-    
-
-    <h4 class="name" id=".print"><span class="type-signature">(static) </span>print<span class="signature">(farmdata<span class="signature-attributes">non-null</span>, extent<span class="signature-attributes">non-null</span>, baseMap<span class="signature-attributes">non-null</span>, title<span class="signature-attributes">non-null</span>, showPaddocksLabel<span class="signature-attributes">non-null</span>, includePaddocksTable<span class="signature-attributes">non-null</span>, width, height, dpi)</span><span class="type-signature"> &rarr; {extent}</span></h4>
-
-    
-
-
-
-<div class="description">
-    <p>Make a request for map print .</p>
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>farmdata</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Object</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>farmdata which includes farm and paddocks information</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>extent</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">ol.Extent</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of the map to be printed</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>baseMap</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">baseMap</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>base map identifier (ie: 'GOOGLE_SATELLITE', 'VICMAP_SATELLITE'). <br/> Use &quot;webmapping.printer.baseLayers&quot; for reference values!</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>title</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">String</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>report title</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>showPaddocksLabel</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of the map to be printed</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>includePaddocksTable</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Boolean</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of the map to be printed</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>width</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of the map to be printed</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>height</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of the map to be printed</p></td>
-        </tr>
-
-    
-
-        <tr>
-            
-                <td class="name"><code>dpi</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Number</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last"><p>extent of the map to be printed</p></td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="web-mapping.src.js.html">web-mapping.src.js</a>, <a href="web-mapping.src.js.html#line236">line 236</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Returns:</h5>
-
-        
-<div class="param-desc">
-    <p>extent of the map to be printed</p>
-</div>
-
-
-
-<dl class="param-type">
-    <dt>
-        Type
-    </dt>
-    <dd>
-        
-<span class="param-type">extent</span>
-
-
-    </dd>
-</dl>
-
-    
-
-
-
-        
-    
-
-    
-
-    
-</article>
-
-</section>
+    <h1 class="page-title">measurement/index.src.js</h1>
+    
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>'use strict';
+
+/**
+ * webmapping measurement
+ * @type {object}
+ * @namespace webmapping.measurement
+ */
+
+angular.module('farmbuild.webmapping')
+	.factory('webMappingMeasurement',
+	function (validations,
+	          webMappingConverter,
+	          $log) {
+		var _isDefined = validations.isDefined,
+            _googleProjection = 'EPSG:3857',
+            _openlayersDefaultProjection = 'EPSG:4326',
+			_converter = webMappingConverter;
+
+		function _areas(features) {
+			$log.info('calculating area of features ...', features);
+			try {
+				return turf.area(features) * 0.0001;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		/**
+		 * Calculates are of a feature
+		 * @method area
+		 * @returns {number} area in hectare
+		 * @param {!ol.Feature} feature
+		 * @memberof webmapping.measurement
+		 */
+		function _area(feature) {
+			$log.info('calculating area of polygon ...', feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
+			try {
+				return turf.area(feature) * 0.0001;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		/**
+		 * Calculates length of a line
+		 * @method length
+		 * @returns {number} length in metre
+		 * @param {!ol.Feature} feature
+		 * @memberof webmapping.measurement
+		 */
+		function _length(feature) {
+			$log.info('calculating length of line ...', feature);
+			feature = _converter.featureToGeoJson(feature, _openlayersDefaultProjection, _googleProjection);
+			try {
+				return turf.lineDistance(feature, 'kilometers') * 1000;
+			} catch (e) {
+				$log.error(e);
+			}
+		};
+
+		return {
+			area: _area,
+			areas: _areas,
+			length: _length
+		}
+
+	});
+</code></pre>
+        </article>
+    </section>
 
 
 
@@ -578,7 +118,7 @@
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Oct 03 2016 10:11:34 GMT+1100 (AEDT) using the Minami theme.
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.3.2</a> on Mon Oct 03 2016 10:17:39 GMT+1100 (AEDT) using the Minami theme.
 </footer>
 
 <script>prettyPrint();</script>
