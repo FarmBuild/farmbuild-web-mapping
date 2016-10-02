@@ -1111,13 +1111,13 @@ angular.module("farmbuild.webmapping").factory("webMappingParcels", function($lo
 
 angular.module("farmbuild.webmapping").factory("webMappingPrint", function($log, $http, $q, farmdata, validations, farmdataConverter) {
     var _isDefined = validations.isDefined, _isEmpty = validations.isEmpty, _baseLayers = [ {
-        name: "Google Satellite",
+        name: "Google Imagery",
         value: "GOOGLE_SATELLITE"
     }, {
         name: "Google Street",
         value: "GOOGLE_STREET"
     }, {
-        name: "VicMap Satellite",
+        name: "VicMap Imagery",
         value: "VICMAP_SATELLITE"
     }, {
         name: "VicMap Street",
@@ -1216,7 +1216,7 @@ angular.module("farmbuild.webmapping").factory("webMappingProjections", function
 angular.module("farmbuild.webmapping").factory("webMappingSession", function($log, farmdata, validations, webMappingMeasurement, webMappingConverter) {
     var webMappingSession = {}, _isEmpty = validations.isEmpty, _isDefined = validations.isDefined;
     var defaultConfigs = {
-        printUrl: "http://farmbuild-mapprint.spatialvision.com.au/getmap"
+        printUrl: "https://farmbuild-mapprint-stg.agriculture.vic.gov.au/getmap"
     };
     if (_isEmpty(sessionStorage.webMappingConfigs)) {
         sessionStorage.webMappingConfigs = JSON.stringify(defaultConfigs);
@@ -1239,6 +1239,7 @@ angular.module("farmbuild.webmapping").factory("webMappingSession", function($lo
             _featureForArea = webMappingConverter.geoJsonToFeatures(p, p.geometry.crs.properties.name, _googleProjection);
             _featureForArea = webMappingConverter.featuresToGeoJson(_featureForArea, _openlayersDefaultProjection, _googleProjection);
             p.properties.area = webMappingMeasurement.areas(_featureForArea);
+            p.properties.areaUnit = "hectare";
         });
         return farmData;
     }

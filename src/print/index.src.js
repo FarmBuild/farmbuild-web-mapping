@@ -14,13 +14,13 @@ angular.module('farmbuild.webmapping')
 			
 			var _isDefined = validations.isDefined, _isEmpty = validations.isEmpty,
 				_baseLayers = [{
-					name: 'Google Satellite',
+					name: 'Google Imagery',
 					value: 'GOOGLE_SATELLITE'
 				},{
 					name: 'Google Street',
 					value: 'GOOGLE_STREET'
 				},{
-					name: 'VicMap Satellite',
+					name: 'VicMap Imagery',
 					value: 'VICMAP_SATELLITE'
 				},{
 					name: 'VicMap Street',

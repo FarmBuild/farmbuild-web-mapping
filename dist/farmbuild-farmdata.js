@@ -1065,7 +1065,7 @@
                                     break;
                                 }
                             },
-                            rules: [ /^(?:\s+)/, /^(?:(-?([0-9]|[1-9][0-9]+))(\.[0-9]+)?([eE][-+]?[0-9]+)?\b)/, /^(?:"(?:\\[\\"bfnrt/]|\\u[a-fA-F0-9]{4}|[^\\\0-\x09\x0a-\x1f"])*")/, /^(?:\{)/, /^(?:\})/, /^(?:\[)/, /^(?:\])/, /^(?:,)/, /^(?::)/, /^(?:true\b)/, /^(?:false\b)/, /^(?:null\b)/, /^(?:$)/, /^(?:.)/ ],
+                            rules: [ /^(?:\s+)/, /^(?:(-?([0-9]|[1-9][0-9]+))(\.[0-9]+)?([eE][-+]?[0-9]+)?\b)/, /^(?:"(?:\\[\\"bfnrt\/]|\\u[a-fA-F0-9]{4}|[^\\\0-\x09\x0a-\x1f"])*")/, /^(?:\{)/, /^(?:\})/, /^(?:\[)/, /^(?:\])/, /^(?:,)/, /^(?::)/, /^(?:true\b)/, /^(?:false\b)/, /^(?:null\b)/, /^(?:$)/, /^(?:.)/ ],
                             conditions: {
                                 INITIAL: {
                                     rules: [ 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13 ],
@@ -1679,15 +1679,16 @@ angular.module("farmbuild.farmdata").factory("farmdataConverter", function(valid
         return geometry;
     }
     farmdataConverter.convertToFarmDataGeometry = convertToFarmDataGeometry;
-    function createFeature(geoJsonGeometry, name, id, type, comment, area, group) {
+    function createFeature(geoJsonGeometry, name, id, type, comment, area, areaUnit, group) {
         var properties;
-        if (_isDefined(type) || _isDefined(comment) || _isDefined(area) || _isDefined(group)) {
+        if (_isDefined(type) || _isDefined(comment) || _isDefined(area) || _isDefined(areaUnit) || _isDefined(group)) {
             properties = {
                 name: name,
                 _id: id,
                 type: type,
                 comment: comment,
                 area: area,
+                areaUnit: areaUnit,
                 group: group
             };
         } else {
@@ -1708,7 +1709,7 @@ angular.module("farmbuild.farmdata").factory("farmdataConverter", function(valid
         var copied = angular.copy(farmData);
         var farmGeometry = copied.geometry, paddocks = [];
         copied.paddocks.forEach(function(paddock) {
-            paddocks.push(createFeature(convertToGeoJsonGeometry(paddock.geometry, farmGeometry.crs), paddock.name, paddock._id, paddock.type, paddock.comment, paddock.area, paddock.group));
+            paddocks.push(createFeature(convertToGeoJsonGeometry(paddock.geometry, farmGeometry.crs), paddock.name, paddock._id, paddock.type, paddock.comment, paddock.area, paddock.areaUnit, paddock.group));
         });
         return {
             farm: {
@@ -1731,7 +1732,7 @@ angular.module("farmbuild.farmdata").factory("farmdataConverter", function(valid
         var farmGeometry = copied.geometry, features = [];
         features.push(createFeature(convertToGeoJsonGeometry(farmGeometry, farmGeometry.crs), copied.name, copied.id));
         copied.paddocks.forEach(function(paddock) {
-            features.push(createFeature(convertToGeoJsonGeometry(paddock.geometry, farmGeometry.crs), paddock.name, paddock._id, paddock.type, paddock.comment, paddock.area, paddock.group));
+            features.push(createFeature(convertToGeoJsonGeometry(paddock.geometry, farmGeometry.crs), paddock.name, paddock._id, paddock.type, paddock.comment, paddock.area, paddock.areaUnit, paddock.group));
         });
         return {
             type: "FeatureCollection",
@@ -1759,7 +1760,7 @@ angular.module("farmbuild.farmdata").factory("farmdataConverter", function(valid
         var farmGeometry = copied.geometry, features = [];
         features.push(createFeature(convertToGeoJsonGeometry(farmGeometry, farmGeometry.crs), copied.name, copied.id));
         copied.paddocks.forEach(function(paddock) {
-            features.push(createFeature(convertToGeoJsonGeometry(paddock.geometry, farmGeometry.crs), paddock.name, paddock._id, paddock.type, paddock.comment, paddock.area, paddock.group));
+            features.push(createFeature(convertToGeoJsonGeometry(paddock.geometry, farmGeometry.crs), paddock.name, paddock._id, paddock.type, paddock.comment, paddock.area, paddock.areaUnit, paddock.group));
         });
         return tokml(JSON.parse(JSON.stringify({
             type: "FeatureCollection",
@@ -1993,8 +1994,11 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddockGroups", function($
 
 angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, collections, validations, farmdataPaddockValidator, farmdataPaddockGroups, farmdataConverter) {
     var farmdataPaddocks = {}, _isDefined = validations.isDefined;
+    function randomInt(min, max) {
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
     function createName() {
-        return "Paddock " + new Date().getTime();
+        return "Paddock " + new Date().getTime() + randomInt(1, 1e3);
     }
     function generateId() {
         return new Date().getTime();
@@ -2017,6 +2021,7 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, 
             comment: paddockFeature.properties.comment,
             type: paddockFeature.properties.type,
             area: paddockFeature.properties.area,
+            areaUnit: paddockFeature.properties.areaUnit,
             group: paddockFeature.properties.group,
             geometry: farmdataConverter.convertToFarmDataGeometry(paddockFeature.geometry),
             dateLastUpdated: new Date()
@@ -2046,6 +2051,7 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, 
         toUpdate.comment = paddockFeature.properties.comment;
         toUpdate.type = paddockFeature.properties.type;
         toUpdate.area = paddockFeature.properties.area;
+        toUpdate.areaUnit = paddockFeature.properties.areaUnit;
         toUpdate.group = paddockFeature.properties.group;
         toUpdate.geometry = farmdataConverter.convertToFarmDataGeometry(paddockFeature.geometry);
         toUpdate.dateLastUpdated = new Date();
@@ -2071,12 +2077,14 @@ angular.module("farmbuild.farmdata").factory("farmdataPaddocks", function($log, 
             }
             paddocksMerged.push(merged);
             if (paddockFeature.properties.group) {
-                var paddockGroup = farmdataPaddockGroups.byName(paddockFeature.properties.group.name);
+                var paddockGroup = farmdataPaddockGroups.byName(paddockFeature.properties.group.name), paddockName = paddockFeature.properties.name;
                 if (!_isDefined(paddockGroup)) {
                     paddockGroup = farmdataPaddockGroups.create(paddockFeature.properties.group.name);
                     paddockGroups.push(paddockGroup);
                 }
-                paddockGroup.paddocks.push(paddockFeature.properties.name);
+                if (paddockGroup.paddocks.indexOf(paddockName) < 0) {
+                    paddockGroup.paddocks.push(paddockFeature.properties.name);
+                }
             }
         });
         farmData.paddocks = paddocksMerged;

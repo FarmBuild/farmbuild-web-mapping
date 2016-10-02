@@ -17,7 +17,7 @@ angular.module('farmbuild.webmapping')
 			_isDefined = validations.isDefined;
 		
 		var defaultConfigs = {
-			printUrl: 'http://farmbuild-mapprint.spatialvision.com.au/getmap'
+			printUrl: 'https://farmbuild-mapprint-stg.agriculture.vic.gov.au/getmap'
 		};
 		
 		if(_isEmpty(sessionStorage.webMappingConfigs)){
@@ -48,6 +48,7 @@ angular.module('farmbuild.webmapping')
 				_featureForArea = webMappingConverter.geoJsonToFeatures(p, p.geometry.crs.properties.name, _googleProjection);
 				_featureForArea = webMappingConverter.featuresToGeoJson(_featureForArea, _openlayersDefaultProjection, _googleProjection);
 				p.properties.area = webMappingMeasurement.areas(_featureForArea);
+				p.properties.areaUnit = "hectare";
 			});
 			return farmData;
 		}
