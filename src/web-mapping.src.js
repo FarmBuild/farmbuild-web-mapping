@@ -240,12 +240,9 @@ angular.module('farmbuild.webmapping', ['farmbuild.core', 'farmbuild.farmdata'])
 				 * @param {!ol.Extent} extent - extent of the map to be printed
 				 * @param {!baseMap} baseMap - base map identifier (ie: 'GOOGLE_SATELLITE', 'VICMAP_SATELLITE'). <br/> Use "webmapping.printer.baseLayers" for reference values!
 				 * @param {!String} title - report title
-				 * @param {!Boolean} showPaddocksLabel -  extent of the map to be printed
-				 * @param {!Boolean} includePaddocksTable - extent of the map to be printed
-				 * @param {Number} width - extent of the map to be printed
-				 * @param {Number} height - extent of the map to be printed
-				 * @param {Number} dpi - extent of the map to be printed
-				 * @returns {extent} extent of the map to be printed
+				 * @param {!Boolean} showPaddocksLabel -  indicates whether to show paddock labels on the map
+				 * @param {!Boolean} includePaddocksTable - indicates whether to print paddocks information in a tabular format
+				 * @returns {extent} a url that you can download you printed map from
 				 * @memberof webmapping.printer
 				 */
 				

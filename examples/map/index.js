@@ -576,7 +576,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			var extent = olMap.getView().calculateExtent(olMap.getSize());
 			$scope.printErrors = [];
 			$scope.printing = true;
-			webmapping.print(farmData, extent, printConfig.baseMap, printConfig.title, printConfig.showPaddocksLabel, printConfig.includePaddocksTable, 512, 512, 92).then(
+			webmapping.print(farmData, extent, printConfig.baseMap, printConfig.title, printConfig.showPaddocksLabel, printConfig.includePaddocksTable).then(
 				function (printResponse) {
 					$scope.printing = false;
 					$scope.printResponse = printResponse;

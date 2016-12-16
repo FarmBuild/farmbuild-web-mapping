@@ -68,25 +68,13 @@ angular.module('farmbuild.webmapping')
 				return result;
 			}
 			
-			function _print(farmData, extent, baseMap, title, showPaddocksLabel, includePaddocksTable, width, height, dpi) {
-				$log.info('Map print requested ...', farmData, extent, baseMap, title, showPaddocksLabel, includePaddocksTable, width, height, dpi);
+			function _print(farmData, extent, baseMap, title, showPaddocksLabel, includePaddocksTable) {
+				$log.info('Map print requested ...', farmData, extent, baseMap, title, showPaddocksLabel, includePaddocksTable);
 				var deferred = $q.defer(),
 					validationResult = _validate(extent, baseMap, title, showPaddocksLabel, includePaddocksTable), webMappingConfigs = angular.fromJson(sessionStorage.webMappingConfigs), printUrl = webMappingConfigs.printUrl;
 				
 				if (!validationResult.valid) {
 					deferred.reject(validationResult.errors);
-				}
-				
-				if (_isEmpty(width)) {
-					width = 512;
-				}
-				
-				if (_isEmpty(height)) {
-					height = 512;
-				}
-				
-				if (_isEmpty(dpi)) {
-					dpi = 96;
 				}
 				
 				if (!farmdata.validate(farmData)) {
@@ -101,10 +89,7 @@ angular.module('farmbuild.webmapping')
 					baseMap: baseMap,
 					title: title,
 					showPaddocksLabel: showPaddocksLabel,
-					includePaddocksTable: includePaddocksTable,
-					width: width,
-					height: height,
-					dpi: dpi
+					includePaddocksTable: includePaddocksTable
 				}, {
 					cache: false
 				}).then(function (response) {
