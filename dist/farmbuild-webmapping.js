@@ -917,9 +917,9 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             type: "base",
             visible: true,
             source: new ol.source.TileWMS({
-                url: "http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms",
+                url: "https://base.maps.vic.gov.au/service?",
                 params: {
-                    LAYERS: "SATELLITE_WM",
+                    LAYERS: "AERIAL_WM",
                     VERSION: "1.1.1"
                 }
             })
@@ -928,9 +928,9 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             type: "base",
             visible: false,
             source: new ol.source.TileWMS({
-                url: "http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms",
+                url: "https://base.maps.vic.gov.au/service?",
                 params: {
-                    LAYERS: "WEB_MERCATOR",
+                    LAYERS: "CARTO_WM",
                     VERSION: "1.1.1"
                 }
             })
@@ -946,9 +946,9 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             type: "base",
             visible: false,
             source: new ol.source.TileWMS({
-                url: "http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms",
+                url: "https://base.maps.vic.gov.au/service?",
                 params: {
-                    LAYERS: "SATELLITE_WM",
+                    LAYERS: "AERIAL_WM",
                     VERSION: "1.1.1"
                 }
             })
@@ -957,9 +957,9 @@ angular.module("farmbuild.webmapping").factory("webMappingOpenLayersHelper", fun
             type: "base",
             visible: false,
             source: new ol.source.TileWMS({
-                url: "http://api.maps.vic.gov.au/vicmapapi-mercator/map-wm/wms",
+                url: "https://base.maps.vic.gov.au/service?",
                 params: {
-                    LAYERS: "WEB_MERCATOR",
+                    LAYERS: "CARTO_WM",
                     VERSION: "1.1.1"
                 }
             })
