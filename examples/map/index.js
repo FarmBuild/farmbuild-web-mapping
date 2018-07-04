@@ -440,7 +440,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 				return;
 			}
 			if (data.layer.getProperties().title.indexOf('VicMAP') > -1) {
-				googleMapElement.firstChild.firstChild.style.display = 'none';
+				//googleMapElement.firstChild.firstChild.style.display = 'none';
 				return;
 			}
 		});
