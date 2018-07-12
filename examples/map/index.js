@@ -33,7 +33,7 @@ angular.module('farmbuild.webmapping.examples', ['farmbuild.webmapping'])
 			/**
 			 * In order to create google map we need to pass the container element in DOM
 			 */
-			googleMapElement = document.getElementById('olmap'),
+			googleMapElement = document.getElementById('gmap'),
 			googleMap,
 			olMap,
 
