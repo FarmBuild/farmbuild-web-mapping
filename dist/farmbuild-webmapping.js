@@ -1204,7 +1204,7 @@ angular.module("farmbuild.webmapping").factory("webMappingProjections", function
 angular.module("farmbuild.webmapping").factory("webMappingSession", function($log, farmdata, validations, webMappingMeasurement, webMappingConverter) {
     var webMappingSession = {}, _isEmpty = validations.isEmpty, _isDefined = validations.isDefined;
     var defaultConfigs = {
-        printUrl: "https://farmbuild-mapprint.agriculture.vic.gov.au/getmap"
+        printUrl: "https://farmbuild-mapprint-stg.agriculture.vic.gov.au/getmap"
     };
     if (_isEmpty(sessionStorage.webMappingConfigs)) {
         sessionStorage.webMappingConfigs = JSON.stringify(defaultConfigs);
